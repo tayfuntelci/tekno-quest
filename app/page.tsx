@@ -63,10 +63,7 @@ export default function Portal() {
         <p className="text-lg" style={{ color: 'var(--muted)' }}>
           İnternetten Yapay Zekaya — Geleceğin Şifresi
         </p>
-        <div className="mt-3 inline-block font-game text-xs px-4 py-1 rounded border"
-          style={{ borderColor: 'rgba(57,255,20,0.3)', color: 'var(--success)', background: 'rgba(57,255,20,0.05)' }}>
-          ▸ 9–10 YAŞ SINIFI
-        </div>
+
       </div>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
