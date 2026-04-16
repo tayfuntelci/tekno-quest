@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teknoloji Yolculuğu — Uzay Versiyonu</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cyan: #00f5ff;
+  --purple: #bf5fff;
+  --blue: #1a6fff;
+  --green: #00ff88;
+  --orange: #ff8c00;
+  --pink: #ff3cac;
+  --dark: #020818;
+  --darker: #010510;
+  --text: #e0f4ff;
+  --dim: rgba(0,245,255,0.15);
+  --grid: rgba(0,245,255,0.04);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Exo 2', sans-serif;
+  background: var(--dark);
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  cursor: default;
+  user-select: none;
+  color: var(--text);
+}
+
+/* GRID BG */
+.grid-bg {
+  position: fixed;
+  top:0;left:0;width:100%;height:100%;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* SCAN LINE */
+.scanline {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  animation: scan 4s linear infinite;
+  z-index: 1;
+  opacity: 0.4;
+}
+@keyframes scan { 0%{top:-3px} 100%{top:100vh} }
+
+.presentation { width:100vw; height:100vh; position:relative; z-index:2; }
+
+.slide {
+  position: absolute;
+  top:0;left:0;width:100%;height:100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+  padding: 40px 60px;
+}
+.slide.active { opacity:1; pointer-events:all; }
+
+/* NAV */
+.nav {
+  position: fixed;
+  bottom: 24px; left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 100;
+  background: rgba(0,20,40,0.8);
+  padding: 8px 20px;
+  border-radius: 50px;
+  border: 1px solid rgba(0,245,255,0.2);
+  backdrop-filter: blur(12px);
+}
+.nav-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(0,245,255,0.25);
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 1px solid rgba(0,245,255,0.3);
+}
+.nav-dot.active { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); transform: scale(1.4); }
+.slide-counter {
+  color: var(--cyan);
+  font-family: 'Exo 2';
+  font-size: 12px;
+  opacity: 0.8;
+  padding: 0 6px;
+}
+
+.arrow-btn {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,245,255,0.07);
+  border: 1px solid rgba(0,245,255,0.3);
+  color: var(--cyan);
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.2s;
+}
+.arrow-btn:hover {
+  background: rgba(0,245,255,0.2);
+  box-shadow: 0 0 20px rgba(0,245,255,0.3);
+  transform: translateY(-50%) scale(1.1);
+}
+.arrow-left { left: 16px; }
+.arrow-right { right: 16px; }
+
+/* COMMON */
+.slide-title {
+  font-family: 'Exo 2';
+  font-weight: 900;
+  font-size: clamp(26px, 4vw, 52px);
+  color: var(--cyan);
+  text-align: center;
+  margin-bottom: 6px;
+  text-shadow: 0 0 30px rgba(0,245,255,0.6);
+  letter-spacing: 2px;
+}
+.slide-sub {
+  font-size: clamp(13px, 1.8vw, 18px);
+  color: rgba(224,244,255,0.6);
+  text-align: center;
+  margin-bottom: 28px;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.holo-card {
+  background: rgba(0,30,60,0.6);
+  border: 1px solid rgba(0,245,255,0.25);
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.holo-card::before {
+  content:'';
+  position:absolute;
+  top:0;left:0;width:100%;height:2px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+}
+.holo-card:hover {
+  border-color: var(--cyan);
+  box-shadow: 0 0 25px rgba(0,245,255,0.15), inset 0 0 25px rgba(0,245,255,0.03);
+  transform: translateY(-4px);
+}
+
+/* ===== SLIDE 1 ===== */
+#s1 { justify-content: center; }
+
+.orbit-container {
+  position: relative;
+  width: 200px; height: 200px;
+  margin-bottom: 20px;
+}
+.planet {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  font-size: 80px;
+  animation: planetPulse 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(0,245,255,0.8));
+}
+@keyframes planetPulse { 0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-50%) scale(1.08)} }
+
+.orbit-ring {
+  position: absolute;
+  top:50%;left:50%;
+  border-radius:50%;
+  border: 1px solid rgba(0,245,255,0.3);
+  transform: translate(-50%,-50%) rotateX(70deg);
+}
+.orbit-ring-1 { width:160px;height:160px; animation: ringRotate 6s linear infinite; }
+.orbit-ring-2 { width:220px;height:220px; animation: ringRotate 10s linear infinite reverse; border-color: rgba(191,95,255,0.3); }
+@keyframes ringRotate { to{transform:translate(-50%,-50%) rotateX(70deg) rotateZ(360deg)} }
+
+.orbit-moon {
+  position: absolute;
+  font-size: 20px;
+  top: 50%; left: 50%;
+  transform-origin: 0 0;
+  animation: moonOrbit 6s linear infinite;
+}
+@keyframes moonOrbit { to{transform:rotate(360deg) translateX(80px) rotate(-360deg)} }
+
+.s1-title {
+  font-family: 'Exo 2';
+  font-weight: 900;
+  font-size: clamp(40px, 7vw, 80px);
+  color: var(--cyan);
+  text-align: center;
+  text-shadow: 0 0 40px rgba(0,245,255,0.7), 0 0 80px rgba(0,245,255,0.3);
+  letter-spacing: 4px;
+  line-height: 1.1;
+}
+.s1-tagline {
+  font-size: clamp(14px, 2vw, 20px);
+  color: rgba(224,244,255,0.6);
+  text-align: center;
+  margin-top: 12px;
+  letter-spacing: 3px;
+  font-weight: 300;
+}
+.s1-badge {
+  margin-top: 24px;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  padding: 8px 24px;
+  border-radius: 4px;
+  font-family: 'Exo 2';
+  font-size: clamp(11px, 1.4vw, 14px);
+  letter-spacing: 2px;
+  background: rgba(0,245,255,0.05);
+  animation: glowPulse 2s ease-in-out infinite;
+}
+@keyframes glowPulse { 0%,100%{box-shadow:0 0 10px rgba(0,245,255,0.3)} 50%{box-shadow:0 0 25px rgba(0,245,255,0.7)} }
+
+/* ===== SLIDE 2 ===== */
+#s2 {}
+.info-hex-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 900px;
+}
+.hex-card {
+  padding: 22px 18px;
+  text-align: center;
+}
+.hex-card .h-icon {
+  font-size: 44px;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 10px var(--cyan));
+}
+.hex-card .h-title {
+  font-family: 'Exo 2';
+  font-size: clamp(12px,1.6vw,16px);
+  color: var(--cyan);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+.hex-card .h-desc {
+  font-size: clamp(11px,1.3vw,14px);
+  color: rgba(224,244,255,0.75);
+  line-height: 1.5;
+  font-weight: 300;
+}
+
+/* ===== SLIDE 3 ===== */
+.timeline-v2 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 800px;
+  position: relative;
+}
+.timeline-v2::before {
+  content:'';
+  position:absolute;
+  left:70px; top:0; bottom:0; width:2px;
+  background: linear-gradient(to bottom, transparent, var(--cyan), var(--purple), transparent);
+}
+.tl-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  position: relative;
+  transition: transform 0.3s;
+}
+.tl-item:hover { transform: translateX(8px); }
+.tl-item::before {
+  content:'';
+  position:absolute;
+  left:68px; width:6px; height:6px;
+  background: var(--cyan);
+  border-radius:50%;
+  box-shadow: 0 0 12px var(--cyan);
+}
+.tl-year {
+  font-family: 'Exo 2';
+  font-weight: 800;
+  font-size: clamp(18px,2.5vw,28px);
+  color: var(--cyan);
+  min-width: 55px;
+  text-shadow: 0 0 15px rgba(0,245,255,0.5);
+}
+.tl-dot-spacer { width: 20px; }
+.tl-icon { font-size: 28px; flex-shrink:0; }
+.tl-info { flex:1; }
+.tl-info strong {
+  display: block;
+  font-size: clamp(13px,1.7vw,17px);
+  color: var(--text);
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.tl-info span {
+  font-size: clamp(11px,1.3vw,14px);
+  color: rgba(224,244,255,0.6);
+  font-weight: 300;
+}
+
+/* ===== SLIDE 4 ===== */
+.gen-bars {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+  max-width: 900px;
+  align-items: flex-end;
+  height: 260px;
+}
+.gen-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+.gen-label {
+  font-family: 'Exo 2';
+  font-size: clamp(18px,3vw,32px);
+  margin-bottom: 6px;
+}
+.gen-speed {
+  font-size: clamp(10px,1.3vw,13px);
+  color: var(--cyan);
+  margin-bottom: 8px;
+  font-family: 'Exo 2';
+}
+.gen-bar {
+  width: 100%;
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 8px;
+  transition: height 1s ease;
+}
+.gen-bar-label {
+  font-size: clamp(10px,1.2vw,13px);
+  color: rgba(255,255,255,0.7);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  margin-top: 8px;
+  font-weight: 300;
+}
+.fact-box {
+  background: rgba(0,245,255,0.07);
+  border: 1px solid rgba(0,245,255,0.25);
+  border-radius: 12px;
+  padding: 12px 24px;
+  margin-top: 16px;
+  max-width: 700px;
+  text-align: center;
+  font-size: clamp(12px,1.5vw,15px);
+  color: rgba(224,244,255,0.85);
+}
+
+/* ===== SLIDE 5 ===== */
+.ya-central {
+  display: flex;
+  gap: 30px;
+  width: 100%;
+  max-width: 900px;
+  align-items: center;
+}
+.ya-brain-center {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.brain-glow {
+  font-size: 90px;
+  filter: drop-shadow(0 0 25px rgba(191,95,255,0.8));
+  animation: brainGlow 2s ease-in-out infinite;
+}
+@keyframes brainGlow { 0%,100%{filter:drop-shadow(0 0 25px rgba(191,95,255,0.8))} 50%{filter:drop-shadow(0 0 50px rgba(191,95,255,1))} }
+.ya-label-main {
+  font-family: 'Exo 2';
+  font-size: clamp(10px,1.4vw,14px);
+  color: var(--purple);
+  letter-spacing: 2px;
+  text-align: center;
+}
+.ya-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ya-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  transition: transform 0.3s;
+}
+.ya-row:hover { transform: translateX(6px); }
+.ya-row .icon { font-size: 32px; flex-shrink:0; filter: drop-shadow(0 0 8px var(--purple)); }
+.ya-row .text strong {
+  display: block;
+  font-size: clamp(13px,1.7vw,17px);
+  color: var(--purple);
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+.ya-row .text span {
+  font-size: clamp(11px,1.3vw,14px);
+  color: rgba(224,244,255,0.7);
+  font-weight: 300;
+}
+
+/* ===== SLIDE 6 ===== */
+.future-hex {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 900px;
+}
+.fhex {
+  padding: 22px 16px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.fhex::after {
+  content:'';
+  position:absolute;
+  bottom:0;left:0;width:100%;height:2px;
+}
+.fhex:nth-child(1)::after{background:var(--cyan);}
+.fhex:nth-child(2)::after{background:var(--purple);}
+.fhex:nth-child(3)::after{background:var(--green);}
+.fhex:nth-child(4)::after{background:var(--orange);}
+.fhex:nth-child(5)::after{background:var(--pink);}
+.fhex:nth-child(6)::after{background:var(--blue);}
+.fhex .fh-icon { font-size: 46px; margin-bottom: 8px; display:block; filter: drop-shadow(0 0 12px rgba(0,245,255,0.5)); }
+.fhex .fh-title {
+  font-family: 'Exo 2';
+  font-size: clamp(11px,1.5vw,15px);
+  color: var(--cyan);
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+}
+.fhex .fh-desc {
+  font-size: clamp(11px,1.2vw,13px);
+  color: rgba(224,244,255,0.7);
+  line-height: 1.5;
+  font-weight: 300;
+}
+
+/* ===== SLIDE 7 ===== */
+.tech-matrix {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 900px;
+}
+.tm-card {
+  padding: 16px 12px;
+  text-align: center;
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+.tm-card:hover {
+  background: rgba(0,245,255,0.1);
+  border-color: var(--cyan);
+  box-shadow: 0 0 20px rgba(0,245,255,0.1);
+  transform: scale(1.04);
+}
+.tm-card .icon { font-size: 36px; margin-bottom: 8px; filter: drop-shadow(0 0 8px var(--cyan)); }
+.tm-card .name {
+  font-family: 'Exo 2';
+  font-size: clamp(10px,1.3vw,13px);
+  color: var(--cyan);
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+.tm-card .detail {
+  font-size: clamp(10px,1.2vw,12px);
+  color: rgba(224,244,255,0.6);
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+/* ===== SLIDE 8 ===== */
+.trade-v2 {
+  display: grid;
+  grid-template-columns: 1fr 60px 1fr;
+  gap: 16px;
+  width: 100%;
+  max-width: 900px;
+  align-items: center;
+}
+.tv2-col {
+  padding: 22px 18px;
+  border-radius: 14px;
+}
+.tv2-col h3 {
+  font-family: 'Exo 2';
+  font-size: clamp(14px,2vw,20px);
+  color: var(--cyan);
+  margin-bottom: 16px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+.tv2-col ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
+.tv2-col li {
+  font-size: clamp(12px,1.4vw,15px);
+  color: rgba(224,244,255,0.85);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(0,245,255,0.04);
+  border-radius: 8px;
+  border-left: 2px solid rgba(0,245,255,0.3);
+  font-weight: 300;
+}
+.tv2-arrow {
+  text-align: center;
+  font-size: 36px;
+  color: var(--cyan);
+  filter: drop-shadow(0 0 12px var(--cyan));
+  animation: arrowPulse 1.5s ease-in-out infinite;
+}
+@keyframes arrowPulse { 0%,100%{opacity:0.6;transform:scale(1)} 50%{opacity:1;transform:scale(1.2)} }
+
+/* ===== SLIDE 9 ===== */
+.career-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 900px;
+}
+.career-card {
+  padding: 22px 16px;
+  text-align: center;
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.career-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--green);
+  box-shadow: 0 8px 30px rgba(0,255,136,0.15);
+}
+.career-card .icon { font-size: 48px; margin-bottom: 10px; filter: drop-shadow(0 0 12px var(--green)); }
+.career-card .title {
+  font-family: 'Exo 2';
+  font-size: clamp(11px,1.5vw,15px);
+  color: var(--green);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+.career-card .text {
+  font-size: clamp(11px,1.3vw,14px);
+  color: rgba(224,244,255,0.7);
+  line-height: 1.5;
+  font-weight: 300;
+}
+
+/* ===== SLIDE 10 ===== */
+#s10 {}
+.end-glow-title {
+  font-family: 'Exo 2';
+  font-weight: 900;
+  font-size: clamp(32px,5.5vw,68px);
+  color: var(--cyan);
+  text-align: center;
+  text-shadow: 0 0 40px rgba(0,245,255,0.8), 0 0 80px rgba(0,245,255,0.4);
+  letter-spacing: 3px;
+  line-height: 1.2;
+  animation: titleFlicker 4s ease-in-out infinite;
+}
+@keyframes titleFlicker { 0%,100%{text-shadow:0 0 40px rgba(0,245,255,0.8),0 0 80px rgba(0,245,255,0.4)} 50%{text-shadow:0 0 60px rgba(0,245,255,1),0 0 120px rgba(0,245,255,0.6)} }
+.end-sub-v2 {
+  font-size: clamp(14px,2vw,20px);
+  color: rgba(224,244,255,0.6);
+  text-align: center;
+  margin: 16px 0 30px;
+  font-weight: 300;
+  letter-spacing: 2px;
+}
+.end-tags {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.end-tag {
+  padding: 8px 20px;
+  border-radius: 4px;
+  font-family: 'Exo 2';
+  font-size: clamp(11px,1.4vw,14px);
+  letter-spacing: 1px;
+  transition: all 0.3s;
+  cursor: default;
+  animation: tagFloat 3s ease-in-out infinite;
+}
+.end-tag:nth-child(1){border:1px solid var(--cyan);color:var(--cyan);background:rgba(0,245,255,0.05);animation-delay:0s;}
+.end-tag:nth-child(2){border:1px solid var(--purple);color:var(--purple);background:rgba(191,95,255,0.05);animation-delay:0.4s;}
+.end-tag:nth-child(3){border:1px solid var(--green);color:var(--green);background:rgba(0,255,136,0.05);animation-delay:0.8s;}
+.end-tag:nth-child(4){border:1px solid var(--orange);color:var(--orange);background:rgba(255,140,0,0.05);animation-delay:1.2s;}
+@keyframes tagFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+.end-planet {
+  font-size: 90px;
+  filter: drop-shadow(0 0 30px rgba(0,245,255,0.7));
+  margin-bottom: 16px;
+  animation: endPlanet 4s ease-in-out infinite;
+}
+@keyframes endPlanet { 0%,100%{transform:rotate(-5deg) scale(1)} 50%{transform:rotate(5deg) scale(1.05)} }
+
+/* Particles */
+.particles-container {
+  position: fixed;
+  top:0;left:0;width:100%;height:100%;
+  pointer-events:none;
+  z-index: 0;
+}
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  animation: particleDrift linear infinite;
+}
+@keyframes particleDrift {
+  0%{transform:translateY(100vh) translateX(0) scale(0);opacity:0}
+  10%{opacity:1}
+  90%{opacity:0.5}
+  100%{transform:translateY(-20px) translateX(var(--drift)) scale(1);opacity:0}
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="scanline"></div>
+<div class="particles-container" id="particles"></div>
+
+<div class="presentation" id="pres">
+
+  <!-- SLIDE 1: KAPAK -->
+  <div class="slide active" id="s1">
+    <div class="orbit-container">
+      <div class="orbit-ring orbit-ring-1"></div>
+      <div class="orbit-ring orbit-ring-2"></div>
+      <div class="planet">🌍</div>
+      <div class="orbit-moon">🛸</div>
+    </div>
+    <div class="s1-title">TEKNOLOJİ<br>YOLCULUĞU</div>
+    <div class="s1-tagline">İNTERNETTEN YAPAY ZEKAYA — GELECEĞİN ŞIFRESI</div>
+    <div class="s1-badge">▸ 9–10 YAŞ SINIFI MİSYON BAŞLATILIYOR</div>
+  </div>
+
+  <!-- SLIDE 2: İNTERNET NEDİR -->
+  <div class="slide" id="s2">
+    <div class="slide-title">// İNTERNET NEDİR?</div>
+    <div class="slide-sub">Dünyayı saran görünmez bir süper ağ</div>
+    <div class="info-hex-grid">
+      <div class="holo-card hex-card">
+        <div class="h-icon">🕸️</div>
+        <div class="h-title">DEV BİR AĞ</div>
+        <div class="h-desc">Milyarlarca cihaz birbirine bağlı. Örümcek ağından çok daha büyük — gezegensel boyutta!</div>
+      </div>
+      <div class="holo-card hex-card">
+        <div class="h-icon">📦</div>
+        <div class="h-title">VERİ PAKETLERİ</div>
+        <div class="h-desc">Mesajlar küçük paketlere bölünür, ışığın hızıyla dünyayı dolaşır ve birleşir!</div>
+      </div>
+      <div class="holo-card hex-card">
+        <div class="h-icon">🛰️</div>
+        <div class="h-title">HER YERDEN BAĞLANTI</div>
+        <div class="h-desc">Kablo, uydu ve hava dalgası — dünyanın her köşesine, hatta denizin altına kadar uzanır!</div>
+      </div>
+      <div class="holo-card hex-card">
+        <div class="h-icon">📅</div>
+        <div class="h-title">DOĞUM: 1969</div>
+        <div class="h-desc">Sadece 4 bilgisayar arasında başladı. Adı ARPANET idi. Bugün 5,5 milyar kişi kullanıyor!</div>
+      </div>
+      <div class="holo-card hex-card">
+        <div class="h-icon">👨‍💻</div>
+        <div class="h-title">WWW: 1991</div>
+        <div class="h-desc">Tim Berners-Lee web sitelerini icat etti. İnternet artık herkese açık bir kütüphane oldu!</div>
+      </div>
+      <div class="holo-card hex-card">
+        <div class="h-icon">⚡</div>
+        <div class="h-title">BUGÜN: 5.5 MİLYAR</div>
+        <div class="h-desc">Her saniye yüzlerce yeni kullanıcı internete bağlanıyor. Sayı her gün büyüyor!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: TÜRKİYE -->
+  <div class="slide" id="s3">
+    <div class="slide-title">// TÜRKİYE'DE İNTERNET</div>
+    <div class="slide-sub">30 yılda nereye gelindi?</div>
+    <div class="timeline-v2">
+      <div class="tl-item holo-card">
+        <div class="tl-year">1993</div>
+        <div class="tl-dot-spacer"></div>
+        <div class="tl-icon">🔌</div>
+        <div class="tl-info">
+          <strong>İlk Bağlantı — ODTÜ, Ankara</strong>
+          <span>Türkiye internete ilk kez bağlandı. Sadece üniversiteler kullanabiliyordu — çok yavaş!</span>
+        </div>
+      </div>
+      <div class="tl-item holo-card">
+        <div class="tl-year">1996</div>
+        <div class="tl-dot-spacer"></div>
+        <div class="tl-icon">🏠</div>
+        <div class="tl-info">
+          <strong>Halka Açıldı</strong>
+          <span>Türk Telekom evlere internet getirdi. Telefon çevirmeli bağlantı — "tıkır tıkır" sesi ile!</span>
+        </div>
+      </div>
+      <div class="tl-item holo-card">
+        <div class="tl-year">2000s</div>
+        <div class="tl-dot-spacer"></div>
+        <div class="tl-icon">⚡</div>
+        <div class="tl-info">
+          <strong>ADSL — Hızlanma Başlıyor</strong>
+          <span>Geniş bant internet geldi, ilk Türk forumları ve sosyal platformlar kuruldu!</span>
+        </div>
+      </div>
+      <div class="tl-item holo-card">
+        <div class="tl-year">2010s</div>
+        <div class="tl-dot-spacer"></div>
+        <div class="tl-icon">📱</div>
+        <div class="tl-info">
+          <strong>Akıllı Telefon Devrimi</strong>
+          <span>Herkesin cebinde internet. YouTube, Instagram, WhatsApp hayatımıza girdi!</span>
+        </div>
+      </div>
+      <div class="tl-item holo-card">
+        <div class="tl-year">2024+</div>
+        <div class="tl-dot-spacer"></div>
+        <div class="tl-icon">🚀</div>
+        <div class="tl-info">
+          <strong>Fiber & 5G Çağı</strong>
+          <span>60 milyondan fazla kullanıcı, fiber internet ve 5G ile ultra hızlı bağlantı!</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: 4G / 5G -->
+  <div class="slide" id="s4">
+    <div class="slide-title">// MOBİL HIZLANMA: 1G → 5G</div>
+    <div class="slide-sub">Her nesil 10 kat daha hızlı — grafik gerçek verilere dayanıyor</div>
+    <div class="gen-bars">
+      <div class="gen-bar-wrap">
+        <div class="gen-label">1G</div>
+        <div class="gen-speed">~2 kb/s</div>
+        <div class="gen-bar" style="height:20px;background:rgba(150,150,150,0.3);border:1px solid rgba(150,150,150,0.4);">
+          <div class="gen-bar-label">Sadece Ses</div>
+        </div>
+      </div>
+      <div class="gen-bar-wrap">
+        <div class="gen-label">2G</div>
+        <div class="gen-speed">~64 kb/s</div>
+        <div class="gen-bar" style="height:50px;background:rgba(100,200,200,0.2);border:1px solid rgba(100,200,200,0.4);">
+          <div class="gen-bar-label">SMS</div>
+        </div>
+      </div>
+      <div class="gen-bar-wrap">
+        <div class="gen-label">3G</div>
+        <div class="gen-speed">~2 Mb/s</div>
+        <div class="gen-bar" style="height:90px;background:rgba(0,180,255,0.2);border:1px solid rgba(0,180,255,0.4);">
+          <div class="gen-bar-label">Video Arama</div>
+        </div>
+      </div>
+      <div class="gen-bar-wrap">
+        <div class="gen-label" style="color:var(--cyan)">4G</div>
+        <div class="gen-speed">~100 Mb/s</div>
+        <div class="gen-bar" style="height:155px;background:rgba(0,245,255,0.15);border:1px solid rgba(0,245,255,0.5);box-shadow:0 0 20px rgba(0,245,255,0.15);">
+          <div class="gen-bar-label" style="color:var(--cyan)">Netflix HD</div>
+        </div>
+      </div>
+      <div class="gen-bar-wrap">
+        <div class="gen-label" style="color:var(--purple)">5G</div>
+        <div class="gen-speed" style="color:var(--purple)">~10 Gb/s</div>
+        <div class="gen-bar" style="height:220px;background:rgba(191,95,255,0.15);border:1px solid rgba(191,95,255,0.6);box-shadow:0 0 30px rgba(191,95,255,0.2);">
+          <div class="gen-bar-label" style="color:var(--purple)">Robot Arabalar & VR</div>
+        </div>
+      </div>
+    </div>
+    <div class="fact-box">
+      ⚡ <strong style="color:var(--cyan)">Hesap Yapalım:</strong> 5G ile 3 saatlik film = <strong style="color:var(--purple)">3-4 saniye</strong> indirme. 4G ile aynı film = <strong>25 dakika</strong> beklerdin!
+    </div>
+  </div>
+
+  <!-- SLIDE 5: YAPAY ZEKA NEDİR -->
+  <div class="slide" id="s5">
+    <div class="slide-title">// YAPAY ZEKA NEDİR?</div>
+    <div class="slide-sub">Bilgisayarların öğrenme süper gücü — YZ nasıl çalışır?</div>
+    <div class="ya-central">
+      <div class="ya-brain-center">
+        <div class="brain-glow">🧠</div>
+        <div class="ya-label-main">YAPAY<br>ZEKA<br>ÇEKIRDEĞI</div>
+      </div>
+      <div class="ya-list">
+        <div class="holo-card ya-row">
+          <div class="icon">📚</div>
+          <div class="text">
+            <strong>VERİ İLE ÖĞRENİR</strong>
+            <span>Milyonlarca resim, metin ve ses dinleyerek öğrenir. Tıpkı sen ders çalışırken gibi — ama milyonlarca kez daha hızlı!</span>
+          </div>
+        </div>
+        <div class="holo-card ya-row">
+          <div class="icon">🎤</div>
+          <div class="text">
+            <strong>SESİNİ TANIR</strong>
+            <span>Siri, Google Asistan, Alexa — hepsi YZ. Seni duyar, anlar, cevap verir!</span>
+          </div>
+        </div>
+        <div class="holo-card ya-row">
+          <div class="icon">🖼️</div>
+          <div class="text">
+            <strong>SANAT YAPAR</strong>
+            <span>Bir cümle yazarsın, saniyeler içinde harika resim üretir. Müzik, şiir, hikaye de yapabilir!</span>
+          </div>
+        </div>
+        <div class="holo-card ya-row">
+          <div class="icon">🏥</div>
+          <div class="text">
+            <strong>HAYAT KURTARIR</strong>
+            <span>Röntgen filmlerini inceleyerek hastalıkları doktorlardan önce tespit edebiliyor!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: YAPAY ZEKA NEREYE -->
+  <div class="slide" id="s6">
+    <div class="slide-title">// YZ'NİN GELECEĞİ</div>
+    <div class="slide-sub">Yapay zeka önümüzdeki yıllarda hayatımızı nasıl değiştirecek?</div>
+    <div class="future-hex">
+      <div class="holo-card fhex">
+        <span class="fh-icon">🚗</span>
+        <div class="fh-title">SÜRÜCÜSİZ ARAÇLAR</div>
+        <div class="fh-desc">Direksiyon yok, pedal yok. YZ trafiği okur, güvenli sürüş sağlar.</div>
+      </div>
+      <div class="holo-card fhex">
+        <span class="fh-icon">🏫</span>
+        <div class="fh-title">KİŞİSEL ÖĞRETMEN</div>
+        <div class="fh-desc">Sana özel müfredat hazırlar. Zayıf olduğun konuları bilir, güçlendirmeni sağlar!</div>
+      </div>
+      <div class="holo-card fhex">
+        <span class="fh-icon">💊</span>
+        <div class="fh-title">KİŞİSEL İLAÇ</div>
+        <div class="fh-desc">Sadece senin DNA'na göre üretilmiş ilaçlar. Kanser gibi hastalıklar yenilebilecek!</div>
+      </div>
+      <div class="holo-card fhex">
+        <span class="fh-icon">🌍</span>
+        <div class="fh-title">DÜNYA KORUYUCU</div>
+        <div class="fh-desc">İklim krizi çözümleri için en iyi formülü YZ hesaplayacak!</div>
+      </div>
+      <div class="holo-card fhex">
+        <span class="fh-icon">🎮</span>
+        <div class="fh-title">CANLI OYUN DÜNYASI</div>
+        <div class="fh-desc">Oyun karakterleri gerçekten düşünecek. Her oturum tamamen farklı!</div>
+      </div>
+      <div class="holo-card fhex">
+        <span class="fh-icon">🤝</span>
+        <div class="fh-title">ROBOT YARDIMCILAR</div>
+        <div class="fh-desc">Evde, hastanede, fabrikada insanlara yardım eden zeki robotlar!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: TEKNOLOJİ NEREYE -->
+  <div class="slide" id="s7">
+    <div class="slide-title">// TEKNOLOJİ NEREYE GİDİYOR?</div>
+    <div class="slide-sub">Önümüzdeki 20 yılda ne değişecek?</div>
+    <div class="tech-matrix">
+      <div class="holo-card tm-card">
+        <div class="icon">🥽</div>
+        <div class="name">SANAL GERÇEKLİK</div>
+        <div class="detail">Gözlük tak, farklı dünyaya ışınlan. Okul, konser, tatil — hepsi sanal!</div>
+      </div>
+      <div class="holo-card tm-card">
+        <div class="icon">🔬</div>
+        <div class="name">NANO TEKNOLOJİ</div>
+        <div class="detail">Gözle görülemeyen minik robotlar vücudunu içeriden onarır!</div>
+      </div>
+      <div class="holo-card tm-card">
+        <div class="icon">⚛️</div>
+        <div class="name">KUANTUM BİLGİSAYAR</div>
+        <div class="detail">Bugünkü bilgisayarlardan milyonlarca kat hızlı! Sıradışı hesaplamalar!</div>
+      </div>
+      <div class="holo-card tm-card">
+        <div class="icon">🌱</div>
+        <div class="name">YEŞİL ENERJİ</div>
+        <div class="detail">Güneş ve rüzgar teknolojisi ucuzlayacak, fosil yakıtlar bitecek!</div>
+      </div>
+      <div class="holo-card tm-card">
+        <div class="icon">🚀</div>
+        <div class="name">UZAY TURİZMİ</div>
+        <div class="detail">Mars'a tatile gitmek bu neslin çocukları için mümkün olabilir!</div>
+      </div>
+      <div class="holo-card tm-card">
+        <div class="icon">🧬</div>
+        <div class="name">GEN TEKNOLOJİSİ</div>
+        <div class="detail">Kalıtsal hastalıklar doğmadan önce düzeltilebilecek!</div>
+      </div>
+      <div class="holo-card tm-card">
+        <div class="icon">🤖</div>
+        <div class="name">AKILLI ŞEHİRLER</div>
+        <div class="detail">Trafik, çöp, enerji — her şey birbirine bağlı ve optimize!</div>
+      </div>
+      <div class="holo-card tm-card">
+        <div class="icon">🔋</div>
+        <div class="name">SÜPER PİLLER</div>
+        <div class="detail">Telefonunu haftada bir kez şarj edeceksin!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: TİCARET -->
+  <div class="slide" id="s8">
+    <div class="slide-title">// TİCARET DÖNÜŞÜMÜ</div>
+    <div class="slide-sub">Alışveriş nasıl değişti — ve daha nasıl değişecek?</div>
+    <div class="trade-v2">
+      <div class="holo-card tv2-col">
+        <h3>▸ ESKİDEN</h3>
+        <ul>
+          <li>🏪 Sadece mağazaya gidilirdi</li>
+          <li>💵 Nakit para kullanılırdı</li>
+          <li>📰 Gazete reklamları</li>
+          <li>📞 Telefonla sipariş</li>
+          <li>🗺️ Haritayla yol bulunurdu</li>
+          <li>📋 Kağıt fatura</li>
+        </ul>
+      </div>
+      <div class="tv2-arrow">⇒</div>
+      <div class="holo-card tv2-col">
+        <h3>▸ ŞİMDİ & GELECEK</h3>
+        <ul>
+          <li>📱 Her şey telefondan</li>
+          <li>💳 Dijital ödeme & kripto para</li>
+          <li>🎯 YZ ile kişisel reklam</li>
+          <li>🚁 Drone ile kapıya teslimat</li>
+          <li>🗺️ GPS & akıllı navigasyon</li>
+          <li>📧 Dijital fatura & e-ticaret</li>
+        </ul>
+      </div>
+    </div>
+    <div class="fact-box" style="margin-top:14px">
+      🌍 <strong style="color:var(--cyan)">Dünya Verisi:</strong> Amazon'da her gün <strong style="color:var(--green)">35 milyon+</strong> ürün satılıyor — bu saniyede <strong style="color:var(--cyan)">400 ürün</strong> demek!
+    </div>
+  </div>
+
+  <!-- SLIDE 9: GELECEK MESLEKLERİ -->
+  <div class="slide" id="s9">
+    <div class="slide-title">// GELECEĞİN MESLEKLERİ</div>
+    <div class="slide-sub">Bu meslekler ya yeni doğacak ya da tamamen değişecek!</div>
+    <div class="career-grid">
+      <div class="holo-card career-card">
+        <div class="icon">🤖</div>
+        <div class="title">YZ MÜHENDİSİ</div>
+        <div class="text">Yapay zeka sistemleri kurar, eğitir ve geliştirir. Dünyanın en çok aranan mesleği!</div>
+      </div>
+      <div class="holo-card career-card">
+        <div class="icon">🥽</div>
+        <div class="title">METAVERSE MİMARI</div>
+        <div class="text">Sanal dünyalar ve dijital şehirler tasarlar. Geleceğin mimarı!</div>
+      </div>
+      <div class="holo-card career-card">
+        <div class="icon">🧬</div>
+        <div class="title">GEN MÜHENDİSİ</div>
+        <div class="text">Hastalıkları önlemek için DNA'yı düzenler. Tıbbın geleceği!</div>
+      </div>
+      <div class="holo-card career-card">
+        <div class="icon">🌍</div>
+        <div class="title">İKLİM TEKNOLOJİSTİ</div>
+        <div class="text">Teknolojiyle iklim değişikliğiyle savaşır. Gezegenimizi kurtarır!</div>
+      </div>
+      <div class="holo-card career-card">
+        <div class="icon">🚀</div>
+        <div class="title">UZAY MÜHENDİSİ</div>
+        <div class="text">Mars kolonisi ve uzay istasyonları tasarlar. Yıldızlara giden yolu açar!</div>
+      </div>
+      <div class="holo-card career-card">
+        <div class="icon">🛡️</div>
+        <div class="title">SİBER GÜVENLIK UZMANI</div>
+        <div class="text">Dijital dünyayı saldırılardan korur. Geleceğin en kritik görevi!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: KAPANIŞ -->
+  <div class="slide" id="s10">
+    <div class="end-planet">🌌</div>
+    <div class="end-glow-title">GELECEK<br>SENİN</div>
+    <div class="end-sub-v2">Bugün öğrendiklerin, yarın evreni değiştirecek.</div>
+    <div class="end-tags">
+      <div class="end-tag">▸ MERAKLI OL</div>
+      <div class="end-tag">▸ ÜRETKENLİĞİ SEV</div>
+      <div class="end-tag">▸ TEKNOLOJİYİ KULLAN</div>
+      <div class="end-tag">▸ DÜNYAYI İYİLEŞTİR</div>
+    </div>
+  </div>
+
+</div>
+
+<button class="arrow-btn arrow-left" onclick="changeSlide(-1)">◀</button>
+<button class="arrow-btn arrow-right" onclick="changeSlide(1)">▶</button>
+<div class="nav" id="navDots"></div>
+
+<script>
+  const TOTAL = 10;
+  let current = 0;
+
+  const nav = document.getElementById('navDots');
+  const counter = document.createElement('span');
+  counter.className = 'slide-counter';
+  for (let i = 0; i < TOTAL; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot' + (i===0?' active':'');
+    dot.onclick = ()=>goTo(i);
+    nav.appendChild(dot);
+  }
+  nav.appendChild(counter);
+  updateCounter();
+
+  function goTo(n) {
+    document.getElementById('s'+(current+1)).classList.remove('active');
+    document.querySelectorAll('.nav-dot')[current].classList.remove('active');
+    current = Math.max(0,Math.min(TOTAL-1,n));
+    document.getElementById('s'+(current+1)).classList.add('active');
+    document.querySelectorAll('.nav-dot')[current].classList.add('active');
+    updateCounter();
+  }
+  function changeSlide(d){goTo(current+d);}
+  function updateCounter(){counter.textContent=(current+1)+' / '+TOTAL;}
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' ')changeSlide(1);
+    if(e.key==='ArrowLeft')changeSlide(-1);
+  });
+
+  // Particles
+  const pc = document.getElementById('particles');
+  const colors = ['#00f5ff','#bf5fff','#00ff88','#1a6fff'];
+  for(let i=0;i<40;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random()*3+1;
+    const drift = (Math.random()-0.5)*200;
+    p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${Math.random()*8+6}s;animation-delay:${Math.random()*8}s;--drift:${drift}px;opacity:0.6;box-shadow:0 0 6px currentColor`;
+    pc.appendChild(p);
+  }
+</script>
+</body>
+</html>

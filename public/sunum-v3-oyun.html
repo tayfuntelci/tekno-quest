@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teknoloji Yolculuğu — Oyun Versiyonu</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Exo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d1a;
+  --bg2: #12122b;
+  --yellow: #ffe600;
+  --green: #39ff14;
+  --red: #ff3131;
+  --blue: #00cfff;
+  --purple: #c084fc;
+  --orange: #ff9f1c;
+  --pink: #ff6ec7;
+  --white: #f0f0ff;
+  --dim: rgba(255,255,255,0.06);
+  --border: rgba(255,230,0,0.25);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Exo 2', sans-serif;
+  background: var(--bg);
+  overflow: hidden;
+  width: 100vw; height: 100vh;
+  color: var(--white);
+  user-select: none;
+}
+
+/* PIXEL GRID */
+body::before {
+  content:'';
+  position:fixed;
+  top:0;left:0;width:100%;height:100%;
+  background-image: radial-gradient(rgba(255,230,0,0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* TOP HUD */
+.hud {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 56px;
+  background: rgba(10,10,25,0.95);
+  border-bottom: 2px solid var(--yellow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 200;
+  box-shadow: 0 4px 30px rgba(255,230,0,0.1);
+}
+.hud-left { display:flex; align-items:center; gap:16px; }
+.hud-logo {
+  font-family: 'Chakra Petch';
+  font-size: 11px;
+  color: var(--yellow);
+  text-shadow: 0 0 10px rgba(255,230,0,0.6);
+}
+.hud-level {
+  background: var(--yellow);
+  color: #000;
+  font-family: 'Chakra Petch';
+  font-size: 9px;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+.hud-center { display:flex; align-items:center; gap:10px; }
+.xp-label {
+  font-family: 'Chakra Petch';
+  font-size: 8px;
+  color: var(--green);
+}
+.xp-bar-wrap {
+  width: 200px; height: 14px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(57,255,20,0.3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), #a8ff3e);
+  border-radius: 3px;
+  transition: width 0.8s ease;
+  position: relative;
+}
+.xp-bar-fill::after {
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;bottom:0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+  animation: shimmer 2s linear infinite;
+}
+@keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+.xp-count {
+  font-family: 'Chakra Petch';
+  font-size: 8px;
+  color: var(--green);
+  min-width: 80px;
+}
+.hud-right { display:flex; gap:12px; align-items:center; }
+.badge-item {
+  font-size: 20px;
+  filter: grayscale(1) opacity(0.3);
+  transition: all 0.4s;
+  cursor: default;
+}
+.badge-item.earned {
+  filter: none;
+  filter: drop-shadow(0 0 8px rgba(255,230,0,0.8));
+  animation: badgePop 0.4s ease;
+}
+@keyframes badgePop { 0%{transform:scale(0.5)} 60%{transform:scale(1.3)} 100%{transform:scale(1)} }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 48px;
+  background: rgba(10,10,25,0.95);
+  border-top: 2px solid var(--yellow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  z-index: 200;
+}
+.level-pip {
+  width: 32px; height: 32px;
+  border: 2px solid rgba(255,230,0,0.2);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Chakra Petch';
+  font-size: 7px;
+  color: rgba(255,255,255,0.3);
+  cursor: pointer;
+  transition: all 0.3s;
+  background: rgba(255,255,255,0.03);
+}
+.level-pip.done {
+  border-color: var(--green);
+  color: var(--green);
+  background: rgba(57,255,20,0.08);
+  box-shadow: 0 0 10px rgba(57,255,20,0.2);
+}
+.level-pip.active {
+  border-color: var(--yellow);
+  color: var(--yellow);
+  background: rgba(255,230,0,0.12);
+  box-shadow: 0 0 14px rgba(255,230,0,0.4);
+  transform: scale(1.15);
+}
+
+/* ARROW BTNS */
+.arrow-btn {
+  position: fixed;
+  top: 50%; transform: translateY(-50%);
+  background: rgba(255,230,0,0.08);
+  border: 2px solid rgba(255,230,0,0.3);
+  color: var(--yellow);
+  width: 44px; height: 44px;
+  border-radius: 6px;
+  font-family: 'Chakra Petch';
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 200;
+  transition: all 0.2s;
+}
+.arrow-btn:hover {
+  background: rgba(255,230,0,0.2);
+  box-shadow: 0 0 20px rgba(255,230,0,0.3);
+}
+.arrow-left { left: 12px; }
+.arrow-right { right: 12px; }
+
+/* SLIDES */
+.presentation { width:100vw; height:100vh; position:relative; z-index:1; }
+.slide {
+  position:absolute; top:0;left:0;width:100%;height:100%;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  opacity:0; pointer-events:none;
+  transition:opacity 0.4s ease;
+  padding: 70px 60px 60px;
+}
+.slide.active { opacity:1; pointer-events:all; }
+
+/* LEVEL BANNER */
+.level-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.level-badge {
+  font-family: 'Chakra Petch';
+  font-size: 9px;
+  background: var(--yellow);
+  color: #000;
+  padding: 4px 12px;
+  border-radius: 4px;
+}
+.level-title {
+  font-family: 'Chakra Petch';
+  font-size: clamp(14px, 2.5vw, 22px);
+  color: var(--yellow);
+  text-shadow: 0 0 20px rgba(255,230,0,0.5);
+  text-align: center;
+}
+.slide-sub {
+  font-size: clamp(14px, 1.8vw, 18px);
+  color: rgba(240,240,255,0.55);
+  text-align: center;
+  margin-bottom: 24px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* GAME CARDS */
+.game-grid {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  max-width: 900px;
+}
+.g3 { grid-template-columns: repeat(3,1fr); }
+.g2 { grid-template-columns: repeat(2,1fr); }
+.g4 { grid-template-columns: repeat(4,1fr); }
+
+.game-card {
+  background: var(--dim);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 18px 16px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+  cursor: default;
+}
+.game-card::before {
+  content:'';
+  position:absolute;
+  top:0;left:0;width:4px;height:100%;
+  border-radius:10px 0 0 10px;
+}
+.game-card:nth-child(1)::before{background:var(--blue);}
+.game-card:nth-child(2)::before{background:var(--green);}
+.game-card:nth-child(3)::before{background:var(--purple);}
+.game-card:nth-child(4)::before{background:var(--orange);}
+.game-card:nth-child(5)::before{background:var(--pink);}
+.game-card:nth-child(6)::before{background:var(--red);}
+.game-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  border-color: rgba(255,230,0,0.3);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4), 0 0 15px rgba(255,230,0,0.07);
+}
+.gc-icon { font-size: clamp(32px,4vw,44px); margin-bottom: 8px; display:block; }
+.gc-title {
+  font-family: 'Chakra Petch';
+  font-size: clamp(8px,1.2vw,11px);
+  color: var(--yellow);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.gc-text {
+  font-size: clamp(12px,1.4vw,15px);
+  color: rgba(240,240,255,0.75);
+  line-height: 1.5;
+  font-weight: 400;
+}
+.gc-xp {
+  position: absolute;
+  top: 10px; right: 12px;
+  font-family: 'Chakra Petch';
+  font-size: 8px;
+  color: var(--green);
+  background: rgba(57,255,20,0.1);
+  border: 1px solid rgba(57,255,20,0.3);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+/* TIMELINE GAME */
+.quest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 820px;
+}
+.quest-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--dim);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 14px 20px;
+  position: relative;
+  transition: all 0.3s;
+}
+.quest-item:hover { border-color: rgba(255,230,0,0.3); transform: translateX(6px); }
+.quest-year {
+  font-family: 'Chakra Petch';
+  font-size: clamp(12px,1.8vw,18px);
+  color: var(--yellow);
+  min-width: 70px;
+  text-shadow: 0 0 10px rgba(255,230,0,0.4);
+}
+.quest-icon { font-size: 28px; flex-shrink:0; }
+.quest-text { flex:1; }
+.quest-text strong {
+  display:block;
+  font-size: clamp(13px,1.7vw,17px);
+  color: var(--white);
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+.quest-text span {
+  font-size: clamp(11px,1.3vw,14px);
+  color: rgba(240,240,255,0.6);
+}
+.quest-badge {
+  font-family: 'Chakra Petch';
+  font-size: 7px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.qb-done { background: rgba(57,255,20,0.15); color: var(--green); border: 1px solid var(--green); }
+.qb-active { background: rgba(255,230,0,0.15); color: var(--yellow); border: 1px solid var(--yellow); animation: blinkBadge 1.2s step-end infinite; }
+@keyframes blinkBadge { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* SPEED LEVELS */
+.speed-levels {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 900px;
+  align-items: stretch;
+}
+.speed-lv {
+  flex: 1;
+  background: var(--dim);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 18px 12px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.speed-lv:last-child {
+  border-color: rgba(255,230,0,0.4);
+  box-shadow: 0 0 25px rgba(255,230,0,0.1);
+}
+.speed-lv:hover { transform: translateY(-4px); }
+.slv-gen {
+  font-family: 'Chakra Petch';
+  font-size: clamp(18px,3vw,30px);
+  margin-bottom: 4px;
+}
+.slv-speed {
+  font-family: 'Chakra Petch';
+  font-size: clamp(7px,1vw,10px);
+  color: var(--blue);
+  margin-bottom: 10px;
+}
+.slv-stars { font-size: 14px; margin-bottom: 8px; }
+.slv-desc {
+  font-size: clamp(10px,1.2vw,13px);
+  color: rgba(240,240,255,0.7);
+  line-height: 1.4;
+}
+.slv-bar { width:100%; height:8px; background:rgba(255,255,255,0.08); border-radius:4px; margin-top:10px; overflow:hidden; }
+.slv-fill { height:100%; border-radius:4px; }
+
+/* BOSS CARD */
+.boss-fight {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  max-width: 900px;
+  align-items: center;
+}
+.boss-icon-wrap {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.boss-icon { font-size: 90px; animation: bossPulse 2s ease-in-out infinite; filter: drop-shadow(0 0 20px rgba(192,132,252,0.7)); }
+@keyframes bossPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+.boss-name {
+  font-family: 'Chakra Petch';
+  font-size: 9px;
+  color: var(--purple);
+  text-align: center;
+}
+.boss-cards {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bc {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--dim);
+  border: 1px solid rgba(192,132,252,0.15);
+  border-radius: 10px;
+  padding: 12px 16px;
+  transition: transform 0.3s;
+}
+.bc:hover { transform: translateX(6px); border-color: rgba(192,132,252,0.4); }
+.bc .icon { font-size: 28px; flex-shrink:0; }
+.bc strong { display:block; font-size:clamp(13px,1.6vw,16px); color:var(--purple); font-weight:700; margin-bottom:3px; }
+.bc span { font-size:clamp(11px,1.3vw,14px); color:rgba(240,240,255,0.7); }
+
+/* TRADE GAME */
+.trade-board {
+  display: grid;
+  grid-template-columns: 1fr 50px 1fr;
+  gap: 12px;
+  width: 100%; max-width: 900px;
+  align-items: start;
+}
+.tb-col { background:var(--dim); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:18px 16px; }
+.tb-col h3 {
+  font-family: 'Chakra Petch';
+  font-size: clamp(9px,1.3vw,13px);
+  margin-bottom: 14px;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.tb-col.old h3 { color: var(--blue); }
+.tb-col.new h3 { color: var(--green); }
+.tb-col ul { list-style:none; display:flex; flex-direction:column; gap:8px; }
+.tb-col li {
+  font-size: clamp(12px,1.4vw,15px);
+  color: rgba(240,240,255,0.8);
+  display:flex; align-items:center; gap:8px;
+  padding: 7px 10px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 7px;
+}
+.tb-arrow { display:flex; align-items:center; justify-content:center; font-size:28px; color:var(--yellow); filter:drop-shadow(0 0 8px var(--yellow)); animation:arrowBlink 1.5s ease-in-out infinite; }
+@keyframes arrowBlink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* CAREER RPG */
+.career-rpg {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 14px;
+  width:100%; max-width:900px;
+}
+.crpg {
+  background: var(--dim);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 18px 14px;
+  text-align: center;
+  transition: all 0.3s;
+  position: relative;
+}
+.crpg:hover { transform:translateY(-6px); border-color: rgba(57,255,20,0.4); box-shadow:0 8px 25px rgba(57,255,20,0.1); }
+.crpg .c-icon { font-size: 46px; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(57,255,20,0.4)); }
+.crpg .c-class {
+  font-family: 'Chakra Petch';
+  font-size: clamp(7px,1vw,9px);
+  color: var(--green);
+  margin-bottom: 6px;
+}
+.crpg .c-text {
+  font-size: clamp(11px,1.3vw,14px);
+  color: rgba(240,240,255,0.7);
+  line-height: 1.5;
+}
+.crpg .c-level {
+  position: absolute;
+  top: 8px; right: 10px;
+  font-family: 'Chakra Petch';
+  font-size: 7px;
+  color: rgba(255,230,0,0.6);
+}
+
+/* FINAL SLIDE */
+#s10 { justify-content: center; }
+.victory-screen {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+.victory-title {
+  font-family: 'Chakra Petch';
+  font-size: clamp(20px,4vw,44px);
+  color: var(--yellow);
+  text-shadow: 0 0 30px rgba(255,230,0,0.8), 4px 4px 0 rgba(0,0,0,0.5);
+  animation: victoryFlash 2s ease-in-out infinite;
+  line-height: 1.4;
+}
+@keyframes victoryFlash { 0%,100%{text-shadow:0 0 30px rgba(255,230,0,0.8),4px 4px 0 rgba(0,0,0,0.5)} 50%{text-shadow:0 0 60px rgba(255,230,0,1),4px 4px 0 rgba(0,0,0,0.5),0 0 120px rgba(255,230,0,0.4)} }
+.final-xp {
+  font-family: 'Chakra Petch';
+  font-size: clamp(12px,2vw,20px);
+  color: var(--green);
+  background: rgba(57,255,20,0.1);
+  border: 2px solid var(--green);
+  padding: 12px 28px;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(57,255,20,0.3);
+}
+.achievement-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.achievement {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  background: var(--dim);
+  border: 1px solid rgba(255,230,0,0.3);
+  border-radius: 10px;
+  min-width: 100px;
+  animation: achieveFloat 3s ease-in-out infinite;
+}
+.achievement:nth-child(2){animation-delay:0.4s;}
+.achievement:nth-child(3){animation-delay:0.8s;}
+.achievement:nth-child(4){animation-delay:1.2s;}
+@keyframes achieveFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+.ach-icon { font-size: 36px; filter: drop-shadow(0 0 10px rgba(255,230,0,0.6)); }
+.ach-label {
+  font-family: 'Chakra Petch';
+  font-size: 7px;
+  color: var(--yellow);
+  text-align: center;
+  line-height: 1.5;
+}
+.press-start {
+  font-family: 'Chakra Petch';
+  font-size: clamp(9px,1.3vw,12px);
+  color: rgba(240,240,255,0.4);
+  animation: blink 1.2s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* PIXEL DECORATION */
+.pixel-corner {
+  position: fixed;
+  width: 12px; height: 12px;
+  z-index: 300;
+}
+.pc-tl { top:56px; left:0; border-top:2px solid var(--yellow); border-left:2px solid var(--yellow); }
+.pc-tr { top:56px; right:0; border-top:2px solid var(--yellow); border-right:2px solid var(--yellow); }
+.pc-bl { bottom:48px; left:0; border-bottom:2px solid var(--yellow); border-left:2px solid var(--yellow); }
+.pc-br { bottom:48px; right:0; border-bottom:2px solid var(--yellow); border-right:2px solid var(--yellow); }
+
+/* FACT BOX */
+.fact-box {
+  background: rgba(255,230,0,0.07);
+  border: 1px solid rgba(255,230,0,0.25);
+  border-radius: 8px;
+  padding: 10px 20px;
+  margin-top: 12px;
+  max-width: 800px;
+  text-align: center;
+  font-size: clamp(12px,1.5vw,15px);
+  color: rgba(240,240,255,0.85);
+}
+
+/* INTRO SLIDE */
+#s1 { background: radial-gradient(ellipse at center, #1a1a3e 0%, #0d0d1a 70%); }
+.intro-pixel-art {
+  font-size: 80px;
+  margin-bottom: 12px;
+  animation: introFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(255,230,0,0.5));
+}
+@keyframes introFloat { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-12px) rotate(3deg)} }
+.intro-title {
+  font-family: 'Chakra Petch';
+  font-size: clamp(22px,4.5vw,52px);
+  color: var(--yellow);
+  text-align: center;
+  text-shadow: 4px 4px 0 rgba(0,0,0,0.5), 0 0 30px rgba(255,230,0,0.5);
+  line-height: 1.3;
+  margin-bottom: 16px;
+}
+.intro-sub {
+  font-size: clamp(14px,2vw,20px);
+  color: rgba(240,240,255,0.55);
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+.intro-start {
+  font-family: 'Chakra Petch';
+  font-size: clamp(10px,1.5vw,14px);
+  color: var(--green);
+  border: 2px solid var(--green);
+  padding: 12px 28px;
+  border-radius: 6px;
+  background: rgba(57,255,20,0.08);
+  animation: glowGreen 2s ease-in-out infinite;
+}
+@keyframes glowGreen { 0%,100%{box-shadow:0 0 10px rgba(57,255,20,0.3)} 50%{box-shadow:0 0 25px rgba(57,255,20,0.7)} }
+.health-bars {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+.hbar { display:flex; flex-direction:column; align-items:center; gap:6px; }
+.hbar-label { font-family:'Chakra Petch'; font-size:7px; color:rgba(255,255,255,0.5); }
+.hbar-track { width:120px; height:10px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden; border:1px solid rgba(255,255,255,0.15); }
+.hbar-fill { height:100%; border-radius:3px; }
+</style>
+</head>
+<body>
+
+<div class="pixel-corner pc-tl"></div>
+<div class="pixel-corner pc-tr"></div>
+<div class="pixel-corner pc-bl"></div>
+<div class="pixel-corner pc-br"></div>
+
+<!-- HUD -->
+<div class="hud">
+  <div class="hud-left">
+    <div class="hud-logo">TEKNO QUEST</div>
+    <div class="hud-level" id="hudLevel">LV.1</div>
+  </div>
+  <div class="hud-center">
+    <div class="xp-label">XP</div>
+    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xpFill" style="width:0%"></div></div>
+    <div class="xp-count" id="xpCount">0 / 900</div>
+  </div>
+  <div class="hud-right">
+    <div class="badge-item" id="b0" title="İnternet Ustası">🌐</div>
+    <div class="badge-item" id="b1" title="Tarih Kaşifi">📜</div>
+    <div class="badge-item" id="b2" title="Hız Şampiyonu">⚡</div>
+    <div class="badge-item" id="b3" title="YZ Kaşifi">🤖</div>
+    <div class="badge-item" id="b4" title="Gelecek Mimarı">🔮</div>
+    <div class="badge-item" id="b5" title="Teknoloji Gurusu">💡</div>
+    <div class="badge-item" id="b6" title="Ticaret Lideri">💰</div>
+    <div class="badge-item" id="b7" title="Kariyer Efsanesi">🏆</div>
+  </div>
+</div>
+
+<div class="presentation" id="pres">
+
+  <!-- SLIDE 1: KAPAK -->
+  <div class="slide active" id="s1">
+    <div class="intro-pixel-art">🕹️</div>
+    <div class="intro-title">TEKNOLOJİ<br>QUEST</div>
+    <div class="intro-sub">İNTERNETTEN YAPAY ZEKAYA — BÜYÜK MACERA</div>
+    <div class="health-bars">
+      <div class="hbar">
+        <div class="hbar-label">MERAK</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:90%;background:linear-gradient(90deg,#39ff14,#a8ff3e)"></div></div>
+      </div>
+      <div class="hbar">
+        <div class="hbar-label">HAYAL GÜCÜ</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:100%;background:linear-gradient(90deg,var(--blue),var(--purple))"></div></div>
+      </div>
+      <div class="hbar">
+        <div class="hbar-label">CESARET</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:85%;background:linear-gradient(90deg,var(--orange),var(--yellow))"></div></div>
+      </div>
+    </div>
+    <div style="margin-top:20px">
+      <div class="intro-start">▶ OYUNA BAŞLA</div>
+    </div>
+    <div style="margin-top:10px;font-family:'Chakra Petch';font-size:8px;color:rgba(255,255,255,0.3)">← → TUŞLARI İLE İLERLE</div>
+  </div>
+
+  <!-- SLIDE 2: İNTERNET NEDİR — LEVEL 1 -->
+  <div class="slide" id="s2">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 1</div>
+      <div class="level-title">İNTERNET NEDİR?</div>
+    </div>
+    <div class="slide-sub">+100 XP — Görünmez Süper Ağın Sırrını Çöz!</div>
+    <div class="game-grid g3">
+      <div class="game-card">
+        <div class="gc-xp">+15 XP</div>
+        <span class="gc-icon">🕸️</span>
+        <div class="gc-title">DEV BİR AĞ</div>
+        <div class="gc-text">Milyarlarca cihaz birbirine bağlı. Örümcek ağından çok daha büyük — gezegensel boyutta!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+20 XP</div>
+        <span class="gc-icon">📦</span>
+        <div class="gc-title">VERİ PAKETLERİ</div>
+        <div class="gc-text">Mesajlar paketlere bölünür, ışığın hızıyla seyahat eder ve hedefte birleşir!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+15 XP</div>
+        <span class="gc-icon">🛰️</span>
+        <div class="gc-title">HER YERDEN BAĞLANTI</div>
+        <div class="gc-text">Kablo, uydu ve hava dalgası — dünyanın her köşesine ulaşır!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+15 XP</div>
+        <span class="gc-icon">📅</span>
+        <div class="gc-title">DOĞUM: 1969</div>
+        <div class="gc-text">Sadece 4 bilgisayar arasında başladı. Adı ARPANET. Bugün 5,5 milyar kullanıcı!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+15 XP</div>
+        <span class="gc-icon">👨‍💻</span>
+        <div class="gc-title">WWW: 1991</div>
+        <div class="gc-text">Tim Berners-Lee web sitelerini icat etti. İnternet herkese açık kütüphane oldu!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+20 XP</div>
+        <span class="gc-icon">⚡</span>
+        <div class="gc-title">BUGÜN: 5.5 MİLYAR</div>
+        <div class="gc-text">Her saniye yüzlerce yeni kullanıcı bağlanıyor. Sayı her gün büyüyor!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: TÜRKİYE — LEVEL 2 -->
+  <div class="slide" id="s3">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 2</div>
+      <div class="level-title">TÜRKİYE QUEST</div>
+    </div>
+    <div class="slide-sub">+100 XP — Türkiye'nin İnternet Tarihi Görevini Tamamla!</div>
+    <div class="quest-list">
+      <div class="quest-item">
+        <div class="quest-year">1993</div>
+        <div class="quest-icon">🔌</div>
+        <div class="quest-text">
+          <strong>✅ GÖREV TAMAM — İlk Bağlantı, ODTÜ Ankara</strong>
+          <span>Türkiye internete ilk kez bağlandı. Sadece üniversiteler kullanabiliyordu — çok yavaş!</span>
+        </div>
+        <div class="quest-badge qb-done">TAMAMLANDI</div>
+      </div>
+      <div class="quest-item">
+        <div class="quest-year">1996</div>
+        <div class="quest-icon">🏠</div>
+        <div class="quest-text">
+          <strong>✅ GÖREV TAMAM — İnternet Evlere Girdi</strong>
+          <span>Türk Telekom evlere internet getirdi. "Tıkır tıkır" çevirmeli bağlantı çağı!</span>
+        </div>
+        <div class="quest-badge qb-done">TAMAMLANDI</div>
+      </div>
+      <div class="quest-item">
+        <div class="quest-year">2000s</div>
+        <div class="quest-icon">⚡</div>
+        <div class="quest-text">
+          <strong>✅ GÖREV TAMAM — ADSL Hızlanması</strong>
+          <span>Geniş bant geldi, ilk Türk forumları ve sosyal platformlar kuruldu!</span>
+        </div>
+        <div class="quest-badge qb-done">TAMAMLANDI</div>
+      </div>
+      <div class="quest-item">
+        <div class="quest-year">2010s</div>
+        <div class="quest-icon">📱</div>
+        <div class="quest-text">
+          <strong>✅ GÖREV TAMAM — Akıllı Telefon Devrimi</strong>
+          <span>Herkesin cebinde internet. YouTube, Instagram, WhatsApp hayatımıza girdi!</span>
+        </div>
+        <div class="quest-badge qb-done">TAMAMLANDI</div>
+      </div>
+      <div class="quest-item">
+        <div class="quest-year">2024+</div>
+        <div class="quest-icon">🚀</div>
+        <div class="quest-text">
+          <strong>🔥 AKTİF GÖREV — Fiber & 5G Çağı</strong>
+          <span>60M+ kullanıcı, ultra hızlı bağlantı. Türkiye dijital dönüşümde!</span>
+        </div>
+        <div class="quest-badge qb-active">AKTİF</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: 4G/5G — LEVEL 3 -->
+  <div class="slide" id="s4">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 3</div>
+      <div class="level-title">MOBİL HIZ BOSSU</div>
+    </div>
+    <div class="slide-sub">+100 XP — 1G'den 5G'ye Tüm Nesilleri Yen!</div>
+    <div class="speed-levels">
+      <div class="speed-lv">
+        <div class="slv-gen">1G</div>
+        <div class="slv-speed">~2 kb/s</div>
+        <div class="slv-stars">⭐☆☆☆☆</div>
+        <div class="slv-desc">Sadece sesli arama. SMS bile yok! 📞</div>
+        <div class="slv-bar"><div class="slv-fill" style="width:2%;background:#666"></div></div>
+      </div>
+      <div class="speed-lv">
+        <div class="slv-gen">2G</div>
+        <div class="slv-speed">~64 kb/s</div>
+        <div class="slv-stars">⭐⭐☆☆☆</div>
+        <div class="slv-desc">SMS geldi! Basit internet var 📝</div>
+        <div class="slv-bar"><div class="slv-fill" style="width:8%;background:#4aa"></div></div>
+      </div>
+      <div class="speed-lv">
+        <div class="slv-gen">3G</div>
+        <div class="slv-speed">~2 Mb/s</div>
+        <div class="slv-stars">⭐⭐⭐☆☆</div>
+        <div class="slv-desc">Video arama mümkün! 🎥</div>
+        <div class="slv-bar"><div class="slv-fill" style="width:25%;background:var(--blue)"></div></div>
+      </div>
+      <div class="speed-lv" style="border-color:rgba(0,207,255,0.5)">
+        <div class="slv-gen" style="color:var(--blue)">4G</div>
+        <div class="slv-speed" style="color:var(--blue)">~100 Mb/s</div>
+        <div class="slv-stars">⭐⭐⭐⭐☆</div>
+        <div class="slv-desc">Netflix, YouTube tam gaz! 🎬</div>
+        <div class="slv-bar"><div class="slv-fill" style="width:60%;background:var(--blue)"></div></div>
+      </div>
+      <div class="speed-lv" style="border-color:rgba(255,230,0,0.5);box-shadow:0 0 25px rgba(255,230,0,0.12)">
+        <div class="slv-gen" style="color:var(--yellow)">5G</div>
+        <div class="slv-speed" style="color:var(--yellow)">~10 Gb/s</div>
+        <div class="slv-stars">⭐⭐⭐⭐⭐</div>
+        <div class="slv-desc">Robot arabalar & VR oyunlar! 🤖</div>
+        <div class="slv-bar"><div class="slv-fill" style="width:100%;background:linear-gradient(90deg,var(--orange),var(--yellow))"></div></div>
+      </div>
+    </div>
+    <div class="fact-box">
+      🎯 <strong style="color:var(--yellow)">BOSS BİLGİSİ:</strong> 5G ile 3 saatlik film = <strong style="color:var(--green)">3-4 saniye</strong>! 4G ile aynı film = 25 dakika beklerdin!
+    </div>
+  </div>
+
+  <!-- SLIDE 5: YAPAY ZEKA — LEVEL 4 -->
+  <div class="slide" id="s5">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 4</div>
+      <div class="level-title">YAPAY ZEKA BOSS'U</div>
+    </div>
+    <div class="slide-sub">+100 XP — Yapay Zekanın Sırlarını Çöz!</div>
+    <div class="boss-fight">
+      <div class="boss-icon-wrap">
+        <div class="boss-icon">🧠</div>
+        <div class="boss-name">YAPAY ZEKA<br>ÇEKIRDEĞI</div>
+      </div>
+      <div class="boss-cards">
+        <div class="bc">
+          <div class="icon">📚</div>
+          <div>
+            <strong>VERİ İLE ÖĞRENİR</strong>
+            <span>Milyonlarca resim ve metni okur. Sen 1 kitap okurken o 1 milyon kitap öğrenir!</span>
+          </div>
+        </div>
+        <div class="bc">
+          <div class="icon">🎤</div>
+          <div>
+            <strong>SESİNİ TANIR</strong>
+            <span>Siri, Google Asistan, Alexa — hepsi YZ. Seni duyar, anlar, cevap verir!</span>
+          </div>
+        </div>
+        <div class="bc">
+          <div class="icon">🖼️</div>
+          <div>
+            <strong>SANAT & MÜZİK YAPAR</strong>
+            <span>Bir cümle yaz, saniyeler içinde harika resim, şiir, müzik üretir!</span>
+          </div>
+        </div>
+        <div class="bc">
+          <div class="icon">🏥</div>
+          <div>
+            <strong>HAYAT KURTARIR</strong>
+            <span>Doktorlara yardım eder — röntgen filmlerinde hastalıkları erken tespit eder!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: YZ NEREYE — LEVEL 5 -->
+  <div class="slide" id="s6">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 5</div>
+      <div class="level-title">GELECEK HARİTASI</div>
+    </div>
+    <div class="slide-sub">+100 XP — YZ'nin Gelecek Planını Keşfet!</div>
+    <div class="game-grid g3">
+      <div class="game-card">
+        <div class="gc-xp">+15 XP</div>
+        <span class="gc-icon">🚗</span>
+        <div class="gc-title">SÜRÜCÜSİZ ARAÇLAR</div>
+        <div class="gc-text">Direksiyon yok, pedal yok. YZ trafiği okur ve güvenli sürüş sağlar!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+15 XP</div>
+        <span class="gc-icon">🏫</span>
+        <div class="gc-title">KİŞİSEL ÖĞRETMEN</div>
+        <div class="gc-text">Sana özel müfredat hazırlar. Zayıf konularını bilir, güçlendirmeni sağlar!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+20 XP</div>
+        <span class="gc-icon">💊</span>
+        <div class="gc-title">KİŞİSEL İLAÇ</div>
+        <div class="gc-text">Senin DNA'na özel üretilmiş ilaçlar. Kanser gibi hastalıklar yenilebilecek!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+15 XP</div>
+        <span class="gc-icon">🌍</span>
+        <div class="gc-title">DÜNYA KORUYUCU</div>
+        <div class="gc-text">İklim krizi için en iyi çözümleri YZ hesaplayacak!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+20 XP</div>
+        <span class="gc-icon">🎮</span>
+        <div class="gc-title">CANLI OYUN DÜNYASI</div>
+        <div class="gc-text">Oyun karakterleri gerçekten düşünecek. Her oturum tamamen farklı!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+15 XP</div>
+        <span class="gc-icon">🤝</span>
+        <div class="gc-title">ROBOT YARDIMCILAR</div>
+        <div class="gc-text">Evde, hastanede, fabrikada insanlara yardım eden zeki robotlar!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: TEKNOLOJİ — LEVEL 6 -->
+  <div class="slide" id="s7">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 6</div>
+      <div class="level-title">TEKNOLOJİ DÜNYASI</div>
+    </div>
+    <div class="slide-sub">+100 XP — Önümüzdeki 20 Yılın Teknolojisini Keşfet!</div>
+    <div class="game-grid g4">
+      <div class="game-card">
+        <div class="gc-xp">+12 XP</div>
+        <span class="gc-icon">🥽</span>
+        <div class="gc-title">SANAL GERÇEKLİK</div>
+        <div class="gc-text">Gözlük tak, farklı dünyaya ışınlan. Okul, konser, tatil — hepsi sanal!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+13 XP</div>
+        <span class="gc-icon">🔬</span>
+        <div class="gc-title">NANO TEKNOLOJİ</div>
+        <div class="gc-text">Gözle görülemeyen minik robotlar vücudunu içeriden onarır!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+13 XP</div>
+        <span class="gc-icon">⚛️</span>
+        <div class="gc-title">KUANTUM BİLGİSAYAR</div>
+        <div class="gc-text">Bugünkü bilgisayarlardan milyonlarca kat hızlı!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+12 XP</div>
+        <span class="gc-icon">🌱</span>
+        <div class="gc-title">YEŞİL ENERJİ</div>
+        <div class="gc-text">Güneş ve rüzgar teknolojisi ucuzlayacak, fosil yakıt bitecek!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+12 XP</div>
+        <span class="gc-icon">🚀</span>
+        <div class="gc-title">UZAY TURİZMİ</div>
+        <div class="gc-text">Mars'a tatile gitmek bu neslin çocukları için gerçek olabilir!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+12 XP</div>
+        <span class="gc-icon">🧬</span>
+        <div class="gc-title">GEN TEKNOLOJİSİ</div>
+        <div class="gc-text">Kalıtsal hastalıklar doğmadan önce düzeltilebilecek!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+13 XP</div>
+        <span class="gc-icon">🤖</span>
+        <div class="gc-title">AKILLI ŞEHİRLER</div>
+        <div class="gc-text">Trafik, çöp, enerji — her şey birbirine bağlı ve akıllı!</div>
+      </div>
+      <div class="game-card">
+        <div class="gc-xp">+13 XP</div>
+        <span class="gc-icon">🔋</span>
+        <div class="gc-title">SÜPER PİLLER</div>
+        <div class="gc-text">Telefonunu haftada bir kez şarj edeceksin!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: TİCARET — LEVEL 7 -->
+  <div class="slide" id="s8">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 7</div>
+      <div class="level-title">TİCARET ARENASI</div>
+    </div>
+    <div class="slide-sub">+100 XP — Alışverişin Dönüşümünü Keşfet!</div>
+    <div class="trade-board">
+      <div class="tb-col old">
+        <h3>⏮ ESKİDEN</h3>
+        <ul>
+          <li>🏪 Sadece mağazaya gidilirdi</li>
+          <li>💵 Nakit para kullanılırdı</li>
+          <li>📰 Gazete reklamları</li>
+          <li>📞 Telefonla sipariş</li>
+          <li>🗺️ Haritayla yol bulunurdu</li>
+          <li>📋 Kağıt fatura</li>
+        </ul>
+      </div>
+      <div class="tb-arrow">⇒</div>
+      <div class="tb-col new">
+        <h3>🚀 ŞİMDİ & GELECEK</h3>
+        <ul>
+          <li>📱 Her şey telefondan</li>
+          <li>💳 Dijital ödeme & kripto para</li>
+          <li>🎯 YZ ile kişisel reklam</li>
+          <li>🚁 Drone ile kapıya teslimat</li>
+          <li>🗺️ GPS & akıllı navigasyon</li>
+          <li>📧 Dijital fatura & e-ticaret</li>
+        </ul>
+      </div>
+    </div>
+    <div class="fact-box" style="margin-top:12px">
+      💰 <strong style="color:var(--yellow)">PUAN BONUSU:</strong> Amazon'da her gün <strong style="color:var(--green)">35 milyon+</strong> ürün satılıyor = saniyede <strong style="color:var(--yellow)">400 ürün</strong>!
+    </div>
+  </div>
+
+  <!-- SLIDE 9: KARİYER — LEVEL 8 -->
+  <div class="slide" id="s9">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 8</div>
+      <div class="level-title">SINIF SEÇİMİ</div>
+    </div>
+    <div class="slide-sub">+100 XP — Geleceğin Karakterini Seç!</div>
+    <div class="career-rpg">
+      <div class="crpg">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🤖</div>
+        <div class="c-class">YZ MÜHENDİSİ</div>
+        <div class="c-text">Yapay zeka sistemleri kurar ve eğitir. Dünyanın en çok aranan mesleği!</div>
+      </div>
+      <div class="crpg">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🥽</div>
+        <div class="c-class">METAVERSE MİMARI</div>
+        <div class="c-text">Sanal dünyalar ve dijital şehirler tasarlar. Geleceğin yaratıcısı!</div>
+      </div>
+      <div class="crpg">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🧬</div>
+        <div class="c-class">GEN MÜHENDİSİ</div>
+        <div class="c-text">Hastalıkları önlemek için DNA'yı programlar. Tıbbın geleceği!</div>
+      </div>
+      <div class="crpg">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🌍</div>
+        <div class="c-class">İKLİM TEKNOLOJİSTİ</div>
+        <div class="c-text">Teknolojiyle iklim değişikliğiyle savaşır. Dünyamızı kurtarır!</div>
+      </div>
+      <div class="crpg">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🚀</div>
+        <div class="c-class">UZAY MÜHENDİSİ</div>
+        <div class="c-text">Mars kolonisi tasarlar. Yıldızlara giden yolu açar!</div>
+      </div>
+      <div class="crpg">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🛡️</div>
+        <div class="c-class">SİBER KAHRAMAN</div>
+        <div class="c-text">Dijital dünyayı saldırılardan korur. Geleceğin en kritik görevi!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: VİCTORY -->
+  <div class="slide" id="s10">
+    <div class="victory-screen">
+      <div style="font-size:80px;filter:drop-shadow(0 0 25px rgba(255,230,0,0.8));animation:introFloat 2s ease-in-out infinite">🏆</div>
+      <div class="victory-title">TEBR İKLER!<br>OYUN TAMAM!</div>
+      <div class="final-xp" id="finalXP">🌟 TOPLAM XP: 900 / 900</div>
+      <div class="achievement-row">
+        <div class="achievement">
+          <div class="ach-icon">🌐</div>
+          <div class="ach-label">İNTERNET<br>USTASI</div>
+        </div>
+        <div class="achievement">
+          <div class="ach-icon">⚡</div>
+          <div class="ach-label">HIZ<br>ŞAMPİYONU</div>
+        </div>
+        <div class="achievement">
+          <div class="ach-icon">🤖</div>
+          <div class="ach-label">YZ<br>KAŞİFİ</div>
+        </div>
+        <div class="achievement">
+          <div class="ach-icon">🚀</div>
+          <div class="ach-label">GELECEK<br>MİMARI</div>
+        </div>
+      </div>
+      <div class="press-start">TEKRAR OYNAMAK İÇİN ← TUŞUNA BAS</div>
+    </div>
+  </div>
+
+</div>
+
+<button class="arrow-btn arrow-left" onclick="changeSlide(-1)">◀</button>
+<button class="arrow-btn arrow-right" onclick="changeSlide(1)">▶</button>
+
+<div class="bottom-nav" id="bottomNav"></div>
+
+<script>
+  const TOTAL = 10;
+  let current = 0;
+
+  // XP per slide (cumulative when reached)
+  const slideXP = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+  const slideBadge = [null, 0, 1, 2, 3, 4, 5, 6, 7, null];
+  const slideLabels = ['START','LV1','LV2','LV3','LV4','LV5','LV6','LV7','LV8','END'];
+
+  // Build bottom nav
+  const bn = document.getElementById('bottomNav');
+  for(let i=0;i<TOTAL;i++){
+    const pip = document.createElement('div');
+    pip.className='level-pip'+(i===0?' active':'');
+    pip.textContent = slideLabels[i];
+    pip.onclick=()=>goTo(i);
+    bn.appendChild(pip);
+  }
+
+  function updateHUD(n) {
+    const xp = slideXP[n];
+    const pct = (xp/900)*100;
+    document.getElementById('xpFill').style.width = pct+'%';
+    document.getElementById('xpCount').textContent = xp+' / 900';
+    document.getElementById('hudLevel').textContent = n===0?'LV.1':(n===TOTAL-1?'MAX':'LV.'+n);
+
+    // Unlock badges
+    for(let i=0;i<8;i++){
+      const badge = document.getElementById('b'+i);
+      if(i < n-1) badge.classList.add('earned');
+      else badge.classList.remove('earned');
+    }
+  }
+
+  function goTo(n) {
+    document.querySelectorAll('.level-pip')[current].classList.remove('active','done');
+    document.querySelectorAll('.level-pip')[current].classList.add('done');
+    document.getElementById('s'+(current+1)).classList.remove('active');
+    current = Math.max(0, Math.min(TOTAL-1, n));
+    document.getElementById('s'+(current+1)).classList.add('active');
+    document.querySelectorAll('.level-pip').forEach((p,i)=>{
+      p.classList.remove('active','done');
+      if(i<current) p.classList.add('done');
+      if(i===current) p.classList.add('active');
+    });
+    updateHUD(current);
+  }
+
+  function changeSlide(d){ goTo(current+d); }
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' ') changeSlide(1);
+    if(e.key==='ArrowLeft') changeSlide(-1);
+  });
+
+  updateHUD(0);
+</script>
+</body>
+</html>
