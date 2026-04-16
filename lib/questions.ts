@@ -54,7 +54,7 @@ export const questions: Question[] = [
   {
     id: 5, type: 'mcq',
     text: 'Yapay zeka nasıl "öğrenir"?',
-    options: ['Uyuyarak', 'Veri analiz ederek', 'Okula giderek', 'Rastgele tahmin ederek'],
+    options: ['Uyuyarak', 'Veri analiz ederek', 'Spor yaparak', 'Rastgele tahmin ederek'],
     correct: 'Veri analiz ederek',
     explanation: '🧠 Yapay zeka milyonlarca veriyi analiz ederek örüntüleri öğrenir!',
     xp: 10,
