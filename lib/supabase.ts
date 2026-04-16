@@ -48,5 +48,7 @@ export function subscribeToLeaderboard(callback: (results: QuizResult[]) => void
       }
     )
     .subscribe();
-  return () => supabase.removeChannel(channel);
+  return () => {
+    supabase.removeChannel(channel);
+  };
 }
