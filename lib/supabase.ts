@@ -41,7 +41,7 @@ export function subscribeToLeaderboard(callback: (results: QuizResult[]) => void
     .channel('leaderboard-realtime')
     .on(
       'postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'quiz_results' },
+      { event: '*', schema: 'public', table: 'quiz_results' },
       async () => {
         const results = await getLeaderboard();
         callback(results);
@@ -51,4 +51,14 @@ export function subscribeToLeaderboard(callback: (results: QuizResult[]) => void
   return () => {
     supabase.removeChannel(channel);
   };
+}
+
+// Liderboard'u komple sıfırla — sadece öğretmen/admin için
+// Not: RLS delete policy'si yoksa başarısız olur. Schema'da policy açık.
+export async function resetLeaderboard() {
+  const { error } = await supabase
+    .from('quiz_results')
+    .delete()
+    .neq('id', '00000000-0000-0000-0000-000000000000');   // tüm satırları sil
+  if (error) throw error;
 }

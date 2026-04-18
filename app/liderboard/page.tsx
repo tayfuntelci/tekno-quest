@@ -1,7 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getLeaderboard, subscribeToLeaderboard, QuizResult } from '@/lib/supabase';
+import { getLeaderboard, subscribeToLeaderboard, resetLeaderboard, QuizResult } from '@/lib/supabase';
+
+// Öğretmen şifresi — sınıf-içi kullanım için yeterli
+const ADMIN_PASSWORD = 'TEKNO2026';
 
 function rankDisplay(i: number) {
   if (i === 0) return { emoji: '🥇', cls: 'rank-1' };
@@ -13,6 +16,8 @@ function rankDisplay(i: number) {
 export default function Leaderboard() {
   const [results, setResults] = useState<QuizResult[]>([]);
   const [loading, setLoading] = useState(true);
+  const [resetStage, setResetStage] = useState<'idle' | 'ask' | 'working' | 'done' | 'wrong'>('idle');
+  const [pwInput, setPwInput] = useState('');
 
   useEffect(() => {
     getLeaderboard(50)
@@ -24,6 +29,28 @@ export default function Leaderboard() {
   }, []);
 
   const sorted = [...results].sort((a, b) => b.total_xp - a.total_xp);
+
+  const handleReset = async () => {
+    if (pwInput !== ADMIN_PASSWORD) {
+      setResetStage('wrong');
+      setTimeout(() => setResetStage('ask'), 1400);
+      return;
+    }
+    setResetStage('working');
+    try {
+      await resetLeaderboard();
+      setResults([]);
+      setResetStage('done');
+      setTimeout(() => {
+        setResetStage('idle');
+        setPwInput('');
+      }, 1800);
+    } catch (err) {
+      console.error(err);
+      alert('Sıfırlama başarısız oldu. Supabase policy kontrol et.');
+      setResetStage('idle');
+    }
+  };
 
   return (
     <main className="min-h-screen relative z-10 px-4 py-8 max-w-2xl mx-auto">
@@ -114,6 +141,102 @@ export default function Leaderboard() {
           {sorted.length} öğrenci • Yeni skorlar otomatik eklenir
         </p>
       )}
+
+      {/* Sıfırla butonu — sağ altta sabit, küçük */}
+      <div className="mt-12 pt-6" style={{ borderTop: '1px dashed rgba(255,255,255,0.1)' }}>
+        <div className="text-center">
+          <p className="text-xs mb-3" style={{ color: 'var(--muted)', fontFamily: 'Chakra Petch' }}>
+            🧑‍🏫 ÖĞRETMEN ARAÇLARI
+          </p>
+          {resetStage === 'idle' && (
+            <button
+              onClick={() => setResetStage('ask')}
+              className="text-xs px-3 py-2 rounded"
+              style={{
+                background: 'rgba(255,68,68,0.08)',
+                border: '1px solid rgba(255,68,68,0.3)',
+                color: 'var(--danger)',
+                fontFamily: 'Chakra Petch',
+                letterSpacing: '1px',
+              }}
+            >
+              🗑️ LİDERBOARD'U SIFIRLA
+            </button>
+          )}
+
+          {(resetStage === 'ask' || resetStage === 'wrong') && (
+            <div className="max-w-sm mx-auto">
+              <div className="game-card p-4" style={{
+                borderColor: resetStage === 'wrong' ? 'var(--danger)' : 'rgba(255,159,28,0.4)',
+              }}>
+                <p className="text-xs mb-3" style={{ color: 'var(--muted)' }}>
+                  ⚠️ Tüm skorlar silinecek. Geri alınamaz!
+                </p>
+                <input
+                  type="password"
+                  placeholder="Öğretmen şifresi"
+                  value={pwInput}
+                  onChange={e => setPwInput(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleReset()}
+                  className="w-full px-3 py-2 rounded mb-2 outline-none text-center"
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,159,28,0.4)',
+                    color: 'var(--text)',
+                    fontFamily: 'Exo 2',
+                    fontSize: '14px',
+                    letterSpacing: '2px',
+                  }}
+                  autoFocus
+                />
+                {resetStage === 'wrong' && (
+                  <p className="text-xs mb-2" style={{ color: 'var(--danger)' }}>
+                    ❌ Şifre yanlış — tekrar dene
+                  </p>
+                )}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { setResetStage('idle'); setPwInput(''); }}
+                    className="flex-1 text-xs py-2 rounded"
+                    style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      color: 'var(--muted)',
+                      fontFamily: 'Chakra Petch',
+                    }}
+                  >
+                    VAZGEÇ
+                  </button>
+                  <button
+                    onClick={handleReset}
+                    className="flex-1 text-xs py-2 rounded"
+                    style={{
+                      background: 'var(--danger)',
+                      color: '#000',
+                      fontFamily: 'Chakra Petch',
+                      fontWeight: 700,
+                      letterSpacing: '1px',
+                    }}
+                  >
+                    🗑️ SİL
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {resetStage === 'working' && (
+            <p className="text-xs" style={{ color: 'var(--orange)' }}>
+              ⏳ Siliniyor...
+            </p>
+          )}
+          {resetStage === 'done' && (
+            <p className="text-xs" style={{ color: 'var(--success)' }}>
+              ✅ Liderboard sıfırlandı — yeni bir başlangıç!
+            </p>
+          )}
+        </div>
+      </div>
     </main>
   );
 }

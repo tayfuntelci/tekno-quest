@@ -178,3 +178,1660 @@ body::before {
   100%{transform:translateY(-50px) scale(1.3);opacity:0}
 }
 .xp-pop { animation: xpPop 1s ease forwards; }
+
+/* ============================================================
+   QUIZ GAMIFICATION — Karakter, Power-Up, Streak, Rank, Burst
+   ============================================================ */
+
+/* Karakter kartı seçimi */
+.char-card {
+  background: rgba(18,18,43,0.85);
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 20px 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+.char-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--char-color, var(--primary));
+  box-shadow: 0 10px 30px var(--char-glow, rgba(255,230,0,0.25));
+}
+.char-card.selected {
+  border-color: var(--char-color, var(--primary));
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), transparent);
+  box-shadow: 0 0 28px var(--char-glow, rgba(255,230,0,0.4)), inset 0 0 20px rgba(255,255,255,0.03);
+  transform: translateY(-4px);
+}
+.char-card .char-emoji {
+  font-size: 64px;
+  display: block;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 0 14px var(--char-glow, rgba(255,230,0,0.4)));
+}
+.char-card .char-class {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: var(--char-color, var(--primary));
+  margin-bottom: 6px;
+}
+.char-card .char-bio {
+  font-size: 12px;
+  color: rgba(232,232,255,0.7);
+  line-height: 1.5;
+  margin-bottom: 10px;
+  min-height: 48px;
+}
+.char-card .char-power {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--success);
+  background: rgba(57,255,20,0.08);
+  border: 1px solid rgba(57,255,20,0.3);
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+
+/* Power-up bar (quiz sırasında) */
+.powerup-bar {
+  display: flex;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(18,18,43,0.85);
+  border: 1px solid rgba(255,230,0,0.2);
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+}
+.powerup-slot {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: rgba(255,230,0,0.1);
+  border: 1px solid rgba(255,230,0,0.4);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 11px;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+}
+.powerup-slot:hover:not(:disabled) {
+  background: rgba(255,230,0,0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255,230,0,0.3);
+}
+.powerup-slot:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.powerup-slot .pu-emoji { font-size: 18px; }
+
+/* Streak banner (büyük orta üst) */
+.streak-banner {
+  position: fixed;
+  top: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(18,18,43,0.95), rgba(18,18,43,0.85));
+  border: 3px solid var(--streak-color, var(--primary));
+  border-radius: 16px;
+  padding: 14px 32px;
+  z-index: 90;
+  box-shadow: 0 0 40px var(--streak-color, var(--primary));
+  pointer-events: none;
+  animation: bannerIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+}
+.streak-banner .sb-emoji { font-size: 32px; }
+.streak-banner .sb-text {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--streak-color, var(--primary));
+  text-shadow: 0 0 20px currentColor;
+}
+.streak-banner .sb-bonus {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 13px;
+  color: var(--success);
+  margin-left: 8px;
+}
+
+/* Burst particles (doğru cevap efekti) */
+.burst-container {
+  position: fixed;
+  pointer-events: none;
+  z-index: 80;
+}
+.burst-particle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: burst 0.9s ease-out forwards;
+}
+
+@keyframes burst {
+  0%   { transform: translate(0,0) scale(0); opacity: 1; }
+  100% { transform: translate(var(--bx), var(--by)) scale(1.4); opacity: 0; }
+}
+
+/* Rank-up büyük banner */
+.rank-up-banner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, rgba(255,230,0,0.95), rgba(255,159,28,0.9));
+  border: 4px solid #fff;
+  border-radius: 20px;
+  padding: 24px 48px;
+  z-index: 100;
+  box-shadow: 0 0 80px rgba(255,230,0,0.6), inset 0 0 40px rgba(255,255,255,0.2);
+  pointer-events: none;
+  text-align: center;
+  animation: rankUp 1.8s ease forwards;
+}
+.rank-up-banner .ru-label {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #000;
+  opacity: 0.8;
+}
+.rank-up-banner .ru-name {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #000;
+  margin-top: 4px;
+  text-shadow: 2px 2px 0 rgba(255,255,255,0.4);
+}
+.rank-up-banner .ru-emoji {
+  font-size: 56px;
+  display: block;
+  margin: 4px 0;
+}
+
+/* Rank pill (HUD'da) */
+.rank-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--rank-bg, rgba(255,230,0,0.1));
+  border: 1px solid var(--rank-color, var(--primary));
+  border-radius: 20px;
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--rank-color, var(--primary));
+  letter-spacing: 0.5px;
+}
+
+/* Retry butonu (yanlış cevaptan sonra) */
+.btn-retry {
+  background: linear-gradient(135deg, var(--orange, #ff9f1c), var(--primary));
+  color: #000;
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+  animation: heartbeat 1.2s ease-in-out infinite;
+}
+.btn-retry:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 22px rgba(255,230,0,0.5);
+}
+.btn-retry:active { transform: scale(0.97); }
+
+/* Ekran shake wrapper (doğru cevap küçük titreme) */
+.screen-shake-trigger {
+  animation: screenShake 0.5s ease;
+}
+
+/* Güvenli ekran (uzun yanlış cevap açıklaması vs) */
+.hero-card {
+  background: linear-gradient(180deg, rgba(18,18,43,0.92), rgba(18,18,43,0.75));
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45), 0 0 40px rgba(255,230,0,0.08);
+}
+
+/* Sonuç kartı — oyuncu raporu */
+.result-card {
+  background: linear-gradient(180deg, rgba(18,18,43,0.92), rgba(18,18,43,0.75));
+  border: 2px solid rgba(255,230,0,0.4);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255,230,0,0.15);
+}
+.result-card .rc-head {
+  background: linear-gradient(135deg, var(--char-color, var(--primary)), var(--char-color, var(--orange)));
+  padding: 24px;
+  text-align: center;
+  color: #000;
+}
+.result-card .rc-avatar {
+  font-size: 72px;
+  margin-bottom: 6px;
+  filter: drop-shadow(2px 4px 0 rgba(0,0,0,0.2));
+}
+.result-card .rc-name {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 1px;
+}
+.result-card .rc-class {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 13px;
+  opacity: 0.85;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+/* Rozet ızgarası (sonuç) */
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  gap: 10px;
+  max-width: 100%;
+}
+.badge-chip {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--b-color, var(--primary));
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+  animation: bounceIn 0.6s cubic-bezier(0.175,0.885,0.32,1.275) both;
+  box-shadow: 0 0 16px var(--b-color, rgba(255,230,0,0.2));
+}
+.badge-chip .bc-emoji { font-size: 28px; }
+.badge-chip .bc-name {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 10px;
+  color: var(--b-color, var(--primary));
+  font-weight: 700;
+  margin-top: 4px;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+.badge-chip .bc-desc {
+  font-size: 9px;
+  color: rgba(232,232,255,0.55);
+  margin-top: 3px;
+  line-height: 1.3;
+}
+
+/* Stat kartları (sonuç) */
+.stat-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--s-color, rgba(255,255,255,0.1));
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+}
+.stat-card .sc-num {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--s-color, var(--primary));
+  line-height: 1;
+}
+.stat-card .sc-label {
+  font-size: 10px;
+  color: rgba(232,232,255,0.55);
+  margin-top: 5px;
+  font-family: 'Chakra Petch', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================================
+   QUIZ OYUNSUL ARENA — Progress Path, Arena, Section Overlay
+   ============================================================ */
+
+/* Zafere giden yol — üst HUD altı */
+.progress-path {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 12px;
+  background: rgba(18,18,43,0.85);
+  border: 1px solid rgba(255,230,0,0.2);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  overflow-x: auto;
+  scrollbar-width: none;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+}
+.progress-path::-webkit-scrollbar { display: none; }
+
+.path-node {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 2px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.4);
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.4s;
+}
+.path-node.done {
+  background: linear-gradient(135deg, var(--success), #a8ff3e);
+  border-color: var(--success);
+  color: #000;
+  box-shadow: 0 0 14px rgba(57,255,20,0.6);
+}
+.path-node.current {
+  border-color: var(--primary);
+  background: rgba(255,230,0,0.18);
+  color: var(--primary);
+  box-shadow: 0 0 18px rgba(255,230,0,0.7);
+  transform: scale(1.25);
+  animation: nodePulse 1.4s ease-in-out infinite;
+}
+.path-node.current::after {
+  content: '';
+  position: absolute;
+  top: -6px; left: -6px; right: -6px; bottom: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  opacity: 0.5;
+  animation: nodeRipple 1.6s ease-out infinite;
+}
+@keyframes nodePulse {
+  0%,100% { box-shadow: 0 0 18px rgba(255,230,0,0.7); }
+  50%     { box-shadow: 0 0 30px rgba(255,230,0,1);   }
+}
+@keyframes nodeRipple {
+  0%   { transform: scale(1);   opacity: 0.7; }
+  100% { transform: scale(1.8); opacity: 0;   }
+}
+
+.path-line {
+  flex-shrink: 0;
+  width: 14px;
+  height: 3px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  transition: all 0.4s;
+}
+.path-line.done {
+  background: linear-gradient(90deg, var(--success), #a8ff3e);
+  box-shadow: 0 0 6px rgba(57,255,20,0.4);
+}
+
+.path-checkpoint {
+  flex-shrink: 0;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  filter: grayscale(1) opacity(0.45);
+  transition: all 0.5s;
+  position: relative;
+}
+.path-checkpoint.reached {
+  filter: drop-shadow(0 0 8px rgba(255,159,28,0.6));
+  animation: heartbeat 1.2s ease-in-out infinite;
+}
+
+.path-trophy {
+  flex-shrink: 0;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  filter: grayscale(1) opacity(0.5);
+  transition: all 0.5s;
+}
+.path-trophy.reached {
+  filter: drop-shadow(0 0 14px rgba(255,230,0,0.8));
+  animation: heartbeat 1s ease-in-out infinite;
+}
+
+/* Bölüm geçiş overlay — cinematic */
+.section-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at center, var(--sec-color, rgba(0,207,255,0.35)) 0%, rgba(10,10,24,0.92) 55%, rgba(5,5,15,0.98) 100%);
+  backdrop-filter: blur(6px);
+  animation: sectionFade 2.2s ease forwards;
+  pointer-events: none;
+  overflow: hidden;
+}
+@keyframes sectionFade {
+  0%   { opacity: 0; }
+  12%  { opacity: 1; }
+  82%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Yatay ışık taraması */
+.so-sweep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 40%,
+    var(--sec-color-solid, #00cfff) 50%,
+    transparent 60%,
+    transparent 100%
+  );
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation: soSweep 1.6s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes soSweep {
+  0%   { opacity: 0;   transform: translateX(-100%) skewX(-20deg); }
+  25%  { opacity: 0.55; }
+  60%  { opacity: 0.2; }
+  100% { opacity: 0;   transform: translateX(120%) skewX(-20deg); }
+}
+
+/* Yükselen kıvılcımlar */
+.so-sparks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.so-spark {
+  position: absolute;
+  bottom: -20px;
+  border-radius: 50%;
+  background: var(--sec-color-solid, #00cfff);
+  box-shadow: 0 0 14px 2px var(--sec-color-solid, #00cfff);
+  opacity: 0;
+  animation: soSparkRise ease-out forwards;
+}
+@keyframes soSparkRise {
+  0%   { transform: translateY(0) scale(0.6);  opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translateY(-110vh) scale(0.2); opacity: 0; }
+}
+
+.section-overlay-inner {
+  position: relative;
+  text-align: center;
+  animation: sectionPop 2s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+  z-index: 2;
+}
+@keyframes sectionPop {
+  0%   { transform: scale(0.3) rotate(-6deg); opacity: 0; }
+  22%  { transform: scale(1.18) rotate(2deg); opacity: 1; }
+  45%  { transform: scale(0.95) rotate(-1deg);            }
+  65%  { transform: scale(1.02) rotate(0);                 }
+  88%  { transform: scale(1);                              opacity: 1; }
+  100% { transform: scale(1.08);                           opacity: 0; }
+}
+
+/* Glowing badge — emoji'nin arkasındaki dramatik çerçeve */
+.so-badge {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.so-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.so-ring-1 {
+  background:
+    radial-gradient(circle, transparent 40%, var(--sec-color, rgba(0,207,255,0.5)) 55%, transparent 75%);
+  animation: soRingPulse 1.8s ease-out infinite;
+}
+.so-ring-2 {
+  border: 2px solid var(--sec-color-solid, #00cfff);
+  box-shadow:
+    0 0 30px var(--sec-color, rgba(0,207,255,0.6)) inset,
+    0 0 40px var(--sec-color, rgba(0,207,255,0.6));
+  animation: soRingSpin 4s linear infinite;
+}
+.so-ring-3 {
+  border: 1px dashed var(--sec-color-solid, #00cfff);
+  opacity: 0.6;
+  animation: soRingSpin 7s linear infinite reverse;
+  transform: scale(1.18);
+}
+@keyframes soRingPulse {
+  0%   { transform: scale(0.85); opacity: 1;   }
+  70%  { transform: scale(1.25); opacity: 0.2; }
+  100% { transform: scale(1.3);  opacity: 0;   }
+}
+@keyframes soRingSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.so-orbit-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: var(--sec-color-solid, #00cfff);
+  box-shadow: 0 0 12px 2px var(--sec-color-solid, #00cfff);
+  transform-origin: 4px 82px;
+  animation: soOrbitFade 2s ease-out forwards;
+}
+@keyframes soOrbitFade {
+  0%   { opacity: 0; }
+  30%  { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+.section-overlay .so-emoji {
+  position: relative;
+  z-index: 2;
+  font-size: 100px;
+  line-height: 1;
+  /* Emoji'yi doğru render etmek için: önce emoji fontları, sonra Chakra */
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji", 'Chakra Petch', sans-serif;
+  filter: drop-shadow(0 0 36px var(--sec-color, rgba(0,207,255,0.8)));
+  display: inline-block;
+  animation: soEmojiBob 1.6s ease-in-out infinite;
+}
+@keyframes soEmojiBob {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-6px) scale(1.04); }
+}
+.section-overlay .so-label {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 4px;
+  margin-bottom: 10px;
+  text-shadow: 0 0 14px var(--sec-color, rgba(0,207,255,0.6));
+}
+.section-overlay .so-name {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 44px;
+  font-weight: 900;
+  color: var(--sec-color-solid, var(--info));
+  letter-spacing: 4px;
+  text-shadow:
+    0 0 20px var(--sec-color, rgba(0,207,255,0.8)),
+    0 0 40px var(--sec-color, rgba(0,207,255,0.5));
+  line-height: 1.1;
+  padding: 0 20px;
+  animation: soNameGlow 1.6s ease-in-out infinite alternate;
+}
+@keyframes soNameGlow {
+  from { filter: brightness(1); }
+  to   { filter: brightness(1.3); }
+}
+.section-overlay .so-sub {
+  margin-top: 10px;
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 16px;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 3px;
+}
+
+/* Arena — soru kartı büyük glow */
+.arena-card {
+  position: relative;
+  background: rgba(18,18,43,0.88);
+  border: 2px solid var(--arena-color, rgba(255,230,0,0.35));
+  border-radius: 20px;
+  padding: 28px;
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.45),
+    0 0 50px var(--arena-glow, rgba(255,230,0,0.15)),
+    inset 0 0 40px rgba(0,0,0,0.3);
+}
+.arena-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--arena-color, var(--primary)), transparent);
+  border-radius: 20px 20px 0 0;
+}
+/* Hafif köşe dekorasyon */
+.arena-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--arena-color, var(--primary)) 0%, transparent 30%, transparent 70%, var(--arena-color, var(--primary)) 100%);
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Arka plan parçacıkları (quiz sırasında) */
+.quiz-particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+.quiz-particle {
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  animation: qpDrift linear infinite;
+}
+@keyframes qpDrift {
+  0%   { transform: translateY(100vh) translateX(0)   scale(0); opacity: 0; }
+  10%  { opacity: 0.6; }
+  90%  { opacity: 0.3; }
+  100% { transform: translateY(-30px) translateX(var(--qx, 0))  scale(1); opacity: 0; }
+}
+
+/* Oyunsul cevap butonu (3D) */
+.game-option {
+  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.03) 100%);
+  border: 2px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175,0.885,0.32,1.275);
+  text-align: left;
+  width: 100%;
+  color: var(--text);
+  font-family: 'Exo 2', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.game-option::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: all 0.2s;
+}
+.game-option:hover:not(:disabled) {
+  border-color: rgba(255,230,0,0.6);
+  background: linear-gradient(180deg, rgba(255,230,0,0.08) 0%, rgba(255,230,0,0.03) 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(255,230,0,0.2), 0 4px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.game-option:hover:not(:disabled)::before {
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary);
+}
+.game-option:active:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3), inset 0 2px 4px rgba(0,0,0,0.2);
+}
+.game-option.correct {
+  border-color: var(--success);
+  background: linear-gradient(180deg, rgba(57,255,20,0.15) 0%, rgba(57,255,20,0.05) 100%);
+  color: var(--success);
+  box-shadow: 0 0 24px rgba(57,255,20,0.4), 0 3px 0 rgba(0,0,0,0.3);
+}
+.game-option.correct::before {
+  background: var(--success);
+  box-shadow: 0 0 14px var(--success);
+}
+.game-option.wrong {
+  border-color: var(--danger);
+  background: linear-gradient(180deg, rgba(255,68,68,0.15) 0%, rgba(255,68,68,0.05) 100%);
+  color: var(--danger);
+  animation: shake 0.4s ease;
+}
+.game-option.wrong::before {
+  background: var(--danger);
+}
+.game-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.9;
+}
+
+/* TF için büyük oyun butonu */
+.game-tf {
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 16px;
+  padding: 24px 18px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175,0.885,0.32,1.275);
+  text-align: center;
+  width: 100%;
+  color: var(--text);
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+  letter-spacing: 1px;
+}
+.game-tf:hover:not(:disabled) {
+  transform: translateY(-4px);
+  border-color: rgba(255,230,0,0.55);
+  box-shadow: 0 8px 22px rgba(255,230,0,0.2), 0 4px 0 rgba(0,0,0,0.3);
+}
+.game-tf:active:not(:disabled) { transform: translateY(-1px); }
+.game-tf .tf-big { font-size: 42px; margin-bottom: 6px; display: block; }
+.game-tf.correct {
+  border-color: var(--success);
+  background: linear-gradient(180deg, rgba(57,255,20,0.18), rgba(57,255,20,0.06));
+  color: var(--success);
+  box-shadow: 0 0 28px rgba(57,255,20,0.45), 0 4px 0 rgba(0,0,0,0.3);
+}
+.game-tf.wrong {
+  border-color: var(--danger);
+  background: linear-gradient(180deg, rgba(255,68,68,0.18), rgba(255,68,68,0.05));
+  color: var(--danger);
+  animation: shake 0.4s ease;
+}
+.game-tf:disabled { cursor: not-allowed; opacity: 0.9; }
+
+/* Karakter mini avatar (sol üst, sürekli görünür) */
+.char-mini {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: rgba(18,18,43,0.9);
+  border: 3px solid var(--char-color, var(--primary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  z-index: 50;
+  box-shadow: 0 0 20px var(--char-glow, rgba(255,230,0,0.3));
+  animation: heartbeat 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px var(--char-glow, rgba(255,230,0,0.2)));
+}
+
+@media (max-width: 640px) {
+  .char-mini {
+    top: 10px;
+    left: 10px;
+    width: 42px; height: 42px;
+    font-size: 22px;
+  }
+  .so-badge { width: 140px; height: 140px; margin-bottom: 14px; }
+  .so-orbit-dot { transform-origin: 4px 64px; width: 6px; height: 6px; }
+  .section-overlay .so-emoji { font-size: 72px; }
+  .section-overlay .so-name { font-size: 28px; letter-spacing: 2px; }
+  .section-overlay .so-label { font-size: 12px; letter-spacing: 3px; }
+  .section-overlay .so-sub { font-size: 13px; letter-spacing: 2px; }
+  .arena-card { padding: 18px 16px; }
+}
+
+/* ============================================================
+   UZAY OYUN TAHTASI (Space Map Board)
+   ============================================================ */
+
+/* ----- Uzay arka planı — çok katmanlı yıldız alanı ----- */
+.space-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at top right, rgba(0,207,255,0.08), transparent 50%),
+    radial-gradient(ellipse at bottom left, rgba(192,132,252,0.08), transparent 55%),
+    linear-gradient(180deg, #0a0a18 0%, #050512 100%);
+  pointer-events: none;
+}
+.space-backdrop .sb-layer {
+  position: absolute;
+  inset: -20px;
+  background-repeat: repeat;
+  animation: starsDrift linear infinite;
+}
+.space-backdrop .sb-stars-a {
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, #fff 50%, transparent),
+    radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.85) 50%, transparent),
+    radial-gradient(1.4px 1.4px at 90px 40px, #fff 50%, transparent),
+    radial-gradient(1px 1px at 150px 120px, rgba(0,207,255,0.9) 50%, transparent),
+    radial-gradient(1.2px 1.2px at 190px 60px, rgba(255,230,0,0.8) 50%, transparent),
+    radial-gradient(1px 1px at 230px 150px, rgba(255,255,255,0.7) 50%, transparent);
+  background-size: 280px 200px;
+  animation-duration: 120s;
+  opacity: 0.9;
+}
+.space-backdrop .sb-stars-b {
+  background-image:
+    radial-gradient(2px 2px at 60px 90px, rgba(255,255,255,0.95) 50%, transparent),
+    radial-gradient(1.5px 1.5px at 170px 30px, rgba(255,159,28,0.9) 50%, transparent),
+    radial-gradient(2px 2px at 240px 180px, #fff 50%, transparent),
+    radial-gradient(1.5px 1.5px at 320px 80px, rgba(192,132,252,0.8) 50%, transparent);
+  background-size: 400px 260px;
+  animation-duration: 200s;
+  animation-direction: reverse;
+  opacity: 0.7;
+}
+.space-backdrop .sb-stars-c {
+  background-image:
+    radial-gradient(2.5px 2.5px at 120px 160px, rgba(57,255,20,0.85) 50%, transparent),
+    radial-gradient(3px 3px at 380px 50px, rgba(255,230,0,0.8) 50%, transparent);
+  background-size: 520px 320px;
+  animation-duration: 300s;
+  opacity: 0.55;
+}
+@keyframes starsDrift {
+  0%   { transform: translate(0, 0); }
+  100% { transform: translate(-280px, -200px); }
+}
+
+.space-backdrop .sb-nebula {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.35;
+  animation: nebulaFloat 18s ease-in-out infinite;
+}
+.space-backdrop .sb-nebula-1 {
+  width: 420px; height: 420px;
+  top: -100px; left: -80px;
+  background: radial-gradient(circle, rgba(0,207,255,0.55), transparent 70%);
+}
+.space-backdrop .sb-nebula-2 {
+  width: 380px; height: 380px;
+  top: 40%; right: -100px;
+  background: radial-gradient(circle, rgba(192,132,252,0.5), transparent 70%);
+  animation-delay: -6s;
+}
+.space-backdrop .sb-nebula-3 {
+  width: 460px; height: 460px;
+  bottom: -120px; left: 30%;
+  background: radial-gradient(circle, rgba(57,255,20,0.3), transparent 70%);
+  animation-delay: -11s;
+}
+@keyframes nebulaFloat {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50%     { transform: translate(30px, -20px) scale(1.08); }
+}
+
+/* ----- Oyun tahtası konteyneri ----- */
+.game-board-wrap {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 18px 140px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ----- HUD (üst bar) ----- */
+.game-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, rgba(18,18,43,0.9), rgba(18,18,43,0.7));
+  border: 1px solid rgba(255,230,0,0.18);
+  border-radius: 14px;
+  margin-left: 74px; /* char-mini için boşluk */
+  margin-bottom: 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  flex-wrap: wrap;
+}
+.game-hud .hud-title {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 1px;
+  line-height: 1.2;
+}
+.game-hud .hud-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+  font-family: 'Chakra Petch', sans-serif;
+  letter-spacing: 0.5px;
+}
+.game-hud .hud-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.game-hud .hud-xp {
+  text-align: right;
+  line-height: 1;
+}
+.game-hud .hud-xp-num {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--success);
+  text-shadow: 0 0 12px rgba(57,255,20,0.6);
+}
+.game-hud .hud-xp-label {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1.5px;
+  margin-top: 2px;
+}
+.game-hud .hud-streak {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 13px;
+  background: rgba(255,159,28,0.12);
+  border: 1px solid rgba(255,159,28,0.4);
+  color: var(--orange, #ff9f1c);
+  padding: 4px 10px;
+  border-radius: 20px;
+  animation: heartbeat 1.2s ease-in-out infinite;
+}
+.game-hud .hud-streak strong { color: var(--primary); margin-left: 4px; }
+
+/* ----- Harita alanı ----- */
+.game-map {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 520px;
+  aspect-ratio: 16 / 9;
+  max-height: 72vh;
+  margin: 0 auto;
+  background:
+    radial-gradient(ellipse at center, rgba(0,0,0,0.25) 0%, transparent 60%);
+  border-radius: 20px;
+  overflow: visible;
+}
+
+.map-path-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+.map-path-bg {
+  fill: none;
+  stroke: rgba(255,255,255,0.18);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 7 6;
+}
+.map-path-fg {
+  fill: none;
+  stroke: rgba(255,230,0,0.9);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 8px rgba(255,230,0,0.7));
+  animation: pathGlow 2.2s ease-in-out infinite;
+}
+@keyframes pathGlow {
+  0%,100% { filter: drop-shadow(0 0 8px rgba(255,230,0,0.5)); }
+  50%     { filter: drop-shadow(0 0 16px rgba(255,230,0,0.9)); }
+}
+
+/* ----- Harita düğümü (gezegen) ----- */
+.board-node {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  animation: nodePop 0.6s cubic-bezier(0.175,0.885,0.32,1.275) both;
+}
+@keyframes nodePop {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1);   }
+}
+
+.board-node .node-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.22), rgba(0,0,0,0.35) 65%);
+  border: 3px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: rgba(255,255,255,0.4);
+  transition: all 0.4s;
+  position: relative;
+  box-shadow: inset 0 -6px 12px rgba(0,0,0,0.45);
+}
+
+/* Tamamlanan (done) */
+.board-node.done {
+  cursor: pointer;
+}
+.board-node.done .node-inner {
+  background: radial-gradient(circle at 30% 30%, #d7ffa5, var(--node-color, var(--success)) 65%);
+  border-color: var(--node-color, var(--success));
+  color: #063;
+  box-shadow:
+    inset 0 -8px 14px rgba(0,0,0,0.3),
+    0 0 22px var(--node-glow, rgba(57,255,20,0.6));
+  transition: all 0.3s;
+}
+.board-node.done:hover .node-inner {
+  transform: scale(1.1);
+  box-shadow:
+    inset 0 -8px 14px rgba(0,0,0,0.3),
+    0 0 32px var(--node-glow, rgba(57,255,20,0.9));
+}
+.board-node.done .node-check {
+  font-size: 28px;
+  color: #063;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+}
+.board-node.done .node-review-hint {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(18,18,43,0.95);
+  border: 1.5px solid rgba(255,255,255,0.3);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: all 0.25s cubic-bezier(0.175,0.885,0.32,1.275);
+  pointer-events: none;
+}
+.board-node.done:hover .node-review-hint {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Mevcut (current) — büyük pulse, parlak */
+.board-node.current {
+  z-index: 30;
+  cursor: pointer;
+}
+.board-node.current .node-inner {
+  background: radial-gradient(circle at 30% 30%,
+    rgba(255,255,255,0.35),
+    var(--node-color, var(--primary)) 60%,
+    rgba(0,0,0,0.2) 100%);
+  border-color: var(--node-color, var(--primary));
+  color: #fff;
+  font-size: 28px;
+  box-shadow:
+    inset 0 -10px 18px rgba(0,0,0,0.4),
+    0 0 40px var(--node-glow, rgba(255,230,0,0.6)),
+    0 0 80px var(--node-glow, rgba(255,230,0,0.3));
+  animation: boardNodePulse 1.4s ease-in-out infinite;
+}
+@keyframes boardNodePulse {
+  0%,100% { transform: scale(1); }
+  50%     { transform: scale(1.1); }
+}
+.board-node.current::after {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  border: 3px solid var(--node-color, var(--primary));
+  opacity: 0.6;
+  animation: boardNodeRipple 1.8s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes boardNodeRipple {
+  0%   { transform: scale(1);    opacity: 0.8; }
+  100% { transform: scale(1.55); opacity: 0;   }
+}
+.board-node.current:hover .node-inner {
+  transform: scale(1.08);
+  box-shadow:
+    inset 0 -10px 18px rgba(0,0,0,0.4),
+    0 0 60px var(--node-glow, rgba(255,230,0,0.9));
+}
+.board-node.current .node-current {
+  font-size: 30px;
+  filter: drop-shadow(0 0 10px rgba(0,0,0,0.4));
+}
+
+.board-node .node-tap-hint {
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  background: rgba(18,18,43,0.95);
+  border: 1px solid var(--primary);
+  padding: 4px 10px;
+  border-radius: 14px;
+  white-space: nowrap;
+  letter-spacing: 1.5px;
+  animation: tapHint 1.3s ease-in-out infinite;
+  text-shadow: 0 0 6px currentColor;
+  box-shadow: 0 0 14px rgba(255,230,0,0.4);
+  pointer-events: none;
+}
+@keyframes tapHint {
+  0%,100% { transform: translateX(-50%) translateY(0);   opacity: 0.95; }
+  50%     { transform: translateX(-50%) translateY(-4px); opacity: 1;    }
+}
+
+/* Gelecek (future) — kilitli */
+.board-node.future .node-inner {
+  opacity: 0.55;
+  border-color: rgba(255,255,255,0.12);
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08), rgba(0,0,0,0.4) 70%);
+  color: rgba(255,255,255,0.3);
+}
+.board-node.future .node-lock {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  font-size: 16px;
+  background: rgba(18,18,43,0.95);
+  border: 1px solid rgba(255,255,255,0.25);
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: grayscale(0.5);
+}
+
+/* ----- Trophy ----- */
+.board-trophy {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  transform: translate(-50%, -50%);
+  z-index: 22;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  filter: grayscale(0.6) opacity(0.55);
+  transition: all 0.6s;
+}
+.board-trophy .trophy-inner {
+  font-size: 54px;
+  filter: drop-shadow(0 0 8px rgba(255,215,0,0.3));
+  animation: trophyFloat 3.5s ease-in-out infinite;
+}
+.board-trophy .trophy-label {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: rgba(255,215,0,0.6);
+  margin-top: -4px;
+}
+.board-trophy.reached {
+  filter: grayscale(0) opacity(1);
+  animation: trophyCelebrate 1.5s ease-in-out infinite;
+}
+.board-trophy.reached .trophy-inner {
+  filter: drop-shadow(0 0 22px rgba(255,215,0,1));
+}
+.board-trophy.reached .trophy-label {
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255,215,0,0.8);
+}
+@keyframes trophyFloat {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-6px); }
+}
+@keyframes trophyCelebrate {
+  0%,100% { transform: scale(1) rotate(-3deg); }
+  50%     { transform: scale(1.12) rotate(3deg); }
+}
+
+/* ----- ROKET (karakter) ----- */
+.board-rocket {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  transform: translate(-50%, -50%);
+  z-index: 40;
+  pointer-events: none;
+  transition:
+    left 0.95s cubic-bezier(0.65,0.05,0.36,1),
+    top  0.95s cubic-bezier(0.65,0.05,0.36,1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.board-rocket .rocket-body {
+  font-size: 44px;
+  filter: drop-shadow(0 0 14px var(--rocket-glow, rgba(255,230,0,0.7)));
+  animation: rocketFloat 2.4s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+}
+@keyframes rocketFloat {
+  0%,100% { transform: translateY(0) rotate(-2deg); }
+  50%     { transform: translateY(-5px) rotate(2deg); }
+}
+.board-rocket .rocket-thrust {
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    var(--rocket-glow, rgba(255,230,0,0.6)) 0%,
+    transparent 60%);
+  filter: blur(8px);
+  animation: thrustPulse 0.9s ease-in-out infinite;
+  z-index: 1;
+}
+@keyframes thrustPulse {
+  0%,100% { opacity: 0.55; transform: scale(1);    }
+  50%     { opacity: 0.9;  transform: scale(1.25); }
+}
+.board-rocket.moving .rocket-body {
+  animation: rocketBoost 0.95s ease-out;
+}
+@keyframes rocketBoost {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.3) rotate(-4deg); }
+  70%  { transform: scale(1.15) rotate(4deg); }
+  100% { transform: scale(1); }
+}
+.board-rocket.moving .rocket-thrust {
+  animation: thrustBoost 0.95s ease-out;
+}
+@keyframes thrustBoost {
+  0%   { transform: scale(1);   opacity: 0.6; }
+  40%  { transform: scale(2);   opacity: 1;   }
+  100% { transform: scale(1.2); opacity: 0.7; }
+}
+
+/* ----- Harita üzeri güç hatırlatıcı (küçük rozet, modal kapalıyken) ----- */
+.powerbar-reminder {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, rgba(255,230,0,0.14), rgba(255,159,28,0.08));
+  border: 1.5px solid rgba(255,230,0,0.5);
+  border-radius: 22px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px rgba(255,230,0,0.25);
+  cursor: pointer;
+  z-index: 45;
+  animation: powerBarIn 0.5s ease, pbrPulse 2.2s ease-in-out 0.5s infinite;
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 12px;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+  transition: transform 0.2s;
+}
+.powerbar-reminder:hover { transform: translateX(-50%) scale(1.06); }
+.powerbar-reminder .pr-icon {
+  font-size: 18px;
+  filter: drop-shadow(0 0 6px rgba(255,230,0,0.6));
+}
+@keyframes powerBarIn {
+  0%   { opacity: 0; transform: translate(-50%, 30px); }
+  100% { opacity: 1; transform: translate(-50%, 0);    }
+}
+@keyframes pbrPulse {
+  0%,100% { box-shadow: 0 0 20px rgba(255,230,0,0.25); }
+  50%     { box-shadow: 0 0 32px rgba(255,230,0,0.55); }
+}
+
+/* ----- Modal içi süper güç barı ----- */
+.modal-powerbar {
+  background: linear-gradient(135deg, rgba(255,230,0,0.1), rgba(255,159,28,0.06));
+  border: 1.5px dashed rgba(255,230,0,0.45);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  animation: mpbIn 0.4s ease;
+}
+@keyframes mpbIn {
+  0%   { opacity: 0; transform: translateY(-6px); }
+  100% { opacity: 1; transform: translateY(0);    }
+}
+.modal-powerbar .mp-label {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 10px;
+  color: var(--primary);
+  letter-spacing: 2px;
+  text-align: center;
+  margin-bottom: 8px;
+  text-shadow: 0 0 8px rgba(255,230,0,0.4);
+}
+.modal-powerbar .mp-slots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.modal-powerbar .powerup-slot {
+  flex: 0 1 auto;
+  min-width: 90px;
+}
+
+/* ============================================================
+   SORU MODAL (Question Gate)
+   ============================================================ */
+.q-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: qModalIn 0.3s ease;
+}
+@keyframes qModalIn {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+.q-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(5,5,18,0.78);
+  backdrop-filter: blur(6px);
+}
+.q-modal-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 640px;
+  max-height: 92vh;
+  overflow-y: auto;
+  animation: qCardIn 0.45s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+@keyframes qCardIn {
+  0%   { opacity: 0; transform: scale(0.7) translateY(30px); }
+  100% { opacity: 1; transform: scale(1) translateY(0);      }
+}
+.q-modal-card::-webkit-scrollbar { width: 4px; }
+.q-modal-card::-webkit-scrollbar-thumb { background: rgba(255,230,0,0.3); border-radius: 2px; }
+
+/* Gate banner — "🔒 Bu aşamayı geçmek için..." */
+.q-gate {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border: 1.5px solid;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  animation: gateShake 1.8s ease-in-out infinite;
+}
+@keyframes gateShake {
+  0%,100% { transform: translateX(0); }
+  25%     { transform: translateX(-2px); }
+  75%     { transform: translateX(2px);  }
+}
+.q-gate-icon {
+  font-size: 32px;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,0.5));
+}
+.q-gate-texts { flex: 1; }
+.q-gate-small {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+}
+.q-gate-big {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+  text-shadow: 0 0 12px currentColor;
+}
+
+/* ----- Mobil uyumluluk ----- */
+@media (max-width: 768px) {
+  .game-board-wrap { padding: 10px 10px 120px; }
+  .game-hud {
+    margin-left: 62px;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .game-hud .hud-title { font-size: 13px; }
+  .game-hud .hud-xp-num { font-size: 18px; }
+  .game-map { min-height: 440px; max-height: 60vh; }
+  .board-node { width: 52px; height: 52px; }
+  .board-node .node-inner { font-size: 16px; }
+  .board-node.current .node-inner { font-size: 22px; }
+  .board-node.done .node-check { font-size: 22px; }
+  .board-node .node-tap-hint { font-size: 9px; padding: 3px 8px; top: -28px; }
+  .board-rocket { width: 56px; height: 56px; }
+  .board-rocket .rocket-body { font-size: 34px; }
+  .board-trophy { width: 60px; height: 60px; }
+  .board-trophy .trophy-inner { font-size: 40px; }
+  .q-gate-big { font-size: 13px; }
+  .q-gate-icon { font-size: 26px; }
+  .game-powerbar { bottom: 12px; padding: 8px 12px; }
+  .powerup-slot { font-size: 10px; padding: 5px 8px; }
+}
+@media (max-width: 480px) {
+  .board-node { width: 44px; height: 44px; }
+  .board-node.current .node-inner { font-size: 18px; }
+  .board-rocket { width: 44px; height: 44px; }
+  .board-rocket .rocket-body { font-size: 28px; }
+  .game-map { min-height: 380px; }
+}
+
+/* ============================================================
+   REVIEW MODAL — geçmiş cevabı gör
+   ============================================================ */
+
+.review-wrap .q-modal-backdrop {
+  background: rgba(5,5,18,0.7);
+}
+.review-card {
+  border-color: rgba(192,132,252,0.5) !important;
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, rgba(192,132,252,0.16), rgba(0,207,255,0.08));
+  border: 1.5px solid rgba(192,132,252,0.4);
+  border-radius: 12px;
+}
+.review-header .rh-icon {
+  font-size: 30px;
+  filter: drop-shadow(0 0 8px rgba(192,132,252,0.6));
+}
+.review-header .rh-texts { flex: 1; }
+.review-header .rh-small {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+}
+.review-header .rh-big {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: #c084fc;
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+  text-shadow: 0 0 12px rgba(192,132,252,0.5);
+}
+.review-header .rh-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.review-header .rh-close:hover {
+  background: rgba(255,68,68,0.2);
+  border-color: var(--danger);
+  color: var(--danger);
+  transform: rotate(90deg);
+}
+
+/* Review option satırı (read-only) */
+.review-opt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text);
+  cursor: default;
+}
+.review-opt .ro-text { flex: 1; }
+.review-opt.correct {
+  border-color: var(--success);
+  background: linear-gradient(180deg, rgba(57,255,20,0.18), rgba(57,255,20,0.06));
+  color: var(--success);
+  box-shadow: 0 0 18px rgba(57,255,20,0.25);
+}
+.review-opt.wrong {
+  border-color: var(--danger);
+  background: linear-gradient(180deg, rgba(255,68,68,0.18), rgba(255,68,68,0.05));
+  color: var(--danger);
+}
+.review-opt .ro-tag {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+.review-opt .ro-tag-user {
+  background: rgba(255,230,0,0.18);
+  color: var(--primary);
+  border: 1px solid rgba(255,230,0,0.45);
+}
+.review-opt .ro-tag-ok {
+  background: rgba(57,255,20,0.2);
+  color: var(--success);
+  border: 1px solid rgba(57,255,20,0.5);
+}
+
+/* TF versiyonu */
+.review-opt-tf {
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px 12px;
+  text-align: center;
+}
+.review-opt-tf .ro-big { font-size: 38px; }
+.review-opt-tf .ro-label {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Match eşleme satırı */
+.review-match-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: linear-gradient(180deg, rgba(57,255,20,0.08), rgba(57,255,20,0.02));
+  border: 1px solid rgba(57,255,20,0.25);
+  border-radius: 10px;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 14px;
+}
+.review-match-row .rm-left {
+  flex: 0 0 auto;
+  min-width: 90px;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: 'Chakra Petch', sans-serif;
+  letter-spacing: 0.5px;
+}
+.review-match-row .rm-arrow {
+  color: var(--success);
+  font-weight: 700;
+  font-size: 18px;
+}
+.review-match-row .rm-right {
+  flex: 1;
+  color: var(--text);
+}
+
+@media (max-width: 640px) {
+  .review-header .rh-big { font-size: 13px; }
+  .review-header .rh-icon { font-size: 24px; }
+  .review-opt { padding: 12px 14px; font-size: 14px; }
+  .review-opt .ro-tag { font-size: 8px; padding: 2px 6px; }
+  .review-opt-tf .ro-big { font-size: 32px; }
+  .review-match-row { font-size: 13px; }
+  .review-match-row .rm-left { min-width: 70px; }
+}

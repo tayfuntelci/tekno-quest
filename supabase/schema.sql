@@ -33,6 +33,13 @@ create policy "Herkes ekleyebilir"
   to anon
   with check (true);
 
+-- Herkes silebilir (liderboard sıfırlama için — client'ta şifre ile korunur)
+-- Güvenlik notu: Sınıf-içi oyun için yeterli. Hassas veri yok.
+create policy "Herkes silebilir"
+  on quiz_results for delete
+  to anon
+  using (true);
+
 -- ─── Realtime aktif et ───────────────────────────────────────
 -- Supabase Dashboard > Database > Replication bölümünden
 -- "quiz_results" tablosunu etkinleştir
