@@ -1,0 +1,2246 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teknoloji Quest — Ultimate</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Exo+2:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TEKNO QUEST — HARMAN SUNUM (Ultimate / zenginleştirilmiş)
+   Oyun omurgası + Uzay arka plan + Sıcak aksanlar + Akıllı kullanım
+   ============================================================ */
+
+:root {
+  --bg:        #0d0d1a;
+  --bg-soft:   #12122b;
+  --text:      #f0f0ff;
+  --dim:       rgba(255,255,255,0.06);
+  --primary:   #ffe600;
+  --success:   #39ff14;
+  --info:      #00cfff;
+  --purple:    #A855F7;
+  --warm:      #FF6B35;
+  --pink:      #FF6B9D;
+  --mint:      #4ecdc4;           /* LV9 — akıllı kullanım aksanı */
+  --red:       #ff3131;
+  --holo-bg:     rgba(0,30,60,0.55);
+  --holo-border: rgba(0,245,255,0.25);
+  --grid:        rgba(0,245,255,0.05);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Exo 2', sans-serif;
+  background: var(--bg);
+  overflow: hidden;
+  width: 100vw; height: 100vh;
+  color: var(--text);
+  user-select: none;
+}
+
+/* ======================== ARKA PLAN KATMANLARI ========================= */
+
+.grid-bg {
+  position: fixed;
+  top:0; left:0; width:100%; height:100%;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+.scanline {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--info), transparent);
+  animation: scan 5s linear infinite;
+  z-index: 1; opacity: 0.35;
+  pointer-events: none;
+}
+@keyframes scan { 0%{top:-3px} 100%{top:100vh} }
+.stars-bg { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 0; }
+.star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2.5s ease-in-out infinite; }
+@keyframes twinkle { 0%,100%{opacity:0.15} 50%{opacity:0.9} }
+.particles-container { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 0; }
+.particle { position: absolute; border-radius: 50%; animation: particleDrift linear infinite; }
+@keyframes particleDrift {
+  0%   { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.4; }
+  100% { transform: translateY(-20px) translateX(var(--drift)) scale(1); opacity: 0; }
+}
+.pixel-corner { position: fixed; width: 14px; height: 14px; z-index: 300; pointer-events: none; }
+.pc-tl { top:56px;    left:0;  border-top:2px solid var(--primary); border-left:2px solid var(--primary); }
+.pc-tr { top:56px;    right:0; border-top:2px solid var(--primary); border-right:2px solid var(--primary); }
+.pc-bl { bottom:48px; left:0;  border-bottom:2px solid var(--primary); border-left:2px solid var(--primary); }
+.pc-br { bottom:48px; right:0; border-bottom:2px solid var(--primary); border-right:2px solid var(--primary); }
+
+/* ============================= ÜST HUD ================================= */
+.hud {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 56px;
+  background: rgba(10,10,25,0.95);
+  border-bottom: 2px solid var(--primary);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; z-index: 200;
+  box-shadow: 0 4px 30px rgba(255,230,0,0.1);
+  backdrop-filter: blur(8px);
+}
+.hud-left  { display:flex; align-items:center; gap:14px; }
+.hud-logo {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 12px;
+  color: var(--primary);
+  text-shadow: 0 0 10px rgba(255,230,0,0.6);
+  letter-spacing: 1.5px;
+}
+.hud-level {
+  background: var(--primary); color: #000;
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 10px;
+  padding: 4px 10px; border-radius: 4px; letter-spacing: 1px;
+}
+.hud-center { display:flex; align-items:center; gap:10px; }
+.xp-label { font-family: 'Chakra Petch'; font-size: 9px; color: var(--success); letter-spacing: 1px; }
+.xp-bar-wrap {
+  width: 200px; height: 14px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(57,255,20,0.3);
+  border-radius: 3px; overflow: hidden; position: relative;
+}
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--success), #a8ff3e);
+  border-radius: 3px; transition: width 0.8s ease; position: relative;
+}
+.xp-bar-fill::after {
+  content:''; position: absolute; top:0; left:0; right:0; bottom:0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
+  animation: shimmer 2s linear infinite;
+}
+@keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+.xp-count {
+  font-family: 'Chakra Petch'; font-size: 9px; color: var(--success);
+  min-width: 90px; letter-spacing: 0.5px;
+}
+.hud-right { display:flex; gap:8px; align-items:center; }
+.badge-item {
+  font-size: 19px;
+  filter: grayscale(1) opacity(0.3);
+  transition: all 0.4s;
+  cursor: default;
+}
+.badge-item.earned {
+  filter: drop-shadow(0 0 8px rgba(255,230,0,0.8));
+  animation: badgePop 0.5s ease;
+}
+@keyframes badgePop {
+  0%   { transform: scale(0.5); }
+  60%  { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+/* ============================ ALT NAV ================================== */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 48px;
+  background: rgba(10,10,25,0.95);
+  border-top: 2px solid var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; z-index: 200; backdrop-filter: blur(8px);
+  padding: 0 8px;
+}
+.level-pip {
+  width: 38px; height: 32px;
+  border: 2px solid rgba(255,230,0,0.2); border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 8px;
+  color: rgba(255,255,255,0.35); cursor: pointer;
+  transition: all 0.3s;
+  background: rgba(255,255,255,0.03); letter-spacing: 0.5px;
+}
+.level-pip.done {
+  border-color: var(--success); color: var(--success);
+  background: rgba(57,255,20,0.08); box-shadow: 0 0 10px rgba(57,255,20,0.2);
+}
+.level-pip.active {
+  border-color: var(--primary); color: var(--primary);
+  background: rgba(255,230,0,0.12); box-shadow: 0 0 14px rgba(255,230,0,0.4);
+  transform: scale(1.15);
+}
+
+/* ============================ OKLAR =================================== */
+.arrow-btn {
+  position: fixed; top: 50%; transform: translateY(-50%);
+  background: rgba(255,230,0,0.08);
+  border: 2px solid rgba(255,230,0,0.3);
+  color: var(--primary);
+  width: 44px; height: 44px; border-radius: 8px;
+  font-family: 'Chakra Petch'; font-size: 16px;
+  cursor: pointer; z-index: 200; transition: all 0.2s;
+}
+.arrow-btn:hover {
+  background: rgba(255,230,0,0.22);
+  box-shadow: 0 0 22px rgba(255,230,0,0.35);
+  transform: translateY(-50%) scale(1.08);
+}
+.arrow-left  { left: 10px; }
+.arrow-right { right: 10px; }
+
+/* ============================ SLAYT ZEMİNİ ============================= */
+.presentation { width: 100vw; height: 100vh; position: relative; z-index: 2; }
+.slide {
+  position: absolute; top:0; left:0; width:100%; height:100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.45s ease;
+  padding: 70px 50px 58px;
+  overflow-y: auto;
+}
+.slide.active { opacity: 1; pointer-events: all; }
+.slide::-webkit-scrollbar { width: 6px; }
+.slide::-webkit-scrollbar-track { background: transparent; }
+.slide::-webkit-scrollbar-thumb { background: rgba(255,230,0,0.25); border-radius: 3px; }
+
+/* ======================== ORTAK BİLEŞENLER ============================= */
+.level-banner {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 6px;
+}
+.level-badge {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 10px;
+  background: var(--primary); color: #000;
+  padding: 5px 14px; border-radius: 4px; letter-spacing: 1px;
+}
+.level-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(18px, 2.6vw, 28px);
+  color: var(--primary);
+  text-shadow: 0 0 22px rgba(255,230,0,0.5);
+  text-align: center; letter-spacing: 1.5px;
+}
+.slide-sub {
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: rgba(240,240,255,0.6);
+  text-align: center; margin-bottom: 16px;
+  font-weight: 400; letter-spacing: 1px;
+}
+.section-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(12px, 1.4vw, 14px);
+  color: var(--info);
+  text-align: left;
+  letter-spacing: 1.5px;
+  margin: 14px 0 8px;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(0,245,255,0.4);
+}
+
+.holo-card {
+  background: var(--holo-bg);
+  border: 1px solid var(--holo-border);
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+  position: relative; overflow: hidden;
+  transition: all 0.3s;
+}
+.holo-card::before {
+  content:''; position:absolute; top:0; left:0;
+  width:100%; height:2px;
+  background: linear-gradient(90deg, transparent, var(--info), transparent);
+}
+.holo-card::after {
+  content:''; position:absolute; top:0; left:0;
+  width:4px; height:100%;
+  background: var(--info); opacity: 0.8;
+}
+.holo-card:hover {
+  border-color: var(--info);
+  box-shadow: 0 0 24px rgba(0,245,255,0.18), inset 0 0 24px rgba(0,245,255,0.03);
+  transform: translateY(-3px);
+}
+.accent-warm::after   { background: var(--warm);    }
+.accent-pink::after   { background: var(--pink);    }
+.accent-purple::after { background: var(--purple);  }
+.accent-green::after  { background: var(--success); }
+.accent-yellow::after { background: var(--primary); }
+.accent-cyan::after   { background: var(--info);    }
+.accent-mint::after   { background: var(--mint);    }
+.accent-red::after    { background: var(--red);     }
+
+.fact-box {
+  background: rgba(255,230,0,0.07);
+  border: 1px solid rgba(255,230,0,0.25);
+  border-radius: 8px;
+  padding: 10px 18px;
+  margin-top: 12px;
+  max-width: 900px;
+  text-align: center;
+  font-size: clamp(12px, 1.4vw, 14px);
+  color: rgba(240,240,255,0.9);
+}
+.xp-tag {
+  position: absolute; top: 8px; right: 10px;
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 8px;
+  color: var(--success);
+  background: rgba(57,255,20,0.1);
+  border: 1px solid rgba(57,255,20,0.35);
+  padding: 2px 7px; border-radius: 4px;
+  letter-spacing: 0.5px; z-index: 3;
+}
+
+/* ====================== SLAYT 1 — KAPAK ================================= */
+.orbit-container { position: relative; width: 170px; height: 170px; margin-bottom: 10px; }
+.planet {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); font-size: 70px;
+  animation: planetPulse 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(0,245,255,0.8));
+}
+@keyframes planetPulse {
+  0%,100% { transform: translate(-50%,-50%) scale(1); }
+  50%     { transform: translate(-50%,-50%) scale(1.08); }
+}
+.orbit-ring {
+  position: absolute; top:50%; left:50%;
+  border-radius: 50%;
+  border: 1px solid rgba(0,245,255,0.3);
+  transform: translate(-50%,-50%) rotateX(70deg);
+}
+.orbit-ring-1 { width: 130px; height: 130px; animation: ringRotate 6s linear infinite; }
+.orbit-ring-2 { width: 190px; height: 190px; animation: ringRotate 10s linear infinite reverse; border-color: rgba(191,95,255,0.35); }
+@keyframes ringRotate { to { transform: translate(-50%,-50%) rotateX(70deg) rotateZ(360deg); } }
+.orbit-moon {
+  position: absolute; font-size: 20px;
+  top: 50%; left: 50%;
+  transform-origin: 0 0;
+  animation: moonOrbit 6s linear infinite;
+}
+@keyframes moonOrbit { to { transform: rotate(360deg) translateX(75px) rotate(-360deg); } }
+
+.s1-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(32px, 5.5vw, 60px);
+  color: var(--primary);
+  text-align: center; line-height: 1.05;
+  text-shadow:
+    4px 4px 0 rgba(0,0,0,0.5),
+    0 0 40px rgba(255,230,0,0.6),
+    0 0 80px rgba(255,230,0,0.25);
+  letter-spacing: 3px;
+}
+.s1-tagline {
+  font-size: clamp(11px, 1.4vw, 14px);
+  color: var(--info); text-align: center;
+  margin-top: 8px; letter-spacing: 2.5px;
+  font-weight: 400;
+  text-shadow: 0 0 12px rgba(0,245,255,0.4);
+}
+
+/* Cover — bugün neler öğreneceğiz */
+.preview-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(11px, 1.4vw, 13px);
+  color: var(--info);
+  letter-spacing: 2px;
+  margin: 18px 0 8px;
+  text-shadow: 0 0 10px rgba(0,245,255,0.35);
+}
+.preview-9 {
+  display: grid; grid-template-columns: repeat(9, 1fr);
+  gap: 6px; max-width: 820px; width: 100%;
+  margin-bottom: 10px;
+}
+.preview-chip {
+  background: rgba(0,245,255,0.05);
+  border: 1px solid rgba(0,245,255,0.2);
+  border-radius: 8px;
+  padding: 8px 4px; text-align: center;
+  transition: all 0.3s;
+}
+.preview-chip:hover {
+  background: rgba(0,245,255,0.12);
+  border-color: var(--info);
+  transform: translateY(-2px);
+}
+.preview-chip .pi { font-size: 22px; display:block; margin-bottom: 2px; }
+.preview-chip .pl {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: 7px; color: var(--info);
+  letter-spacing: 0.5px; line-height: 1.3;
+}
+
+/* Cover — canlı sayaçlar */
+.live-counters-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(10px, 1.2vw, 12px);
+  color: var(--success);
+  letter-spacing: 1.5px;
+  margin: 8px 0 6px;
+}
+.live-counters {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; max-width: 760px; width: 100%; margin-bottom: 10px;
+}
+.lc-box {
+  background: rgba(57,255,20,0.05);
+  border: 1px solid rgba(57,255,20,0.25);
+  border-radius: 8px; padding: 8px 12px; text-align: center;
+}
+.lc-num {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(14px, 2vw, 20px);
+  color: var(--success);
+  text-shadow: 0 0 10px rgba(57,255,20,0.4);
+  line-height: 1;
+}
+.lc-label { font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 4px; letter-spacing: 0.5px; }
+
+.health-bars {
+  display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; justify-content: center;
+}
+.hbar { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.hbar-label { font-family: 'Chakra Petch'; font-weight: 700; font-size: 8px; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
+.hbar-track {
+  width: 110px; height: 9px;
+  background: rgba(255,255,255,0.08); border-radius: 3px;
+  overflow: hidden; border: 1px solid rgba(255,255,255,0.18);
+}
+.hbar-fill { height:100%; border-radius:3px; }
+.intro-start {
+  margin-top: 14px;
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(10px, 1.3vw, 13px);
+  color: var(--success); border: 2px solid var(--success);
+  padding: 10px 26px; border-radius: 6px;
+  background: rgba(57,255,20,0.08);
+  animation: glowGreen 2s ease-in-out infinite;
+  letter-spacing: 2px;
+}
+@keyframes glowGreen {
+  0%,100% { box-shadow: 0 0 12px rgba(57,255,20,0.35); }
+  50%     { box-shadow: 0 0 28px rgba(57,255,20,0.7); }
+}
+.keyboard-hint { margin-top: 6px; font-family: 'Chakra Petch'; font-size: 8px; color: rgba(255,255,255,0.35); letter-spacing: 1px; }
+
+/* ====================== ORTAK GAME GRID ================================ */
+.game-grid { display: grid; gap: 10px; width: 100%; max-width: 1000px; }
+.g2 { grid-template-columns: repeat(2, 1fr); }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g4 { grid-template-columns: repeat(4, 1fr); }
+
+.game-card { padding: 16px 14px; text-align: center; }
+.game-card .gc-icon { font-size: clamp(30px, 3.5vw, 40px); margin-bottom: 6px; display: block; filter: drop-shadow(0 0 8px rgba(0,245,255,0.4)); }
+.game-card .gc-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(9px, 1.1vw, 12px);
+  color: var(--primary);
+  margin-bottom: 6px; letter-spacing: 1px; line-height: 1.3;
+}
+.game-card .gc-text {
+  font-size: clamp(10px, 1.2vw, 13px);
+  color: rgba(240,240,255,0.78);
+  line-height: 1.5; font-weight: 400;
+}
+
+/* =================== SLAYT 2 — İNTERNET BİLEŞENLERİ ==================== */
+.internet-split {
+  display: grid; grid-template-columns: 1.15fr 1fr;
+  gap: 14px; width: 100%; max-width: 1000px;
+}
+.msg-map {
+  position: relative;
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.25);
+  border-radius: 10px;
+  padding: 14px 14px 8px;
+  min-height: 180px;
+  overflow: hidden;
+}
+.msg-map-title {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 10px;
+  color: var(--info); letter-spacing: 1.5px; margin-bottom: 8px;
+}
+.msg-map-svg { width: 100%; height: 130px; display: block; }
+.msg-packet {
+  fill: var(--primary);
+  filter: drop-shadow(0 0 6px var(--primary));
+  offset-path: path('M 40 80 Q 200 10 380 70');
+  offset-distance: 0;
+  animation: packetMove 3s linear infinite;
+}
+.msg-packet.p2 { animation-delay: 0.6s; fill: var(--warm); filter: drop-shadow(0 0 6px var(--warm)); }
+.msg-packet.p3 { animation-delay: 1.2s; fill: var(--success); filter: drop-shadow(0 0 6px var(--success)); }
+.msg-packet.p4 { animation-delay: 1.8s; fill: var(--pink); filter: drop-shadow(0 0 6px var(--pink)); }
+@keyframes packetMove { to { offset-distance: 100%; } }
+.city-label {
+  fill: var(--info); font-family: 'Chakra Petch';
+  font-size: 9px; font-weight: 700; letter-spacing: 1px;
+}
+.msg-legend { font-size: 10px; color: rgba(255,255,255,0.55); margin-top: 4px; }
+
+.one-second-panel {
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.25);
+  border-radius: 10px; padding: 12px; min-height: 180px;
+}
+.one-second-title {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 10px;
+  color: var(--warm); letter-spacing: 1.5px; margin-bottom: 8px;
+}
+.os-row {
+  display: grid; grid-template-columns: 28px 1fr auto;
+  align-items: center; gap: 8px;
+  padding: 5px 6px; border-bottom: 1px dashed rgba(255,255,255,0.08);
+}
+.os-row:last-child { border-bottom: 0; }
+.os-icon { font-size: 18px; }
+.os-label { font-size: 12px; color: rgba(255,255,255,0.75); }
+.os-num {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 12px;
+  color: var(--primary);
+}
+
+.page-journey {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 10px; width: 100%; max-width: 1000px; margin-top: 10px;
+}
+.pj-step {
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.25);
+  border-radius: 8px; padding: 10px; text-align: center;
+  position: relative;
+}
+.pj-arrow {
+  position: absolute; top: 50%; right: -12px;
+  transform: translateY(-50%);
+  color: var(--info); font-family: 'Chakra Petch'; font-weight: 700; font-size: 16px;
+  filter: drop-shadow(0 0 6px var(--info));
+  z-index: 1;
+}
+.pj-step:last-child .pj-arrow { display: none; }
+.pj-icon { font-size: 26px; margin-bottom: 4px; }
+.pj-num {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 8px;
+  color: var(--warm); letter-spacing: 1px;
+}
+.pj-title {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 10px;
+  color: var(--primary); margin: 4px 0;
+}
+.pj-desc { font-size: 10px; color: rgba(255,255,255,0.65); line-height: 1.4; }
+
+/* =================== SLAYT 3 — TÜRKİYE QUEST TIMELINE ================== */
+.quest-list { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 880px; position: relative; }
+.quest-list::before {
+  content:''; position: absolute;
+  left: 66px; top: 10px; bottom: 10px; width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--info), var(--purple), transparent);
+}
+.quest-item { display: flex; align-items: center; gap: 14px; padding: 10px 16px; position: relative; }
+.quest-item:hover { transform: translateX(4px); }
+.quest-item .q-dot {
+  position: absolute; left: 62px;
+  width: 10px; height: 10px; background: var(--info);
+  border-radius: 50%; box-shadow: 0 0 14px var(--info);
+}
+.quest-item.active .q-dot {
+  background: var(--primary); box-shadow: 0 0 16px var(--primary);
+  animation: dotBlink 1.2s step-end infinite;
+}
+@keyframes dotBlink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.quest-year {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(13px, 1.7vw, 17px);
+  color: var(--primary); min-width: 55px;
+  text-shadow: 0 0 10px rgba(255,230,0,0.4);
+}
+.q-spacer { width: 18px; flex-shrink: 0; }
+.quest-icon { font-size: 24px; flex-shrink: 0; }
+.quest-text { flex: 1; }
+.quest-text strong { display: block; font-size: clamp(12px, 1.4vw, 15px); color: var(--text); font-weight: 700; margin-bottom: 2px; }
+.quest-text span { font-size: clamp(10px, 1.2vw, 13px); color: rgba(240,240,255,0.6); font-weight: 300; }
+.q-know {
+  display: block; margin-top: 4px; padding: 4px 8px;
+  background: rgba(255,230,0,0.08);
+  border-left: 2px solid var(--primary);
+  border-radius: 3px;
+  font-size: 11px; color: var(--primary);
+  font-style: italic;
+}
+.quest-badge {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 8px;
+  padding: 4px 8px; border-radius: 4px; white-space: nowrap; letter-spacing: 1px;
+}
+.qb-done   { background: rgba(57,255,20,0.15); color: var(--success);  border: 1px solid var(--success); }
+.qb-active { background: rgba(255,230,0,0.15); color: var(--primary);  border: 1px solid var(--primary); animation: badgeBlink 1.2s step-end infinite; }
+@keyframes badgeBlink { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+/* Büyüme grafiği */
+.growth-chart {
+  margin-top: 12px; width: 100%; max-width: 880px;
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.25);
+  border-radius: 10px; padding: 12px 16px;
+}
+.growth-title { font-family: 'Chakra Petch'; font-weight: 700; font-size: 11px; color: var(--info); letter-spacing: 1px; margin-bottom: 8px; }
+.growth-row { display: grid; grid-template-columns: 70px 1fr 100px; gap: 10px; align-items: center; padding: 4px 0; }
+.growth-year { font-family: 'Chakra Petch'; font-weight: 700; font-size: 12px; color: var(--primary); }
+.growth-bar {
+  height: 12px; background: rgba(255,255,255,0.08);
+  border-radius: 3px; overflow: hidden; position: relative;
+}
+.growth-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--info), var(--primary));
+  border-radius: 3px;
+  transition: width 1s ease;
+}
+.growth-val { font-size: 11px; color: var(--success); font-family: 'Chakra Petch'; font-weight: 700; text-align: right; }
+
+/* =================== SLAYT 4 — HIZ & İNDİRME YARIŞI =================== */
+.speed-chart {
+  display: flex; gap: 14px;
+  width: 100%; max-width: 900px;
+  align-items: flex-end; height: 230px;
+  padding-bottom: 4px;
+}
+.sc-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; gap: 4px; }
+.sc-gen { font-family: 'Chakra Petch'; font-weight: 700; font-size: clamp(14px, 2.4vw, 24px); }
+.sc-speed { font-family: 'Chakra Petch'; font-size: 10px; color: var(--info); margin-bottom: 2px; letter-spacing: 0.5px; }
+.sc-stars { font-size: 11px; margin-bottom: 2px; letter-spacing: 1px; }
+.sc-can {
+  font-size: 9px; color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.04); border-radius: 3px;
+  padding: 2px 5px; margin-bottom: 3px; text-align: center;
+  max-width: 100%; line-height: 1.3;
+}
+.sc-bar {
+  width: 100%; border-radius: 5px 5px 0 0;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 8px; transition: height 1s ease;
+}
+.sc-bar-label {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 9px;
+  color: rgba(255,255,255,0.85);
+  writing-mode: vertical-rl; text-orientation: mixed; letter-spacing: 1px;
+}
+
+/* İndirme yarışı */
+.dl-race {
+  width: 100%; max-width: 900px; margin-top: 10px;
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.25);
+  border-radius: 10px; padding: 12px 16px;
+}
+.dl-title { font-family: 'Chakra Petch'; font-weight: 700; font-size: 11px; color: var(--warm); letter-spacing: 1px; margin-bottom: 8px; }
+.dl-row { display: grid; grid-template-columns: 34px 1fr 90px; gap: 10px; align-items: center; padding: 4px 0; }
+.dl-gen { font-family: 'Chakra Petch'; font-weight: 700; font-size: 12px; color: var(--primary); }
+.dl-track { height: 10px; background: rgba(255,255,255,0.06); border-radius: 3px; position: relative; overflow: hidden; }
+.dl-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--warm), var(--primary));
+  border-radius: 3px;
+  animation: dlMove linear infinite;
+}
+@keyframes dlMove { 0%{width:0%} 100%{width:100%} }
+.dl-time { font-size: 10px; color: var(--success); font-family: 'Chakra Petch'; font-weight: 700; text-align: right; }
+
+.mini-cards {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 10px; width: 100%; max-width: 900px; margin-top: 10px;
+}
+.mini-card {
+  background: rgba(0,30,60,0.5);
+  border: 1px solid rgba(0,245,255,0.22);
+  border-radius: 8px; padding: 10px 14px;
+  border-left: 3px solid var(--info);
+}
+.mini-card.purple { border-left-color: var(--purple); }
+.mini-card.warm   { border-left-color: var(--warm); }
+.mini-card.mint   { border-left-color: var(--mint); }
+.mc-label {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: 10px; color: var(--info);
+  letter-spacing: 1px; margin-bottom: 3px;
+}
+.mini-card.purple .mc-label { color: var(--purple); }
+.mini-card.warm .mc-label   { color: var(--warm); }
+.mini-card.mint .mc-label   { color: var(--mint); }
+.mc-text { font-size: 11px; color: rgba(255,255,255,0.78); line-height: 1.5; }
+
+/* ====================== SLAYT 5 — YZ BOSS + DEMO ====================== */
+.boss-fight { display: flex; gap: 22px; width: 100%; max-width: 950px; align-items: center; }
+.boss-icon-wrap { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.boss-icon {
+  font-size: 84px;
+  animation: bossPulse 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 26px rgba(191,95,255,0.75));
+}
+@keyframes bossPulse {
+  0%,100% { transform: scale(1) rotate(-2deg); }
+  50%     { transform: scale(1.08) rotate(2deg); }
+}
+.boss-name {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 10px;
+  color: var(--purple); text-align: center;
+  letter-spacing: 1.5px; line-height: 1.4;
+}
+.boss-cards { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.bc { display: flex; gap: 12px; align-items: flex-start; padding: 10px 14px; }
+.bc:hover { transform: translateX(4px); }
+.bc .bc-icon { font-size: 26px; flex-shrink: 0; filter: drop-shadow(0 0 8px var(--purple)); }
+.bc strong { display: block; font-size: clamp(11px, 1.3vw, 13px); color: var(--purple); font-weight: 700; margin-bottom: 2px; letter-spacing: 0.5px; }
+.bc span { font-size: clamp(10px, 1.2vw, 12px); color: rgba(240,240,255,0.72); line-height: 1.5; }
+
+/* YZ tarih şeridi */
+.ai-timeline {
+  width: 100%; max-width: 950px; margin-top: 12px;
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.ai-tl-cell {
+  background: rgba(168,85,247,0.08);
+  border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 8px; padding: 8px 6px; text-align: center;
+  position: relative;
+}
+.ai-tl-year { font-family: 'Chakra Petch'; font-weight: 700; font-size: 13px; color: var(--purple); }
+.ai-tl-ev  { font-size: 10px; color: rgba(255,255,255,0.75); margin-top: 2px; line-height: 1.4; }
+
+/* YZ günlük hayat + türler */
+.ai-split {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; width: 100%; max-width: 950px; margin-top: 10px;
+}
+.ai-types { background: rgba(0,30,60,0.5); border: 1px solid rgba(168,85,247,0.3); border-radius: 8px; padding: 10px 14px; }
+.ai-life  { background: rgba(0,30,60,0.5); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; padding: 10px 14px; }
+.ai-h { font-family: 'Chakra Petch'; font-weight: 700; font-size: 10px; letter-spacing: 1px; margin-bottom: 6px; }
+.ai-types .ai-h { color: var(--purple); }
+.ai-life  .ai-h { color: var(--warm); }
+.ai-types ul, .ai-life ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.ai-types li, .ai-life li {
+  font-size: 11px; color: rgba(255,255,255,0.78);
+  padding: 4px 6px; background: rgba(255,255,255,0.03);
+  border-radius: 4px; line-height: 1.4;
+}
+.ai-types li strong { color: var(--purple); }
+.ai-life li strong { color: var(--warm); }
+
+/* ====================== SLAYT 6 — 2030'da BİR GÜN ===================== */
+.day-2030 {
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.25);
+  border-radius: 10px; padding: 12px 16px;
+  width: 100%; max-width: 950px; margin-top: 10px;
+}
+.d30-title { font-family: 'Chakra Petch'; font-weight: 700; font-size: 11px; color: var(--info); letter-spacing: 1px; margin-bottom: 8px; }
+.d30-steps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.d30-step { background: rgba(0,245,255,0.06); border: 1px solid rgba(0,245,255,0.2); border-radius: 6px; padding: 8px 4px; text-align: center; }
+.d30-time { font-family: 'Chakra Petch'; font-weight: 700; font-size: 9px; color: var(--primary); letter-spacing: 0.5px; }
+.d30-icon { font-size: 22px; display: block; margin: 2px 0; }
+.d30-desc { font-size: 9px; color: rgba(255,255,255,0.65); line-height: 1.4; }
+
+/* YZ araçları + risk */
+.ai-tools {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 8px; width: 100%; max-width: 950px; margin-top: 10px;
+}
+.ai-tool {
+  background: rgba(0,30,60,0.5);
+  border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 8px; padding: 8px 6px; text-align: center;
+}
+.at-name { font-family: 'Chakra Petch'; font-weight: 700; font-size: 10px; color: var(--purple); letter-spacing: 0.5px; }
+.at-do { font-size: 9px; color: rgba(255,255,255,0.72); margin-top: 3px; line-height: 1.4; }
+
+/* ====================== SLAYT 7 — TEKNOLOJİ ============================ */
+.scifi-flow {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; width: 100%; max-width: 950px; margin-top: 10px;
+}
+.sf-col { background: rgba(0,30,60,0.5); border: 1px solid rgba(0,245,255,0.28); border-radius: 8px; padding: 10px 14px; }
+.sf-col.real::before { }
+.sf-col h4 { font-family: 'Chakra Petch'; font-weight: 700; font-size: 11px; letter-spacing: 1px; margin-bottom: 6px; }
+.sf-col.real h4 { color: var(--success); }
+.sf-col.fic  h4 { color: var(--pink); }
+.sf-col ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.sf-col li { font-size: 11px; color: rgba(255,255,255,0.75); padding: 3px 6px; background: rgba(255,255,255,0.04); border-radius: 4px; line-height: 1.4; }
+
+.tr-tech {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 8px; width: 100%; max-width: 950px; margin-top: 10px;
+}
+.tr-tech-card {
+  background: rgba(255,107,53,0.08);
+  border: 1px solid rgba(255,107,53,0.35);
+  border-radius: 8px; padding: 10px 6px; text-align: center;
+}
+.trt-name { font-family: 'Chakra Petch'; font-weight: 700; font-size: 11px; color: var(--warm); letter-spacing: 0.5px; }
+.trt-sub { font-size: 9px; color: rgba(255,255,255,0.7); margin-top: 3px; line-height: 1.35; }
+
+/* ====================== SLAYT 8 — TİCARET ============================== */
+.trade-board {
+  display: grid; grid-template-columns: 1fr 50px 1fr;
+  gap: 10px; width: 100%; max-width: 900px; align-items: start;
+}
+.tb-col { padding: 14px 14px; }
+.tb-col h3 {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(11px, 1.4vw, 14px);
+  margin-bottom: 10px; text-align: center;
+  padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.1);
+  letter-spacing: 1.5px;
+}
+.tb-col.old h3 { color: var(--info); }
+.tb-col.new h3 { color: var(--success); }
+.tb-col ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.tb-col li {
+  font-size: clamp(11px, 1.2vw, 13px);
+  color: rgba(240,240,255,0.85);
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 10px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px;
+  border-left: 2px solid rgba(0,245,255,0.3);
+}
+.tb-arrow {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; color: var(--primary);
+  filter: drop-shadow(0 0 10px var(--primary));
+  animation: arrowBlink 1.5s ease-in-out infinite;
+  min-height: 100%; padding-top: 60px;
+}
+@keyframes arrowBlink {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%     { opacity: 0.5; transform: scale(1.15); }
+}
+
+/* Ürün yolculuğu */
+.journey {
+  width: 100%; max-width: 950px; margin-top: 10px;
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+.jrn-step {
+  background: rgba(0,30,60,0.5);
+  border: 1px solid rgba(0,245,255,0.25);
+  border-radius: 6px; padding: 8px 4px; text-align: center;
+  position: relative;
+}
+.jrn-step::after {
+  content: '→';
+  position: absolute; right: -10px; top: 50%; transform: translateY(-50%);
+  color: var(--primary); font-family: 'Chakra Petch'; font-weight: 700; font-size: 14px;
+  filter: drop-shadow(0 0 6px var(--primary)); z-index: 2;
+}
+.jrn-step:last-child::after { display: none; }
+.jrn-icon { font-size: 26px; }
+.jrn-label { font-family: 'Chakra Petch'; font-weight: 700; font-size: 8px; color: var(--info); letter-spacing: 0.5px; margin-top: 2px; }
+
+.ecom-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px; width: 100%; max-width: 950px; margin-top: 10px;
+}
+.ecom-card {
+  background: rgba(57,255,20,0.07);
+  border: 1px solid rgba(57,255,20,0.3);
+  border-radius: 8px; padding: 8px 10px;
+  text-align: center;
+}
+.ec-name { font-family: 'Chakra Petch'; font-weight: 700; font-size: 11px; color: var(--success); letter-spacing: 0.5px; }
+.ec-meta { font-size: 9px; color: rgba(255,255,255,0.7); margin-top: 3px; line-height: 1.4; }
+
+.crypto-money {
+  display: grid; grid-template-columns: 1.1fr 1fr;
+  gap: 10px; width: 100%; max-width: 950px; margin-top: 10px;
+}
+.crypto-box, .money-box {
+  background: rgba(0,30,60,0.5);
+  border: 1px solid rgba(255,230,0,0.3);
+  border-radius: 8px; padding: 10px 14px;
+}
+.cm-title { font-family: 'Chakra Petch'; font-weight: 700; font-size: 11px; color: var(--primary); letter-spacing: 1px; margin-bottom: 5px; }
+.cm-text { font-size: 11px; color: rgba(255,255,255,0.78); line-height: 1.5; }
+.money-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.money-chip { font-size: 10px; padding: 4px 8px; border-radius: 15px; background: rgba(255,230,0,0.08); border: 1px solid rgba(255,230,0,0.3); color: var(--primary); }
+
+/* ==================== SLAYT 9 — SINIF SEÇİMİ (RPG) ===================== */
+.career-rpg {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; width: 100%; max-width: 950px;
+}
+.crpg { padding: 14px 12px; text-align: center; position: relative; }
+.crpg .c-level { position: absolute; top: 8px; right: 10px; font-family: 'Chakra Petch'; font-weight: 700; font-size: 7px; color: rgba(255,230,0,0.65); letter-spacing: 0.5px; }
+.crpg .c-icon { font-size: 38px; margin-bottom: 4px; display: block; filter: drop-shadow(0 0 12px rgba(57,255,20,0.4)); }
+.crpg .c-class { font-family: 'Chakra Petch'; font-weight: 700; font-size: clamp(10px, 1.2vw, 12px); color: var(--success); margin-bottom: 5px; letter-spacing: 0.5px; }
+.crpg .c-routine { font-size: 10px; color: rgba(255,255,255,0.75); line-height: 1.5; margin-bottom: 4px; }
+.crpg .c-role-model { font-size: 9px; color: var(--primary); font-style: italic; }
+
+/* TR teknoloji insanları */
+.people-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; width: 100%; max-width: 950px; margin-top: 10px;
+}
+.person-card {
+  background: rgba(255,230,0,0.07);
+  border: 1px solid rgba(255,230,0,0.3);
+  border-radius: 8px; padding: 10px 12px;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.person-icon { font-size: 28px; flex-shrink: 0; }
+.person-name { font-family: 'Chakra Petch'; font-weight: 700; font-size: 11px; color: var(--primary); }
+.person-role { font-size: 9px; color: var(--info); margin: 2px 0; letter-spacing: 0.5px; }
+.person-do { font-size: 10px; color: rgba(255,255,255,0.75); line-height: 1.4; }
+
+/* Yeni meslekler + ne okumalıyım + meslek quiz */
+.extras-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; width: 100%; max-width: 950px; margin-top: 10px;
+}
+.extras-col {
+  background: rgba(0,30,60,0.5);
+  border: 1px solid rgba(0,245,255,0.28);
+  border-radius: 8px; padding: 10px 14px;
+}
+.ext-title { font-family: 'Chakra Petch'; font-weight: 700; font-size: 11px; letter-spacing: 1px; margin-bottom: 6px; }
+.extras-col.new-jobs .ext-title  { color: var(--pink); }
+.extras-col.study    .ext-title  { color: var(--mint); }
+.extras-col ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.extras-col li { font-size: 10px; color: rgba(255,255,255,0.78); padding: 4px 6px; background: rgba(255,255,255,0.04); border-radius: 4px; }
+
+.career-quiz {
+  width: 100%; max-width: 950px; margin-top: 10px;
+  background: rgba(168,85,247,0.08);
+  border: 1px solid rgba(168,85,247,0.35);
+  border-radius: 8px; padding: 10px 14px;
+}
+.cq-title { font-family: 'Chakra Petch'; font-weight: 700; font-size: 11px; color: var(--purple); letter-spacing: 1px; margin-bottom: 6px; }
+.cq-question { font-size: 12px; color: rgba(255,255,255,0.9); margin-bottom: 6px; min-height: 18px; }
+.cq-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.cq-opt {
+  font-size: 11px; padding: 6px 10px; border-radius: 5px;
+  background: rgba(168,85,247,0.1);
+  border: 1px solid rgba(168,85,247,0.3);
+  color: rgba(255,255,255,0.85);
+  cursor: pointer; transition: all 0.2s;
+  text-align: left;
+}
+.cq-opt:hover { background: rgba(168,85,247,0.25); border-color: var(--purple); }
+.cq-result { margin-top: 8px; padding: 6px 10px; border-radius: 5px; background: rgba(57,255,20,0.08); border: 1px solid rgba(57,255,20,0.35); color: var(--success); font-size: 11px; display: none; }
+.cq-result.show { display: block; }
+
+/* ===================== SLAYT 10 — AKILLI KULLANIM (YENİ) ================ */
+.mint-badge { background: var(--mint) !important; color: #002a28 !important; }
+.mint-title { color: var(--mint) !important; text-shadow: 0 0 22px rgba(78,205,196,0.5) !important; }
+
+.smart-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; width: 100%; max-width: 1000px;
+}
+.smart-col {
+  background: rgba(78,205,196,0.06);
+  border: 1px solid rgba(78,205,196,0.3);
+  border-radius: 10px; padding: 10px 14px;
+  position: relative; overflow: hidden;
+}
+.smart-col::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--mint), transparent);
+}
+.sc-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.sc-emo { font-size: 22px; }
+.sc-head h3 { font-family: 'Chakra Petch'; font-weight: 700; font-size: 12px; color: var(--mint); letter-spacing: 1px; }
+.sc-text { font-size: 11px; color: rgba(255,255,255,0.8); line-height: 1.55; margin-bottom: 5px; }
+.sc-list { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+.sc-list li { font-size: 10px; color: rgba(255,255,255,0.75); padding: 3px 6px; background: rgba(255,255,255,0.03); border-radius: 4px; border-left: 2px solid var(--mint); }
+
+/* Ekran süresi slider */
+.screen-slider-wrap {
+  margin-top: 6px;
+  padding: 6px 8px;
+  background: rgba(78,205,196,0.08);
+  border: 1px solid rgba(78,205,196,0.3);
+  border-radius: 6px;
+}
+.sslider-label { font-size: 10px; color: var(--mint); font-family: 'Chakra Petch'; font-weight: 700; letter-spacing: 0.5px; }
+.sslider-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+input[type=range].sslider {
+  flex: 1; -webkit-appearance: none; appearance: none;
+  height: 6px; border-radius: 3px;
+  background: linear-gradient(to right, var(--success) 0%, var(--success) 25%, var(--primary) 25%, var(--primary) 50%, var(--warm) 50%, var(--warm) 75%, var(--red) 75%);
+  outline: none;
+}
+input[type=range].sslider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--primary); cursor: pointer;
+  border: 2px solid #000;
+  box-shadow: 0 0 8px var(--primary);
+}
+.sslider-val { font-family: 'Chakra Petch'; font-weight: 700; font-size: 11px; color: var(--primary); min-width: 80px; text-align: right; }
+.sslider-msg { font-size: 10px; margin-top: 3px; line-height: 1.3; }
+
+/* Şifre oluşturucu */
+.pw-creator {
+  margin-top: 6px; padding: 6px 8px;
+  background: rgba(78,205,196,0.08);
+  border: 1px solid rgba(78,205,196,0.3);
+  border-radius: 6px;
+}
+.pw-lbl { font-size: 10px; color: var(--mint); font-family: 'Chakra Petch'; font-weight: 700; letter-spacing: 0.5px; }
+.pw-input {
+  width: 100%; margin-top: 4px;
+  padding: 5px 8px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  font-family: 'Exo 2'; font-size: 12px;
+  color: var(--text);
+}
+.pw-input:focus { border-color: var(--mint); outline: none; }
+.pw-checks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; margin-top: 5px; }
+.pw-check { font-size: 9px; color: rgba(255,255,255,0.5); padding: 2px 5px; border-radius: 3px; background: rgba(255,255,255,0.04); }
+.pw-check.ok { color: var(--success); background: rgba(57,255,20,0.08); }
+
+/* 5 altın kural */
+.golden-rules {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 8px; width: 100%; max-width: 1000px; margin-top: 12px;
+}
+.gr-card {
+  background: linear-gradient(180deg, rgba(255,230,0,0.12), rgba(78,205,196,0.06));
+  border: 2px solid rgba(255,230,0,0.4);
+  border-radius: 10px; padding: 10px 8px; text-align: center;
+  position: relative; cursor: pointer;
+  transition: all 0.3s;
+}
+.gr-card:hover { transform: translateY(-4px); box-shadow: 0 6px 20px rgba(255,230,0,0.25); border-color: var(--primary); }
+.gr-num { position: absolute; top: 4px; left: 6px; font-family: 'Chakra Petch'; font-weight: 700; font-size: 9px; color: var(--primary); }
+.gr-icon { font-size: 30px; margin-bottom: 3px; display: block; }
+.gr-title { font-family: 'Chakra Petch'; font-weight: 700; font-size: 9px; color: var(--primary); letter-spacing: 0.5px; line-height: 1.3; margin-bottom: 4px; }
+.gr-desc { font-size: 9px; color: rgba(255,255,255,0.75); line-height: 1.5; }
+
+.oath-btn {
+  margin-top: 10px;
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: 12px; letter-spacing: 2px;
+  color: var(--mint); border: 2px solid var(--mint);
+  padding: 10px 26px; border-radius: 6px;
+  background: rgba(78,205,196,0.08);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.oath-btn:hover { background: var(--mint); color: #002a28; box-shadow: 0 0 22px rgba(78,205,196,0.7); }
+.oath-stars {
+  position: fixed; pointer-events: none;
+  top: 50%; left: 50%; z-index: 150;
+}
+.oath-star {
+  position: absolute; font-size: 20px;
+  animation: oathBurst 1.5s ease-out forwards;
+}
+@keyframes oathBurst {
+  0%   { transform: translate(0,0) scale(0); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(1.5); opacity: 0; }
+}
+
+/* ===================== SLAYT 11 — VICTORY + ÖZET ======================= */
+.victory-screen { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.victory-trophy {
+  font-size: 74px;
+  filter: drop-shadow(0 0 28px rgba(255,230,0,0.8));
+  animation: trophyFloat 2.4s ease-in-out infinite;
+}
+@keyframes trophyFloat {
+  0%,100% { transform: translateY(0) rotate(-3deg); }
+  50%     { transform: translateY(-10px) rotate(3deg); }
+}
+.victory-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(22px, 4vw, 40px);
+  color: var(--primary);
+  text-shadow:
+    4px 4px 0 rgba(0,0,0,0.5),
+    0 0 40px rgba(255,230,0,0.8);
+  animation: victoryFlicker 3s ease-in-out infinite;
+  line-height: 1.25; letter-spacing: 2.5px;
+}
+@keyframes victoryFlicker {
+  0%,100% { text-shadow: 4px 4px 0 rgba(0,0,0,0.5), 0 0 40px rgba(255,230,0,0.8); }
+  50%     { text-shadow: 4px 4px 0 rgba(0,0,0,0.5), 0 0 70px rgba(255,230,0,1), 0 0 130px rgba(255,230,0,0.5); }
+}
+.final-xp {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(11px, 1.7vw, 15px);
+  color: var(--success);
+  background: rgba(57,255,20,0.1);
+  border: 2px solid var(--success);
+  padding: 8px 22px; border-radius: 8px;
+  box-shadow: 0 0 22px rgba(57,255,20,0.3); letter-spacing: 1px;
+}
+.summary-keys {
+  display: grid; grid-template-columns: repeat(9, 1fr);
+  gap: 5px; width: 100%; max-width: 900px;
+}
+.sk-chip {
+  background: rgba(255,230,0,0.08);
+  border: 1px solid rgba(255,230,0,0.3);
+  border-radius: 6px; padding: 6px 4px; text-align: center;
+}
+.sk-emoji { font-size: 16px; display: block; }
+.sk-label { font-family: 'Chakra Petch'; font-weight: 700; font-size: 7px; color: var(--primary); letter-spacing: 0.4px; line-height: 1.3; margin-top: 2px; }
+
+.quotes-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 6px; width: 100%; max-width: 900px;
+}
+.quote-card {
+  background: rgba(0,30,60,0.5);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 6px; padding: 8px 10px;
+  font-size: 10px; color: rgba(255,255,255,0.78);
+  line-height: 1.4; font-style: italic;
+}
+.quote-author {
+  display: block; margin-top: 4px;
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: 9px; color: var(--info); font-style: normal;
+  letter-spacing: 0.5px;
+}
+
+.achievement-row { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.achievement {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 8px;
+  background: var(--dim);
+  border: 1px solid rgba(255,230,0,0.3);
+  border-radius: 8px; min-width: 72px;
+  animation: achieveFloat 3s ease-in-out infinite;
+}
+.achievement:nth-child(2) { animation-delay: 0.2s; }
+.achievement:nth-child(3) { animation-delay: 0.4s; }
+.achievement:nth-child(4) { animation-delay: 0.6s; }
+.achievement:nth-child(5) { animation-delay: 0.8s; }
+@keyframes achieveFloat {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-5px); }
+}
+.ach-icon { font-size: 24px; filter: drop-shadow(0 0 10px rgba(255,230,0,0.6)); }
+.ach-label { font-family: 'Chakra Petch'; font-weight: 700; font-size: 7px; color: var(--primary); text-align: center; line-height: 1.5; letter-spacing: 0.4px; }
+
+.final-cta {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(10px, 1.4vw, 12px);
+  color: var(--mint); letter-spacing: 1.5px;
+  padding: 8px 16px;
+  border: 1px solid var(--mint);
+  border-radius: 6px;
+  background: rgba(78,205,196,0.06);
+  text-align: center;
+}
+.press-start {
+  font-family: 'Chakra Petch'; font-size: 9px;
+  color: rgba(240,240,255,0.4);
+  animation: pressBlink 1.2s step-end infinite;
+  letter-spacing: 1.5px;
+}
+@keyframes pressBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* Konfetti */
+.confetti-piece {
+  position: absolute; width: 10px; height: 10px;
+  border-radius: 2px; animation: confettiFall linear infinite;
+  z-index: 150;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0.3; }
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="scanline"></div>
+<div class="stars-bg" id="starsContainer"></div>
+<div class="particles-container" id="particles"></div>
+<div class="pixel-corner pc-tl"></div>
+<div class="pixel-corner pc-tr"></div>
+<div class="pixel-corner pc-bl"></div>
+<div class="pixel-corner pc-br"></div>
+
+<!-- === ÜST HUD (9 rozet) === -->
+<div class="hud">
+  <div class="hud-left">
+    <div class="hud-logo">TEKNO QUEST</div>
+    <div class="hud-level" id="hudLevel">LV.1</div>
+  </div>
+  <div class="hud-center">
+    <div class="xp-label">XP</div>
+    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xpFill" style="width:0%"></div></div>
+    <div class="xp-count" id="xpCount">0 / 1000</div>
+  </div>
+  <div class="hud-right">
+    <div class="badge-item" id="b0" title="İnternet Ustası">🌐</div>
+    <div class="badge-item" id="b1" title="Tarih Kaşifi">📜</div>
+    <div class="badge-item" id="b2" title="Hız Şampiyonu">⚡</div>
+    <div class="badge-item" id="b3" title="YZ Kaşifi">🤖</div>
+    <div class="badge-item" id="b4" title="Gelecek Mimarı">🔮</div>
+    <div class="badge-item" id="b5" title="Teknoloji Gurusu">💡</div>
+    <div class="badge-item" id="b6" title="Ticaret Lideri">💰</div>
+    <div class="badge-item" id="b7" title="Kariyer Efsanesi">🏆</div>
+    <div class="badge-item" id="b8" title="Akıllı Kullanıcı">🧭</div>
+  </div>
+</div>
+
+<div class="presentation" id="pres">
+
+  <!-- ============ SLAYT 1 — KAPAK ============ -->
+  <div class="slide active" id="s1" style="justify-content:flex-start; padding-top:70px;">
+    <div class="orbit-container">
+      <div class="orbit-ring orbit-ring-1"></div>
+      <div class="orbit-ring orbit-ring-2"></div>
+      <div class="planet">🌍</div>
+      <div class="orbit-moon">🛸</div>
+    </div>
+    <div class="s1-title">TEKNOLOJİ QUEST</div>
+    <div class="s1-tagline">İNTERNETTEN YAPAY ZEKAYA — GELECEĞİN ŞİFRESİ</div>
+
+    <div class="preview-title">🎯 BUGÜN NELER ÖĞRENECEĞİZ?</div>
+    <div class="preview-9">
+      <div class="preview-chip"><span class="pi">🌐</span><div class="pl">İNTERNET</div></div>
+      <div class="preview-chip"><span class="pi">📜</span><div class="pl">TÜRKİYE TARİHİ</div></div>
+      <div class="preview-chip"><span class="pi">⚡</span><div class="pl">MOBİL HIZ</div></div>
+      <div class="preview-chip"><span class="pi">🤖</span><div class="pl">YZ NEDİR</div></div>
+      <div class="preview-chip"><span class="pi">🔮</span><div class="pl">YZ GELECEK</div></div>
+      <div class="preview-chip"><span class="pi">🔬</span><div class="pl">TEKNOLOJİ</div></div>
+      <div class="preview-chip"><span class="pi">💰</span><div class="pl">TİCARET</div></div>
+      <div class="preview-chip"><span class="pi">🎯</span><div class="pl">MESLEKLER</div></div>
+      <div class="preview-chip"><span class="pi">🧭</span><div class="pl">AKILLI KULLAN</div></div>
+    </div>
+
+    <div class="live-counters-title">🌍 BUGÜN DÜNYADA (CANLI)</div>
+    <div class="live-counters">
+      <div class="lc-box">
+        <div class="lc-num" id="lc1">0</div>
+        <div class="lc-label">Google araması 🔍</div>
+      </div>
+      <div class="lc-box">
+        <div class="lc-num" id="lc2">0</div>
+        <div class="lc-label">WhatsApp mesajı 💬</div>
+      </div>
+      <div class="lc-box">
+        <div class="lc-num" id="lc3">0</div>
+        <div class="lc-label">YouTube izleme 📺</div>
+      </div>
+    </div>
+
+    <div class="health-bars">
+      <div class="hbar">
+        <div class="hbar-label">MERAK</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:90%;background:linear-gradient(90deg,var(--success),#a8ff3e)"></div></div>
+      </div>
+      <div class="hbar">
+        <div class="hbar-label">HAYAL GÜCÜ</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:100%;background:linear-gradient(90deg,var(--info),var(--purple))"></div></div>
+      </div>
+      <div class="hbar">
+        <div class="hbar-label">CESARET</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:85%;background:linear-gradient(90deg,var(--warm),var(--primary))"></div></div>
+      </div>
+    </div>
+
+    <div class="intro-start">▶ OYUNA BAŞLA</div>
+    <div class="keyboard-hint">← → TUŞLARI İLE İLERLE</div>
+  </div>
+
+  <!-- ============ SLAYT 2 — LV1 İNTERNET NEDİR ============ -->
+  <div class="slide" id="s2">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 1</div>
+      <div class="level-title">İNTERNET NEDİR?</div>
+    </div>
+    <div class="slide-sub">+100 XP — Görünmez süper ağın sırrını çöz!</div>
+
+    <div class="game-grid g3" style="margin-bottom:6px;">
+      <div class="holo-card game-card accent-cyan">
+        <div class="xp-tag">+15 XP</div>
+        <span class="gc-icon">🕸️</span>
+        <div class="gc-title">DEV BİR AĞ</div>
+        <div class="gc-text">Milyarlarca cihaz birbirine bağlı — gezegensel boyutta bir örümcek ağı!</div>
+      </div>
+      <div class="holo-card game-card accent-warm">
+        <div class="xp-tag">+20 XP</div>
+        <span class="gc-icon">📦</span>
+        <div class="gc-title">VERİ PAKETLERİ</div>
+        <div class="gc-text">Mesajlar küçük paketlere bölünür, ışık hızında seyahat eder, hedefte birleşir!</div>
+      </div>
+      <div class="holo-card game-card accent-purple">
+        <div class="xp-tag">+15 XP</div>
+        <span class="gc-icon">🛰️</span>
+        <div class="gc-title">HER YERDEN BAĞLANTI</div>
+        <div class="gc-text">Kablo, uydu ve hava dalgası — okyanus dibinden uzaya kadar uzanır!</div>
+      </div>
+    </div>
+
+    <div class="internet-split">
+      <div class="msg-map">
+        <div class="msg-map-title">📡 BİR MESAJIN YOLU: TÜRKİYE → AMERİKA</div>
+        <svg class="msg-map-svg" viewBox="0 0 420 140">
+          <path d="M 40 80 Q 200 10 380 70" stroke="rgba(0,245,255,0.25)" stroke-width="2" stroke-dasharray="4 4" fill="none"/>
+          <circle cx="40" cy="80" r="6" fill="var(--info)" filter="drop-shadow(0 0 6px var(--info))"/>
+          <text x="40" y="108" class="city-label" text-anchor="middle">İSTANBUL</text>
+          <circle cx="380" cy="70" r="6" fill="var(--warm)" filter="drop-shadow(0 0 6px var(--warm))"/>
+          <text x="380" y="98" class="city-label" text-anchor="middle">NEW YORK</text>
+          <circle class="msg-packet" r="4"/>
+          <circle class="msg-packet p2" r="4"/>
+          <circle class="msg-packet p3" r="4"/>
+          <circle class="msg-packet p4" r="4"/>
+        </svg>
+        <div class="msg-legend">Paketler saniyenin 1/10'unda bu mesafeyi kat eder — 9.500 km!</div>
+      </div>
+
+      <div class="one-second-panel">
+        <div class="one-second-title">⏱ 1 SANİYEDE İNTERNETTE NELER OLUR?</div>
+        <div class="os-row"><span class="os-icon">🔍</span><span class="os-label">Google araması</span><span class="os-num">100.000</span></div>
+        <div class="os-row"><span class="os-icon">🐦</span><span class="os-label">Tweet atılır</span><span class="os-num">9.000</span></div>
+        <div class="os-row"><span class="os-icon">🎬</span><span class="os-label">Netflix saati izlenir</span><span class="os-num">1 milyon</span></div>
+        <div class="os-row"><span class="os-icon">📧</span><span class="os-label">E-posta gönderilir</span><span class="os-num">3 milyon</span></div>
+        <div class="os-row"><span class="os-icon">📸</span><span class="os-label">Instagram paylaşımı</span><span class="os-num">1.000</span></div>
+      </div>
+    </div>
+
+    <div class="section-title">// BİR WEB SAYFASININ AÇILMA HİKAYESİ</div>
+    <div class="page-journey">
+      <div class="pj-step">
+        <div class="pj-icon">⌨️</div>
+        <div class="pj-num">ADIM 1</div>
+        <div class="pj-title">URL YAZ</div>
+        <div class="pj-desc">"google.com" yazıp Enter'a basarsın.</div>
+        <div class="pj-arrow">→</div>
+      </div>
+      <div class="pj-step">
+        <div class="pj-icon">📖</div>
+        <div class="pj-num">ADIM 2</div>
+        <div class="pj-title">DNS ÇEVİRİR</div>
+        <div class="pj-desc">DNS "google.com" adını sayıya çevirir (142.250.x.x).</div>
+        <div class="pj-arrow">→</div>
+      </div>
+      <div class="pj-step">
+        <div class="pj-icon">🖥</div>
+        <div class="pj-num">ADIM 3</div>
+        <div class="pj-title">SERVER BULUR</div>
+        <div class="pj-desc">Google'ın sunucusuna "sayfayı gönder!" der.</div>
+        <div class="pj-arrow">→</div>
+      </div>
+      <div class="pj-step">
+        <div class="pj-icon">✨</div>
+        <div class="pj-num">ADIM 4</div>
+        <div class="pj-title">SAYFA GELİR</div>
+        <div class="pj-desc">Sayfa senin tarayıcına geri döner — hepsi yarım saniyede!</div>
+      </div>
+    </div>
+
+    <div class="mini-cards">
+      <div class="mini-card"><div class="mc-label">🔄 ROUTER</div><div class="mc-text">Evindeki internet postacısı! Paketleri doğru cihaza yönlendirir.</div></div>
+      <div class="mini-card warm"><div class="mc-label">🖥 SERVER</div><div class="mc-text">Web sitesinin beynidir. Milyonlarca bilgisayar aynı anda ona istek gönderir.</div></div>
+      <div class="mini-card purple"><div class="mc-label">📖 DNS</div><div class="mc-text">İnternetin telefon defteri. "google.com" der, o sayıya çevirir.</div></div>
+      <div class="mini-card mint"><div class="mc-label">🔢 IP ADRESİ</div><div class="mc-text">Her cihazın kendine özel numarası. Senin evinin adresi gibi!</div></div>
+    </div>
+
+    <div class="fact-box">
+      🏠 <strong style="color:var(--primary)">Sence evinde kaç cihaz internete bağlı?</strong> Telefon, tablet, TV, bilgisayar, akıllı saat, akıllı hoparlör... Say bakalım! Sen de bu dev ağın bir parçasısın 🚀
+    </div>
+  </div>
+
+  <!-- ============ SLAYT 3 — LV2 TÜRKİYE QUEST ============ -->
+  <div class="slide" id="s3">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 2</div>
+      <div class="level-title">TÜRKİYE QUEST</div>
+    </div>
+    <div class="slide-sub">+100 XP — Türkiye'nin internet tarihini keşfet!</div>
+
+    <div class="quest-list">
+      <div class="quest-item holo-card accent-cyan">
+        <div class="quest-year">1993</div>
+        <div class="q-spacer"></div>
+        <div class="q-dot"></div>
+        <div class="quest-icon">🔌</div>
+        <div class="quest-text">
+          <strong>✅ İlk Bağlantı — ODTÜ, Ankara</strong>
+          <span>Türkiye internete ilk kez bağlandı — 64 kbps hızla. Bir resim 5 dakikada yükleniyordu!</span>
+          <em class="q-know">💡 Biliyor muydun? İlk e-postayı Türkiye'den Mustafa Akgül attı — "İnternetin Dedesi" olarak anılır!</em>
+        </div>
+        <div class="quest-badge qb-done">TAMAMLANDI</div>
+      </div>
+
+      <div class="quest-item holo-card accent-green">
+        <div class="quest-year">1996</div>
+        <div class="q-spacer"></div>
+        <div class="q-dot"></div>
+        <div class="quest-icon">🏠</div>
+        <div class="quest-text">
+          <strong>✅ İnternet Evlere Girdi</strong>
+          <span>Türk Telekom evlere çevirmeli internet getirdi. Modem sesi "tıkır tıkır" — ama telefon çalarsa internet kopardı!</span>
+          <em class="q-know">💡 Biliyor muydun? İlk internet kafelerde saati 300 TL'ydi (bugünkü parayla!), 56K hızla çalışırdı.</em>
+        </div>
+        <div class="quest-badge qb-done">TAMAMLANDI</div>
+      </div>
+
+      <div class="quest-item holo-card accent-purple">
+        <div class="quest-year">2000s</div>
+        <div class="q-spacer"></div>
+        <div class="q-dot"></div>
+        <div class="quest-icon">⚡</div>
+        <div class="quest-text">
+          <strong>✅ ADSL ve Hızlanma</strong>
+          <span>Geniş bant geldi! İlk Türk siteleri: Mynet, Hürriyet Online, Ekşi Sözlük (1999) kuruldu.</span>
+          <em class="q-know">💡 Biliyor muydun? İlk Türk web siteleri: <code>itu.edu.tr</code> ve <code>tubitak.gov.tr</code> idi.</em>
+        </div>
+        <div class="quest-badge qb-done">TAMAMLANDI</div>
+      </div>
+
+      <div class="quest-item holo-card accent-pink">
+        <div class="quest-year">2010s</div>
+        <div class="q-spacer"></div>
+        <div class="q-dot"></div>
+        <div class="quest-icon">📱</div>
+        <div class="quest-text">
+          <strong>✅ Akıllı Telefon Devrimi</strong>
+          <span>2009'da iPhone 3G Türkiye'ye geldi. Cebinde internet çağı başladı — WhatsApp, Instagram, YouTube patladı!</span>
+          <em class="q-know">💡 Biliyor muydun? Bugün Türkiye'de kişi başı günde ortalama 7 saat internet kullanılıyor!</em>
+        </div>
+        <div class="quest-badge qb-done">TAMAMLANDI</div>
+      </div>
+
+      <div class="quest-item holo-card accent-yellow active">
+        <div class="quest-year">2024+</div>
+        <div class="q-spacer"></div>
+        <div class="q-dot"></div>
+        <div class="quest-icon">🚀</div>
+        <div class="quest-text">
+          <strong>🔥 AKTİF GÖREV — Fiber & 5G Çağı</strong>
+          <span>60 milyondan fazla kullanıcı, fiber internet her yerde. 5G 2026'da geliyor!</span>
+          <em class="q-know">💡 Türkiye dünyada en çok sosyal medya kullanan 5. ülke!</em>
+        </div>
+        <div class="quest-badge qb-active">AKTİF</div>
+      </div>
+    </div>
+
+    <div class="growth-chart">
+      <div class="growth-title">📊 İNTERNET KULLANICI SAYISI — TÜRKİYE</div>
+      <div class="growth-row"><div class="growth-year">1993</div><div class="growth-bar"><div class="growth-fill" style="width:0.5%"></div></div><div class="growth-val">~3 kişi</div></div>
+      <div class="growth-row"><div class="growth-year">1996</div><div class="growth-bar"><div class="growth-fill" style="width:2%"></div></div><div class="growth-val">~30.000</div></div>
+      <div class="growth-row"><div class="growth-year">2000</div><div class="growth-bar"><div class="growth-fill" style="width:8%"></div></div><div class="growth-val">2 milyon</div></div>
+      <div class="growth-row"><div class="growth-year">2010</div><div class="growth-bar"><div class="growth-fill" style="width:40%"></div></div><div class="growth-val">25 milyon</div></div>
+      <div class="growth-row"><div class="growth-year">2024</div><div class="growth-bar"><div class="growth-fill" style="width:100%"></div></div><div class="growth-val">70+ milyon</div></div>
+    </div>
+
+    <div class="fact-box">
+      ⏳ <strong style="color:var(--primary)">30 yılda</strong> 3 kişiden <strong style="color:var(--success)">70 milyona</strong> çıktık. Bir nesil bile geçmedi, Türkiye bambaşka bir ülke oldu!
+    </div>
+  </div>
+
+  <!-- ============ SLAYT 4 — LV3 MOBİL HIZ BOSSU ============ -->
+  <div class="slide" id="s4">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 3</div>
+      <div class="level-title">MOBİL HIZ BOSSU</div>
+    </div>
+    <div class="slide-sub">+100 XP — 1G'den 5G'ye tüm nesilleri yen!</div>
+
+    <div class="speed-chart">
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:#888">1G</div>
+        <div class="sc-speed">~2 kb/s</div>
+        <div class="sc-stars">⭐☆☆☆☆</div>
+        <div class="sc-can">Anneni ara 📞</div>
+        <div class="sc-bar" style="height:18px; background:rgba(150,150,150,0.3); border:1px solid rgba(150,150,150,0.5);"><div class="sc-bar-label">Sadece Ses</div></div>
+      </div>
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:#4aa">2G</div>
+        <div class="sc-speed">~64 kb/s</div>
+        <div class="sc-stars">⭐⭐☆☆☆</div>
+        <div class="sc-can">SMS: "iyi geceler" ✉️</div>
+        <div class="sc-bar" style="height:40px; background:rgba(100,200,200,0.22); border:1px solid rgba(100,200,200,0.5);"><div class="sc-bar-label">SMS</div></div>
+      </div>
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:#00b4ff">3G</div>
+        <div class="sc-speed">~2 Mb/s</div>
+        <div class="sc-stars">⭐⭐⭐☆☆</div>
+        <div class="sc-can">Görüntülü arama 🎥</div>
+        <div class="sc-bar" style="height:75px; background:rgba(0,180,255,0.22); border:1px solid rgba(0,180,255,0.5);"><div class="sc-bar-label">Video Arama</div></div>
+      </div>
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:var(--info)">4G</div>
+        <div class="sc-speed" style="color:var(--info)">~100 Mb/s</div>
+        <div class="sc-stars">⭐⭐⭐⭐☆</div>
+        <div class="sc-can">Netflix otobüste 🎬</div>
+        <div class="sc-bar" style="height:130px; background:rgba(0,245,255,0.18); border:1px solid rgba(0,245,255,0.55); box-shadow:0 0 22px rgba(0,245,255,0.2);"><div class="sc-bar-label" style="color:var(--info)">Netflix HD</div></div>
+      </div>
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:var(--primary)">5G</div>
+        <div class="sc-speed" style="color:var(--primary)">~10 Gb/s</div>
+        <div class="sc-stars">⭐⭐⭐⭐⭐</div>
+        <div class="sc-can">Uzaktan ameliyat 🏥</div>
+        <div class="sc-bar" style="height:195px; background:rgba(255,230,0,0.18); border:1px solid rgba(255,230,0,0.6); box-shadow:0 0 30px rgba(255,230,0,0.25);"><div class="sc-bar-label" style="color:var(--primary)">Robot & VR</div></div>
+      </div>
+    </div>
+
+    <div class="dl-race">
+      <div class="dl-title">🏁 YARIŞ: Aynı 1 GB'lık film kaç saniyede iner?</div>
+      <div class="dl-row"><div class="dl-gen" style="color:#888">1G</div><div class="dl-track"><div class="dl-fill" style="background:#888; animation-duration:90s"></div></div><div class="dl-time" style="color:#888">~90 saat!</div></div>
+      <div class="dl-row"><div class="dl-gen" style="color:#4aa">2G</div><div class="dl-track"><div class="dl-fill" style="background:#4aa; animation-duration:30s"></div></div><div class="dl-time" style="color:#4aa">~35 saat</div></div>
+      <div class="dl-row"><div class="dl-gen" style="color:#00b4ff">3G</div><div class="dl-track"><div class="dl-fill" style="background:#00b4ff; animation-duration:12s"></div></div><div class="dl-time" style="color:#00b4ff">~70 dk</div></div>
+      <div class="dl-row"><div class="dl-gen" style="color:var(--info)">4G</div><div class="dl-track"><div class="dl-fill" style="background:var(--info); animation-duration:4s"></div></div><div class="dl-time" style="color:var(--info)">~80 sn</div></div>
+      <div class="dl-row"><div class="dl-gen" style="color:var(--primary)">5G</div><div class="dl-track"><div class="dl-fill" style="background:var(--primary); animation-duration:1s"></div></div><div class="dl-time" style="color:var(--primary)">~1 sn ⚡</div></div>
+    </div>
+
+    <div class="mini-cards" style="grid-template-columns: 1fr 1fr;">
+      <div class="mini-card mint">
+        <div class="mc-label">🔮 6G (2030)</div>
+        <div class="mc-text">Zihin okuyan cihazlar, hologramlı görüşme, 5G'den 100 kat hızlı. Bilim kurgu artık gerçek oluyor!</div>
+      </div>
+      <div class="mini-card warm">
+        <div class="mc-label">🇹🇷 TÜRKİYE 5G</div>
+        <div class="mc-text">2026'da kullanıma açılıyor. İlk başta İstanbul, Ankara, İzmir — sonra tüm şehirler.</div>
+      </div>
+    </div>
+
+    <div class="fact-box">
+      💡 <strong style="color:var(--primary)">WhatsApp</strong> 2G'den beri çalışıyor, <strong style="color:var(--info)">Spotify</strong> 3G+ sever, <strong style="color:var(--primary)">TikTok</strong> 4G ile patladı. Sen hangi G ile doğdun?
+    </div>
+  </div>
+
+  <!-- ============ SLAYT 5 — LV4 YZ NEDİR ============ -->
+  <div class="slide" id="s5">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 4</div>
+      <div class="level-title">YAPAY ZEKA BOSSU</div>
+    </div>
+    <div class="slide-sub">+100 XP — Yapay zekanın sırlarını çöz!</div>
+
+    <div class="boss-fight">
+      <div class="boss-icon-wrap">
+        <div class="boss-icon">🧠</div>
+        <div class="boss-name">YAPAY ZEKA<br>ÇEKİRDEĞİ</div>
+      </div>
+      <div class="boss-cards">
+        <div class="holo-card bc accent-purple">
+          <div class="bc-icon">📚</div>
+          <div>
+            <strong>VERİ İLE ÖĞRENİR</strong>
+            <span>Milyonlarca resim/metin dinler. 🐱 1.000 kedi fotoğrafı göster → kedi tanımayı öğrenir!</span>
+          </div>
+        </div>
+        <div class="holo-card bc accent-pink">
+          <div class="bc-icon">🎤</div>
+          <div><strong>SESİNİ TANIR</strong><span>Siri, Alexa, Google Asistan — hepsi YZ. Seni duyar, anlar, cevap verir!</span></div>
+        </div>
+        <div class="holo-card bc accent-warm">
+          <div class="bc-icon">🖼️</div>
+          <div><strong>SANAT YAPAR</strong><span>Bir cümle yaz → saniyeler içinde resim, şiir, hatta müzik üretir!</span></div>
+        </div>
+        <div class="holo-card bc accent-green">
+          <div class="bc-icon">🏥</div>
+          <div><strong>HAYAT KURTARIR</strong><span>Röntgen filmlerinde hastalıkları doktorlardan önce yakalar!</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">// YAPAY ZEKANIN TARİHİ</div>
+    <div class="ai-timeline">
+      <div class="ai-tl-cell"><div class="ai-tl-year">1956</div><div class="ai-tl-ev">"YZ" kelimesi ilk kez kullanıldı — Dartmouth konferansı</div></div>
+      <div class="ai-tl-cell"><div class="ai-tl-year">1997</div><div class="ai-tl-ev">Deep Blue satrançta dünya şampiyonunu yendi!</div></div>
+      <div class="ai-tl-cell"><div class="ai-tl-year">2016</div><div class="ai-tl-ev">AlphaGo Go oyununda insanı yendi — herkes şaşırdı</div></div>
+      <div class="ai-tl-cell"><div class="ai-tl-year">2022</div><div class="ai-tl-ev">ChatGPT — insan gibi konuşan YZ, her yerde</div></div>
+      <div class="ai-tl-cell"><div class="ai-tl-year">2024</div><div class="ai-tl-ev">Sora — 1 cümleden Hollywood kalitesinde video!</div></div>
+    </div>
+
+    <div class="ai-split">
+      <div class="ai-types">
+        <div class="ai-h">🧬 YZ TÜRLERİ</div>
+        <ul>
+          <li><strong>Dar YZ:</strong> Sadece bir işi çok iyi yapar — Siri, Google Asistan (ŞU AN HEPSİ BÖYLE)</li>
+          <li><strong>Genel YZ:</strong> İnsan gibi düşünür, her konuyu anlar (HENÜZ YOK!)</li>
+          <li><strong>Süper YZ:</strong> İnsandan akıllı olan YZ (GELECEKTE?)</li>
+        </ul>
+      </div>
+      <div class="ai-life">
+        <div class="ai-h">👁 GÜNLÜK HAYATTA YZ NEREDE?</div>
+        <ul>
+          <li>📱 <strong>Telefonunu aç:</strong> Yüz tanıma = YZ</li>
+          <li>📷 <strong>Fotoğraf albümü:</strong> Kedileri, arkadaşları ayırır = YZ</li>
+          <li>▶ <strong>YouTube önerileri:</strong> Sana özel = YZ</li>
+          <li>🗺️ <strong>Yandex/Google navigasyon:</strong> Trafik tahmini = YZ</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fact-box">
+      🤯 <strong style="color:var(--primary)">İNANILMAZ RAKAM:</strong> ChatGPT şu an 180 milyar kelimeden öğrendi — bu yaklaşık <strong style="color:var(--success)">2 milyon kitap</strong> demek! Bir insan ömür boyu 3.000 kitap okuyabilir.
+    </div>
+  </div>
+
+  <!-- ============ SLAYT 6 — LV5 YZ GELECEK ============ -->
+  <div class="slide" id="s6">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 5</div>
+      <div class="level-title">GELECEK HARİTASI</div>
+    </div>
+    <div class="slide-sub">+100 XP — YZ'nin 2030 planını keşfet!</div>
+
+    <div class="game-grid g3" style="max-width:950px;">
+      <div class="holo-card game-card accent-cyan"><div class="xp-tag">+15 XP</div><span class="gc-icon">🚗</span><div class="gc-title">SÜRÜCÜSÜZ ARAÇLAR</div><div class="gc-text">Direksiyon yok! YZ trafiği okur, güvenli sürer.</div></div>
+      <div class="holo-card game-card accent-purple"><div class="xp-tag">+15 XP</div><span class="gc-icon">🏫</span><div class="gc-title">KİŞİSEL ÖĞRETMEN</div><div class="gc-text">Sana özel müfredat. Zayıf konularını bilir!</div></div>
+      <div class="holo-card game-card accent-green"><div class="xp-tag">+20 XP</div><span class="gc-icon">💊</span><div class="gc-title">KİŞİSEL İLAÇ</div><div class="gc-text">Senin DNA'na özel. Kanser yenilebilir!</div></div>
+      <div class="holo-card game-card accent-warm"><div class="xp-tag">+15 XP</div><span class="gc-icon">🌍</span><div class="gc-title">DÜNYA KORUYUCU</div><div class="gc-text">İklim krizi için en iyi çözümler YZ'dan!</div></div>
+      <div class="holo-card game-card accent-pink"><div class="xp-tag">+20 XP</div><span class="gc-icon">🎮</span><div class="gc-title">CANLI OYUN</div><div class="gc-text">Karakterler gerçekten düşünür, her oyun farklı!</div></div>
+      <div class="holo-card game-card accent-yellow"><div class="xp-tag">+15 XP</div><span class="gc-icon">🤝</span><div class="gc-title">ROBOT YARDIMCI</div><div class="gc-text">Evde, hastanede, fabrikada zeki robotlar!</div></div>
+    </div>
+
+    <div class="day-2030">
+      <div class="d30-title">📅 2030'DA BİR ÇOCUĞUN GÜNÜ</div>
+      <div class="d30-steps">
+        <div class="d30-step"><div class="d30-time">07:00</div><div class="d30-icon">☀️</div><div class="d30-desc">YZ seni müzikle uyandırır</div></div>
+        <div class="d30-step"><div class="d30-time">08:00</div><div class="d30-icon">🍳</div><div class="d30-desc">Akıllı buzdolabı kahvaltı yapar</div></div>
+        <div class="d30-step"><div class="d30-time">08:30</div><div class="d30-icon">🚙</div><div class="d30-desc">Sürücüsüz araba okula götürür</div></div>
+        <div class="d30-step"><div class="d30-time">11:00</div><div class="d30-icon">📚</div><div class="d30-desc">YZ öğretmen ders anlatır</div></div>
+        <div class="d30-step"><div class="d30-time">18:00</div><div class="d30-icon">🥽</div><div class="d30-desc">VR konserinde arkadaşlarla</div></div>
+        <div class="d30-step"><div class="d30-time">22:00</div><div class="d30-icon">🌙</div><div class="d30-desc">YZ sana hikaye anlatır</div></div>
+      </div>
+    </div>
+
+    <div class="section-title">// YZ ARAÇLARI — NE İŞE YARAR?</div>
+    <div class="ai-tools">
+      <div class="ai-tool"><div style="font-size:24px">💬</div><div class="at-name">ChatGPT</div><div class="at-do">Yazı, soru-cevap, ödev yardımı</div></div>
+      <div class="ai-tool"><div style="font-size:24px">🎨</div><div class="at-name">Midjourney</div><div class="at-do">1 cümleden harika resim</div></div>
+      <div class="ai-tool"><div style="font-size:24px">🎵</div><div class="at-name">Suno</div><div class="at-do">Sana özel şarkı üretir</div></div>
+      <div class="ai-tool"><div style="font-size:24px">💻</div><div class="at-name">Claude</div><div class="at-do">Kodlama ve analiz uzmanı</div></div>
+      <div class="ai-tool"><div style="font-size:24px">🎬</div><div class="at-name">Sora</div><div class="at-do">Metinden video üretir</div></div>
+    </div>
+
+    <div class="mini-cards">
+      <div class="mini-card purple">
+        <div class="mc-label">⚠️ YZ NE YAPAMAZ?</div>
+        <div class="mc-text">Gerçek arkadaşlık kuramaz, duyguları gerçekten hissetmez, yaratıcılık tartışmalı. İnsan olma becerileri YZ'da yok!</div>
+      </div>
+      <div class="mini-card mint">
+        <div class="mc-label">🧠 SEN YZ İLE NELER YAPABİLİRSİN?</div>
+        <div class="mc-text">Ödeve yardım (ama kopya değil!), dil öğrenme, yaratıcı hikaye yazma, soru-cevap, kodlama öğrenme — sonsuz fırsat!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SLAYT 7 — LV6 TEKNOLOJİ ============ -->
+  <div class="slide" id="s7">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 6</div>
+      <div class="level-title">TEKNOLOJİ DÜNYASI</div>
+    </div>
+    <div class="slide-sub">+100 XP — Önümüzdeki 20 yılın teknolojisini keşfet!</div>
+
+    <div class="game-grid g4" style="max-width:1000px;">
+      <div class="holo-card game-card accent-cyan"><div class="xp-tag">+12 XP</div><span class="gc-icon">🥽</span><div class="gc-title">SANAL GERÇEKLİK</div><div class="gc-text">Tarih dersinde Antik Mısır'a ziyaret!</div></div>
+      <div class="holo-card game-card accent-purple"><div class="xp-tag">+13 XP</div><span class="gc-icon">🔬</span><div class="gc-title">NANO TEKNOLOJİ</div><div class="gc-text">Minik robotlar dişini doktorsuz onarır!</div></div>
+      <div class="holo-card game-card accent-pink"><div class="xp-tag">+13 XP</div><span class="gc-icon">⚛️</span><div class="gc-title">KUANTUM</div><div class="gc-text">Havayı 1 ay önceden doğru tahmin eder!</div></div>
+      <div class="holo-card game-card accent-green"><div class="xp-tag">+12 XP</div><span class="gc-icon">🌱</span><div class="gc-title">YEŞİL ENERJİ</div><div class="gc-text">Güneş ve rüzgar — fosil yakıt bitecek!</div></div>
+      <div class="holo-card game-card accent-warm"><div class="xp-tag">+12 XP</div><span class="gc-icon">🚀</span><div class="gc-title">UZAY TURİZMİ</div><div class="gc-text">Arkadaşınla Ay'da piknik yapabilirsin!</div></div>
+      <div class="holo-card game-card accent-yellow"><div class="xp-tag">+12 XP</div><span class="gc-icon">🧬</span><div class="gc-title">GEN TEKNOLOJİSİ</div><div class="gc-text">Kalıtsal hastalıklar doğmadan düzeltilir!</div></div>
+      <div class="holo-card game-card accent-cyan"><div class="xp-tag">+13 XP</div><span class="gc-icon">🌐</span><div class="gc-title">IoT — NESNELERİN NETİ</div><div class="gc-text">Buzdolabın, saatin, araban konuşur!</div></div>
+      <div class="holo-card game-card accent-purple"><div class="xp-tag">+13 XP</div><span class="gc-icon">🤖</span><div class="gc-title">ROBOTİK</div><div class="gc-text">Ev robotu çamaşırı katlar, cerrah robot ameliyat eder!</div></div>
+    </div>
+
+    <div class="scifi-flow">
+      <div class="sf-col real">
+        <h4>✅ ESKİ BİLİM KURGU → BUGÜN GERÇEK</h4>
+        <ul>
+          <li><strong>Görüntülü konuşma</strong> — Star Trek 1966 → Zoom bugün 📹</li>
+          <li><strong>Tablet</strong> — 2001: A Space Odyssey 1968 → iPad bugün 📱</li>
+          <li><strong>Sesle kontrol</strong> — eski hayaldi → Siri/Alexa bugün 🎤</li>
+          <li><strong>Cep telefonu</strong> — Uzay Yolu → Günlük hayat 📞</li>
+        </ul>
+      </div>
+      <div class="sf-col fic">
+        <h4>🔮 HÂLÂ BİLİM KURGU</h4>
+        <ul>
+          <li>✨ <strong>Işınlanma</strong> — atomları çözüp başka yerde birleştirme</li>
+          <li>⏰ <strong>Zaman yolculuğu</strong> — geçmişe/geleceğe gidiş</li>
+          <li>🦸 <strong>Süper güçler</strong> — uçmak, görünmez olmak</li>
+          <li>🪐 <strong>Başka galaksilere seyahat</strong> — çok uzak!</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-title">// 🇹🇷 TÜRKİYE'NİN TEKNOLOJİSİ</div>
+    <div class="tr-tech">
+      <div class="tr-tech-card"><div style="font-size:28px">🚗</div><div class="trt-name">TOGG</div><div class="trt-sub">Yerli elektrikli otomobil</div></div>
+      <div class="tr-tech-card"><div style="font-size:28px">🚁</div><div class="trt-name">TB2 BAYRAKTAR</div><div class="trt-sub">Dünyaca ünlü insansız hava aracı</div></div>
+      <div class="tr-tech-card"><div style="font-size:28px">🚢</div><div class="trt-name">MİLGEM</div><div class="trt-sub">Yerli savaş gemileri</div></div>
+      <div class="tr-tech-card"><div style="font-size:28px">🚀</div><div class="trt-name">ROKETSAN</div><div class="trt-sub">Uzay ve savunma roketleri</div></div>
+      <div class="tr-tech-card"><div style="font-size:28px">🛰️</div><div class="trt-name">TÜRKSAT</div><div class="trt-sub">Türk uyduları uzayda!</div></div>
+    </div>
+
+    <div class="fact-box">
+      🌟 <strong style="color:var(--primary)">1900'den 2050'ye</strong> — 150 yılda insan uçmayı, internete bağlanmayı ve uzaya gitmeyi başardı. Önümüzdeki 25 yılda neler görecek kim bilir? Belki sen bulacaksın!
+    </div>
+  </div>
+
+  <!-- ============ SLAYT 8 — LV7 TİCARET ============ -->
+  <div class="slide" id="s8">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 7</div>
+      <div class="level-title">TİCARET ARENASI</div>
+    </div>
+    <div class="slide-sub">+100 XP — Alışverişin dönüşümünü keşfet!</div>
+
+    <div class="trade-board">
+      <div class="holo-card tb-col old accent-cyan">
+        <h3>⏮ ESKİDEN</h3>
+        <ul>
+          <li>🏪 Sadece mağazaya gidilirdi</li>
+          <li>💵 Nakit para kullanılırdı</li>
+          <li>📰 Gazete reklamları</li>
+          <li>📞 Telefonla sipariş</li>
+          <li>🗺️ Haritayla yol bulunurdu</li>
+          <li>📋 Kağıt fatura</li>
+        </ul>
+      </div>
+      <div class="tb-arrow">⇒</div>
+      <div class="holo-card tb-col new accent-green">
+        <h3>🚀 ŞİMDİ & GELECEK</h3>
+        <ul>
+          <li>📱 Her şey telefondan</li>
+          <li>💳 Dijital ödeme & kripto</li>
+          <li>🎯 YZ ile kişisel reklam</li>
+          <li>🚁 Drone ile kapıya teslimat</li>
+          <li>🗺️ GPS & akıllı navigasyon</li>
+          <li>📧 Dijital fatura & e-ticaret</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-title">// 🌏 BİR ÜRÜNÜN DÜNYA TURU</div>
+    <div class="journey">
+      <div class="jrn-step"><div class="jrn-icon">🏭</div><div class="jrn-label">1. ÇİN'DE ÜRETİM</div></div>
+      <div class="jrn-step"><div class="jrn-icon">📦</div><div class="jrn-label">2. KONTEYNER</div></div>
+      <div class="jrn-step"><div class="jrn-icon">🚢</div><div class="jrn-label">3. GEMİ/UÇAK</div></div>
+      <div class="jrn-step"><div class="jrn-icon">🏢</div><div class="jrn-label">4. DEPO</div></div>
+      <div class="jrn-step"><div class="jrn-icon">🚚</div><div class="jrn-label">5. KARGO</div></div>
+      <div class="jrn-step"><div class="jrn-icon">🏠</div><div class="jrn-label">6. KAPIN</div></div>
+    </div>
+
+    <div class="section-title">// 🇹🇷 TÜRK E-TİCARET DEVLERİ</div>
+    <div class="ecom-row">
+      <div class="ecom-card"><div style="font-size:24px">🛍</div><div class="ec-name">TRENDYOL</div><div class="ec-meta">2010 — 30M+ kullanıcı</div></div>
+      <div class="ecom-card"><div style="font-size:24px">📦</div><div class="ec-name">HEPSİBURADA</div><div class="ec-meta">2000 — Türkiye'nin ilki!</div></div>
+      <div class="ecom-card"><div style="font-size:24px">🔨</div><div class="ec-name">GİTTİGİDİYOR</div><div class="ec-meta">2001 — Açık artırma mantığı</div></div>
+      <div class="ecom-card"><div style="font-size:24px">🛒</div><div class="ec-name">GETİR</div><div class="ec-meta">2015 — 10 dakikada kapıda</div></div>
+    </div>
+
+    <div class="crypto-money">
+      <div class="crypto-box">
+        <div class="cm-title">💎 KRİPTO PARA NEDİR?</div>
+        <div class="cm-text">Dijital para! Ne devlet, ne banka basıyor — sadece matematik! Bitcoin 2009'da icat edildi. Bir ara 1 Bitcoin = 1.5 milyon TL bile oldu! Dikkat: riskli, hem çok kazandırır hem çok kaybettirir.</div>
+      </div>
+      <div class="money-box">
+        <div class="cm-title">💰 PARAN NEREDE?</div>
+        <div class="cm-text">Para farklı formlarda yaşar — hepsi para ama farklı!</div>
+        <div class="money-list">
+          <span class="money-chip">💵 Nakit</span>
+          <span class="money-chip">💳 Kart</span>
+          <span class="money-chip">🏦 Banka</span>
+          <span class="money-chip">📱 Dijital cüzdan</span>
+          <span class="money-chip">₿ Kripto</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fact-box">
+      🔮 <strong style="color:var(--primary)">GELECEĞİN ALIŞVERİŞİ:</strong> VR mağazada kıyafet dener, drone 10 dk'da getirir, akıllı buzdolabı süt bitince otomatik sipariş verir. YZ senin yerine alışveriş yapabilir!
+    </div>
+  </div>
+
+  <!-- ============ SLAYT 9 — LV8 KARİYER ============ -->
+  <div class="slide" id="s9">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 8</div>
+      <div class="level-title">SINIF SEÇİMİ</div>
+    </div>
+    <div class="slide-sub">+100 XP — Geleceğin karakterini seç!</div>
+
+    <div class="career-rpg">
+      <div class="holo-card crpg accent-green">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🤖</div>
+        <div class="c-class">YZ MÜHENDİSİ</div>
+        <div class="c-routine">Gün: YZ modelleri eğitir, kod yazar, veri inceler.</div>
+        <div class="c-role-model">★ Demis Hassabis (DeepMind)</div>
+      </div>
+      <div class="holo-card crpg accent-purple">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🥽</div>
+        <div class="c-class">METAVERSE MİMARI</div>
+        <div class="c-routine">Gün: 3D dünyalar tasarlar, sanal şehirler kurar.</div>
+        <div class="c-role-model">★ Palmer Luckey (Oculus)</div>
+      </div>
+      <div class="holo-card crpg accent-pink">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🧬</div>
+        <div class="c-class">GEN MÜHENDİSİ</div>
+        <div class="c-routine">Gün: DNA'yı inceler, hastalık tedavisi geliştirir.</div>
+        <div class="c-role-model">★ Jennifer Doudna (CRISPR)</div>
+      </div>
+      <div class="holo-card crpg accent-warm">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🌍</div>
+        <div class="c-class">İKLİM TEKNOLOJİSTİ</div>
+        <div class="c-routine">Gün: Yeşil teknoloji geliştirir, CO2'yi azaltır.</div>
+        <div class="c-role-model">★ Boyan Slat (Ocean Cleanup)</div>
+      </div>
+      <div class="holo-card crpg accent-cyan">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🚀</div>
+        <div class="c-class">UZAY MÜHENDİSİ</div>
+        <div class="c-routine">Gün: Roket tasarlar, uzay görevleri planlar.</div>
+        <div class="c-role-model">★ Elon Musk (SpaceX)</div>
+      </div>
+      <div class="holo-card crpg accent-yellow">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🛡️</div>
+        <div class="c-class">SİBER KAHRAMAN</div>
+        <div class="c-routine">Gün: Dijital saldırıları durdurur, sistemleri korur.</div>
+        <div class="c-role-model">★ Kevin Mitnick (Efsane hacker)</div>
+      </div>
+    </div>
+
+    <div class="section-title">// 🇹🇷 TÜRK TEKNOLOJİ YILDIZLARI</div>
+    <div class="people-row">
+      <div class="person-card">
+        <div class="person-icon">🚁</div>
+        <div>
+          <div class="person-name">SELÇUK BAYRAKTAR</div>
+          <div class="person-role">SİHA Mühendisi</div>
+          <div class="person-do">Bayraktar TB2 insansız hava aracını yaptı — dünyaca tanınıyor!</div>
+        </div>
+      </div>
+      <div class="person-card">
+        <div class="person-icon">💼</div>
+        <div>
+          <div class="person-name">SİNA AFRA</div>
+          <div class="person-role">Teknoloji Girişimcisi</div>
+          <div class="person-do">Markafoni'yi kurdu, sonra sattı. Türk e-ticaretin öncüsü!</div>
+        </div>
+      </div>
+      <div class="person-card">
+        <div class="person-icon">🎓</div>
+        <div>
+          <div class="person-name">DARON ACEMOĞLU</div>
+          <div class="person-role">YZ & Ekonomi Uzmanı</div>
+          <div class="person-do">MIT'de profesör. Nobel ödüllü! YZ ekonomisini yazıyor.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="extras-grid">
+      <div class="extras-col new-jobs">
+        <div class="ext-title">🆕 10 YIL SONRA BU MESLEKLER DOĞACAK</div>
+        <ul>
+          <li>🌾 <strong>Uzay Çiftçisi</strong> — Mars'ta domates yetiştirir</li>
+          <li>🤖 <strong>Robot Psikologu</strong> — YZ'lara "terapi" verir</li>
+          <li>🫀 <strong>Organ Tasarımcısı</strong> — 3D yazıcıyla organ üretir</li>
+          <li>🌪️ <strong>Klimaloji Uzmanı</strong> — iklimi yönetir</li>
+          <li>🔍 <strong>Dijital Arkeolog</strong> — kayıp dijital verileri bulur</li>
+        </ul>
+      </div>
+      <div class="extras-col study">
+        <div class="ext-title">📚 BUGÜNDEN NE ÖĞRENMELİYİM?</div>
+        <ul>
+          <li>🔢 <strong>Matematik</strong> — her şeyin temeli</li>
+          <li>💻 <strong>Kodlama</strong> — Scratch → Python (ücretsiz!)</li>
+          <li>🗣️ <strong>İngilizce</strong> — teknoloji dili</li>
+          <li>🎨 <strong>Yaratıcılık</strong> — resim, müzik, yazı</li>
+          <li>🤔 <strong>Merak</strong> — "neden?" sormaktan vazgeçme</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="career-quiz">
+      <div class="cq-title">🎯 MİNİ TEST — HANGİ MESLEK SANA UYGUN?</div>
+      <div class="cq-question" id="cqQ">Sorulardan birine tıkla:</div>
+      <div class="cq-options" id="cqOpts">
+        <button class="cq-opt" onclick="cqPick('🤖 YZ Mühendisi')">🧩 Yapboz çözmeyi severim</button>
+        <button class="cq-opt" onclick="cqPick('🥽 Metaverse Mimarı')">🎨 Resim ve tasarım yapmak güzel</button>
+        <button class="cq-opt" onclick="cqPick('🧬 Gen Mühendisi')">🔬 Canlıları merak ederim</button>
+        <button class="cq-opt" onclick="cqPick('🚀 Uzay Mühendisi')">🌌 Gökyüzüne bakmayı severim</button>
+      </div>
+      <div class="cq-result" id="cqRes"></div>
+    </div>
+  </div>
+
+  <!-- ============ SLAYT 10 — LV9 YENİ: AKILLI KULLANIM ============ -->
+  <div class="slide" id="s10">
+    <div class="level-banner">
+      <div class="level-badge mint-badge">LEVEL 9</div>
+      <div class="level-title mint-title">🧭 TEKNOLOJİYİ AKILLICA KULLAN</div>
+    </div>
+    <div class="slide-sub">+100 XP — Süper güce sahipsin, nasıl kullanman gerekir?</div>
+
+    <div class="smart-grid">
+      <!-- 1. Ekran süresi -->
+      <div class="smart-col">
+        <div class="sc-head"><div class="sc-emo">⏰</div><h3>EKRAN SÜRESİ DENGESİ</h3></div>
+        <div class="sc-text">9-10 yaş için uzmanlar günde MAKSIMUM <strong style="color:var(--primary)">2 saat</strong> eğlence ekranı öneriyor (ödev hariç).</div>
+        <ul class="sc-list">
+          <li>🌙 Yatmadan 1 saat önce ekran kapat — mavi ışık uykunu bozar!</li>
+          <li>👁 20-20-20 kuralı: her 20 dk'da, 20 sn, 6m uzağa bak</li>
+        </ul>
+        <div class="screen-slider-wrap">
+          <div class="sslider-label">📱 SENİN GÜNLÜK EKRAN SÜREN?</div>
+          <div class="sslider-row">
+            <input type="range" class="sslider" id="screenSlider" min="0" max="8" step="0.5" value="2">
+            <div class="sslider-val" id="screenVal">2 saat</div>
+          </div>
+          <div class="sslider-msg" id="screenMsg" style="color:var(--success)">✅ Harika! Tam ideal bölgedesin.</div>
+        </div>
+      </div>
+
+      <!-- 2. Güvenli kullanım -->
+      <div class="smart-col">
+        <div class="sc-head"><div class="sc-emo">🛡</div><h3>GÜVENLİ İNTERNET — SEN BİR KAHRAMANSIN!</h3></div>
+        <div class="sc-text"><strong style="color:var(--red)">ASLA PAYLAŞMA:</strong> Tam adın, okulun, ev adresin, telefonun, aile fotoğrafları.</div>
+        <ul class="sc-list">
+          <li>💬 Tanımadığın kişiyle online oyun/sohbette konuşma</li>
+          <li>🚨 Rahatsız olduğun bir şey olursa → ANINDA aile/öğretmene söyle, SAKLAMA!</li>
+          <li>☎️ Yardım hatları: <strong>155</strong> (polis) • <strong>183</strong> (sosyal destek)</li>
+        </ul>
+        <div class="pw-creator">
+          <div class="pw-lbl">🔐 GÜÇLÜ ŞİFRE DENE (minimum 8 karakter)</div>
+          <input type="text" class="pw-input" id="pwInput" placeholder="Örn: KediM2024!seviyor" maxlength="30">
+          <div class="pw-checks">
+            <div class="pw-check" id="pw-len">❔ Min 8 karakter</div>
+            <div class="pw-check" id="pw-up">❔ Büyük harf</div>
+            <div class="pw-check" id="pw-num">❔ Rakam</div>
+            <div class="pw-check" id="pw-sym">❔ Sembol (! ? @)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Üret-tüket -->
+      <div class="smart-col">
+        <div class="sc-head"><div class="sc-emo">🎯</div><h3>ÜRET-TÜKET DENGESİ</h3></div>
+        <div class="sc-text"><strong style="color:var(--warm)">Pasif tüketim</strong> = TikTok izlemek, video kaydırmak. <strong style="color:var(--success)">Aktif üretim</strong> = kodlama, video çekmek, oyun yapmak!</div>
+        <div class="sc-text" style="font-size:10px; color: var(--primary); margin-top:3px;"><strong>%20 üretirsen, %80 tüketmeyi hak edersin!</strong></div>
+        <ul class="sc-list">
+          <li>💻 <strong>Kodlama:</strong> Scratch, Code.org, Tynker — ücretsiz!</li>
+          <li>🎨 <strong>Sanat:</strong> Canva, Procreate, Figma</li>
+          <li>🎬 <strong>Video:</strong> iMovie, CapCut</li>
+          <li>🎮 <strong>Oyun yap:</strong> Roblox Studio, Scratch</li>
+          <li>🎵 <strong>Müzik:</strong> GarageBand, BandLab</li>
+        </ul>
+      </div>
+
+      <!-- 4. Dijital zeka -->
+      <div class="smart-col">
+        <div class="sc-head"><div class="sc-emo">🧠</div><h3>DİJİTAL ZEKA — AKILLI TÜKET</h3></div>
+        <div class="sc-text"><strong style="color:var(--red)">Her gördüğüne İNANMA!</strong> Deepfake, sahte haber, YZ üretimi resimler var.</div>
+        <ul class="sc-list">
+          <li>🔍 <strong>3 kaynak kuralı:</strong> Önemli bilgiyi 3 farklı yerden doğrula</li>
+          <li>💰 "Reklam" veya "Sponsored" yazıyorsa biri para ödüyor</li>
+          <li>🎭 Sosyal medyada herkes en iyi anını paylaşır — gerçek hayat böyle değil!</li>
+          <li>❤️ Takipçi sayısı ≠ Mutluluk!</li>
+          <li>🤖 Algoritma: "Sana bunu gösteriyor çünkü kaldın" — farkında ol</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-title" style="color:var(--mint); text-align:center; text-shadow: 0 0 12px rgba(78,205,196,0.4);">💎 TEKNOLOJİ KAHRAMANININ 5 ALTIN KURALI</div>
+    <div class="golden-rules">
+      <div class="gr-card">
+        <div class="gr-num">01</div>
+        <div class="gr-icon">⏰</div>
+        <div class="gr-title">BİR SAAT KODLA,<br>BİR SAAT OYUN</div>
+        <div class="gr-desc">Üretmeyi tüketmekten az yapma!</div>
+      </div>
+      <div class="gr-card">
+        <div class="gr-num">02</div>
+        <div class="gr-icon">👁</div>
+        <div class="gr-title">2-2-2 KURALI</div>
+        <div class="gr-desc">Günde max 2s, her 20dk'da 20sn mola, yatmadan 2s önce kapa.</div>
+      </div>
+      <div class="gr-card">
+        <div class="gr-num">03</div>
+        <div class="gr-icon">🔍</div>
+        <div class="gr-title">GÜVEN AMA<br>DOĞRULA</div>
+        <div class="gr-desc">Her bilgiyi sorgula, her kişiye güvenme.</div>
+      </div>
+      <div class="gr-card">
+        <div class="gr-num">04</div>
+        <div class="gr-icon">🎨</div>
+        <div class="gr-title">ÜRET, YARAT,<br>KEŞFET</div>
+        <div class="gr-desc">Teknoloji oyuncak değil, atölye!</div>
+      </div>
+      <div class="gr-card">
+        <div class="gr-num">05</div>
+        <div class="gr-icon">🌳</div>
+        <div class="gr-title">GERÇEK HAYATA<br>ÇIK</div>
+        <div class="gr-desc">Arkadaş, kitap, doğa — ekran hayatın %10'u!</div>
+      </div>
+    </div>
+
+    <button class="oath-btn" onclick="swearOath()">✋ SÖZÜMÜ VERİYORUM — BEN BİR TEKNOLOJİ KAHRAMANIYIM!</button>
+  </div>
+
+  <!-- ============ SLAYT 11 — LV10 VICTORY ============ -->
+  <div class="slide" id="s11">
+    <div id="confettiContainer"></div>
+    <div class="victory-screen">
+      <div class="victory-trophy">🏆</div>
+      <div class="victory-title">TEBRİKLER!<br>OYUN TAMAM!</div>
+      <div class="final-xp">🌟 TOPLAM XP: 1000 / 1000 — MAX LEVEL!</div>
+
+      <div class="summary-keys">
+        <div class="sk-chip"><span class="sk-emoji">🌐</span><div class="sk-label">Dev bir ağ</div></div>
+        <div class="sk-chip"><span class="sk-emoji">📜</span><div class="sk-label">1993'te TR</div></div>
+        <div class="sk-chip"><span class="sk-emoji">⚡</span><div class="sk-label">5G = 3sn film</div></div>
+        <div class="sk-chip"><span class="sk-emoji">🧠</span><div class="sk-label">YZ öğrenir</div></div>
+        <div class="sk-chip"><span class="sk-emoji">🔮</span><div class="sk-label">2030'da YZ günü</div></div>
+        <div class="sk-chip"><span class="sk-emoji">🔬</span><div class="sk-label">TOGG, TB2</div></div>
+        <div class="sk-chip"><span class="sk-emoji">💰</span><div class="sk-label">Drone teslimat</div></div>
+        <div class="sk-chip"><span class="sk-emoji">🎯</span><div class="sk-label">6 yeni meslek</div></div>
+        <div class="sk-chip"><span class="sk-emoji">🧭</span><div class="sk-label">5 altın kural</div></div>
+      </div>
+
+      <div class="quotes-row">
+        <div class="quote-card">"Hayal gücü, bilgiden daha önemlidir."<span class="quote-author">— Einstein</span></div>
+        <div class="quote-card">"Kalbinin ve sezgilerinin peşinden git."<span class="quote-author">— Steve Jobs</span></div>
+        <div class="quote-card">"İmkansız olan gerçekte imkan değildir."<span class="quote-author">— Elon Musk</span></div>
+        <div class="quote-card">"Mühendislik milletin geleceğidir."<span class="quote-author">— S. Bayraktar</span></div>
+      </div>
+
+      <div class="achievement-row">
+        <div class="achievement"><div class="ach-icon">🌐</div><div class="ach-label">İNTERNET<br>USTASI</div></div>
+        <div class="achievement"><div class="ach-icon">⚡</div><div class="ach-label">HIZ<br>ŞAMPİYONU</div></div>
+        <div class="achievement"><div class="ach-icon">🤖</div><div class="ach-label">YZ<br>KAŞİFİ</div></div>
+        <div class="achievement"><div class="ach-icon">🚀</div><div class="ach-label">GELECEK<br>MİMARI</div></div>
+        <div class="achievement"><div class="ach-icon">🧭</div><div class="ach-label">AKILLI<br>KULLANICI</div></div>
+      </div>
+
+      <div class="final-cta">🎯 SIRADA QUIZ VAR — BİLDİĞİNİ GÖSTER!</div>
+      <div style="font-size:10px; color:rgba(255,255,255,0.6); max-width:700px; text-align:center; line-height:1.5; font-style:italic;">
+        "Dünyayı değiştirmek için yaş sınırı yok. Sen de bugünden başlayabilirsin!"
+      </div>
+      <div class="press-start">QUIZE GEÇMEK İÇİN SAĞ OK (→) TUŞUNA BAS</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- === KONTROLLER === -->
+<button class="arrow-btn arrow-left"  onclick="changeSlide(-1)">◀</button>
+<button class="arrow-btn arrow-right" onclick="changeSlide(1)">▶</button>
+<div class="bottom-nav" id="bottomNav"></div>
+
+<script>
+  const TOTAL = 11;
+  let current = 0;
+
+  // Kümülatif XP (100/level × 10 level)
+  const slideXP = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+  const slideLabels = ['START','LV1','LV2','LV3','LV4','LV5','LV6','LV7','LV8','LV9','MAX'];
+
+  // Alt nav oluştur
+  const bn = document.getElementById('bottomNav');
+  for (let i = 0; i < TOTAL; i++) {
+    const pip = document.createElement('div');
+    pip.className = 'level-pip' + (i === 0 ? ' active' : '');
+    pip.textContent = slideLabels[i];
+    pip.onclick = () => goTo(i);
+    bn.appendChild(pip);
+  }
+
+  function updateHUD(n) {
+    const xp  = slideXP[n];
+    const pct = (xp / 1000) * 100;
+    document.getElementById('xpFill').style.width = pct + '%';
+    document.getElementById('xpCount').textContent = xp + ' / 1000';
+    document.getElementById('hudLevel').textContent =
+      n === 0 ? 'LV.1' : (n === TOTAL - 1 ? 'MAX' : 'LV.' + n);
+
+    // 9 rozet: b0 = s2 (LV1) sonrası, b8 = s10 (LV9) sonrası
+    for (let i = 0; i < 9; i++) {
+      const badge = document.getElementById('b' + i);
+      if (i < n - 1) badge.classList.add('earned');
+      else           badge.classList.remove('earned');
+    }
+  }
+
+  function goTo(n) {
+    document.getElementById('s' + (current + 1)).classList.remove('active');
+    current = Math.max(0, Math.min(TOTAL - 1, n));
+    document.getElementById('s' + (current + 1)).classList.add('active');
+
+    document.querySelectorAll('.level-pip').forEach((p, i) => {
+      p.classList.remove('active', 'done');
+      if (i < current) p.classList.add('done');
+      if (i === current) p.classList.add('active');
+    });
+
+    updateHUD(current);
+    if (current === TOTAL - 1) spawnConfetti();
+    // Scroll'u en üste al
+    const slide = document.getElementById('s' + (current + 1));
+    if (slide) slide.scrollTop = 0;
+  }
+
+  function changeSlide(d) { goTo(current + d); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') changeSlide(1);
+    if (e.key === 'ArrowLeft') changeSlide(-1);
+  });
+
+  // Yıldızlar
+  const starsContainer = document.getElementById('starsContainer');
+  for (let i = 0; i < 70; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 2.5 + 0.8;
+    star.style.cssText =
+      `width:${size}px;height:${size}px;left:${Math.random() * 100}%;top:${Math.random() * 100}%;` +
+      `animation-delay:${Math.random() * 3}s;animation-duration:${Math.random() * 2 + 1.5}s`;
+    starsContainer.appendChild(star);
+  }
+
+  // Parçacıklar
+  const pc = document.getElementById('particles');
+  const particleColors = ['#00cfff', '#A855F7', '#39ff14', '#FF6B35', '#ffe600'];
+  for (let i = 0; i < 36; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 3 + 1;
+    const drift = (Math.random() - 0.5) * 220;
+    const color = particleColors[Math.floor(Math.random() * particleColors.length)];
+    p.style.cssText =
+      `width:${size}px;height:${size}px;left:${Math.random() * 100}%;background:${color};` +
+      `animation-duration:${Math.random() * 8 + 7}s;animation-delay:${Math.random() * 10}s;` +
+      `--drift:${drift}px;opacity:0.55;box-shadow:0 0 6px currentColor`;
+    pc.appendChild(p);
+  }
+
+  // === CANLI SAYAÇLAR (Cover) ===
+  // Günlük başlangıç değerleri, her saniye artar — canlı hissi
+  const counters = [
+    { el: 'lc1', base: 5_200_000_000, rate: 60_000 },   // Google 5.2B/gün → ~60k/sn
+    { el: 'lc2', base: 100_000_000_000, rate: 1_157_000 }, // WhatsApp 100B/gün
+    { el: 'lc3', base: 1_000_000_000, rate: 11_574 }    // YouTube saati izleme
+  ];
+  function fmt(n) {
+    if (n >= 1e9) return (n/1e9).toFixed(2) + ' MİLYAR';
+    if (n >= 1e6) return (n/1e6).toFixed(1) + ' MİLYON';
+    if (n >= 1e3) return Math.floor(n/1e3) + ' BİN';
+    return Math.floor(n).toLocaleString('tr-TR');
+  }
+  counters.forEach(c => {
+    c.val = c.base + Math.random() * c.rate * 30;
+    document.getElementById(c.el).textContent = fmt(c.val);
+  });
+  setInterval(() => {
+    counters.forEach(c => {
+      c.val += c.rate / 2 + Math.random() * c.rate;
+      document.getElementById(c.el).textContent = fmt(c.val);
+    });
+  }, 500);
+
+  // === EKRAN SÜRESİ SLIDER (LV9) ===
+  const ss = document.getElementById('screenSlider');
+  const sv = document.getElementById('screenVal');
+  const sm = document.getElementById('screenMsg');
+  if (ss) {
+    ss.addEventListener('input', () => {
+      const v = parseFloat(ss.value);
+      sv.textContent = v + ' saat';
+      let msg, color;
+      if (v <= 1)      { msg = '🌿 Harika! Çok dengeli.';                 color = 'var(--success)'; }
+      else if (v <= 2) { msg = '✅ İdeal bölge — 9-10 yaş için en iyi!';    color = 'var(--success)'; }
+      else if (v <= 4) { msg = '⚠️ Biraz fazla — dışarı çıkma zamanı!';    color = 'var(--primary)'; }
+      else if (v <= 6) { msg = '🚨 Dikkat! Gözlerin ve uykun etkilenir.';  color = 'var(--warm)'; }
+      else             { msg = '🛑 Çok fazla! Acil ekran molası!';         color = 'var(--red)'; }
+      sm.textContent = msg; sm.style.color = color;
+    });
+  }
+
+  // === ŞİFRE KONTROL (LV9) ===
+  const pw = document.getElementById('pwInput');
+  if (pw) {
+    pw.addEventListener('input', () => {
+      const v = pw.value;
+      toggleCheck('pw-len', v.length >= 8, 'Min 8 karakter');
+      toggleCheck('pw-up',  /[A-ZÇĞİÖŞÜ]/.test(v), 'Büyük harf');
+      toggleCheck('pw-num', /[0-9]/.test(v), 'Rakam');
+      toggleCheck('pw-sym', /[!?@#$%&*()_+\-=]/.test(v), 'Sembol (! ? @)');
+    });
+  }
+  function toggleCheck(id, ok, lbl) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (ok) { el.classList.add('ok'); el.textContent = '✅ ' + lbl; }
+    else    { el.classList.remove('ok'); el.textContent = '❔ ' + lbl; }
+  }
+
+  // === MESLEK MİNİ QUİZ (LV8) ===
+  function cqPick(meslek) {
+    const r = document.getElementById('cqRes');
+    r.innerHTML = '🎯 <strong>Sana önerilen yol:</strong> ' + meslek + ' — Bu yönde bugünden başlayabilirsin!';
+    r.classList.add('show');
+  }
+
+  // === SÖZ VERİRİM — Yıldız patlaması (LV9) ===
+  function swearOath() {
+    const container = document.createElement('div');
+    container.className = 'oath-stars';
+    document.body.appendChild(container);
+    const emojis = ['⭐','✨','🌟','💫','🎆'];
+    for (let i = 0; i < 30; i++) {
+      const s = document.createElement('div');
+      s.className = 'oath-star';
+      s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 200 + Math.random() * 300;
+      s.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+      s.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+      s.style.animationDelay = (Math.random() * 0.3) + 's';
+      container.appendChild(s);
+    }
+    setTimeout(() => container.remove(), 2000);
+  }
+
+  // === KONFETTİ (Victory) ===
+  function spawnConfetti() {
+    const c = document.getElementById('confettiContainer');
+    if (!c) return;
+    c.innerHTML = '';
+    const colors = ['#ffe600','#FF6B35','#00cfff','#A855F7','#39ff14','#FF6B9D','#4ecdc4'];
+    for (let i = 0; i < 80; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      const isCircle = Math.random() > 0.5;
+      piece.style.cssText =
+        `left:${Math.random() * 100}%;top:-20px;background:${colors[Math.floor(Math.random() * colors.length)]};` +
+        `width:${Math.random() * 10 + 6}px;height:${Math.random() * 10 + 6}px;` +
+        `animation-duration:${Math.random() * 3 + 2.5}s;animation-delay:${Math.random() * 2}s;` +
+        `border-radius:${isCircle ? '50%' : '2px'}`;
+      c.appendChild(piece);
+    }
+  }
+
+  updateHUD(0);
+</script>
+</body>
+</html>
