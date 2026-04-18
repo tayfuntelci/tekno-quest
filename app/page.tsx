@@ -3,36 +3,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getLeaderboard, subscribeToLeaderboard, QuizResult } from '@/lib/supabase';
 
-const presentations = [
-  {
-    version: 'v1',
-    emoji: '🎨',
-    title: 'Renkli & Eğlenceli',
-    desc: 'Çizgi film tarzı, canlı renkler ve neşeli animasyonlarla teknoloji yolculuğu!',
-    color: '#FFD93D',
-    glow: 'rgba(255,217,61,0.15)',
-    border: 'rgba(255,217,61,0.35)',
-  },
-  {
-    version: 'v2',
-    emoji: '🚀',
-    title: 'Uzay & Fütüristik',
-    desc: 'Hologram efektleri ve uzay temasıyla geleceğin teknolojisi!',
-    color: '#00cfff',
-    glow: 'rgba(0,207,255,0.15)',
-    border: 'rgba(0,207,255,0.35)',
-  },
-  {
-    version: 'v3',
-    emoji: '🎮',
-    title: 'Oyun Tarzı',
-    desc: 'Level sistemi, XP puanlar ve rozet kazanımlarıyla eğlenceli öğrenme!',
-    color: '#39ff14',
-    glow: 'rgba(57,255,20,0.15)',
-    border: 'rgba(57,255,20,0.35)',
-  },
-];
-
 function rankEmoji(i: number) {
   if (i === 0) return '🥇';
   if (i === 1) return '🥈';
@@ -63,61 +33,104 @@ export default function Portal() {
         <p className="text-lg" style={{ color: 'var(--muted)' }}>
           İnternetten Yapay Zekaya — Geleceğin Şifresi
         </p>
-
       </div>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Presentations */}
+        {/* Left: Presentation (single card) */}
         <div className="lg:col-span-2 space-y-4">
-          <h2 className="font-game text-sm mb-4" style={{ color: 'var(--muted)', letterSpacing: '2px' }}>
-            ▸ SUNUM SEÇ
+          <h2
+            className="font-game text-sm mb-4"
+            style={{ color: 'var(--muted)', letterSpacing: '2px' }}
+          >
+            ▸ SUNUM &amp; QUIZ
           </h2>
-          {presentations.map((p) => (
-            <div
-              key={p.version}
-              className="game-card p-5"
-              style={{ borderColor: p.border, boxShadow: `0 0 20px ${p.glow}` }}
-            >
-              <div className="flex items-start gap-4">
-                <div className="text-4xl flex-shrink-0 animate-float">{p.emoji}</div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className="font-game font-bold text-lg" style={{ color: p.color }}>
-                      {p.title}
-                    </span>
-                    <span className="xp-badge">+110 XP</span>
-                  </div>
-                  <p className="text-sm mb-4" style={{ color: 'var(--muted)' }}>{p.desc}</p>
-                  <div className="flex gap-3 flex-wrap">
-                    <Link href={`/sunum/${p.version}`}>
-                      <button
-                        className="btn-primary text-sm"
-                        style={{ background: p.color }}
+
+          <div
+            className="game-card p-6"
+            style={{
+              borderColor: 'rgba(255,230,0,0.35)',
+              boxShadow: '0 0 28px rgba(255,230,0,0.12)',
+            }}
+          >
+            <div className="flex items-start gap-4">
+              <div className="text-5xl flex-shrink-0 animate-float">🚀</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <span
+                    className="font-game font-bold text-xl neon-yellow"
+                    style={{ letterSpacing: '1.5px' }}
+                  >
+                    TEKNO QUEST
+                  </span>
+                  <span className="xp-badge">+110 XP</span>
+                </div>
+                <p className="text-sm mb-5" style={{ color: 'var(--muted)', lineHeight: 1.6 }}>
+                  Oyun mekanikleri ve uzay temasıyla harmanlanmış interaktif sunum —
+                  10 level, XP barı, rozet kazanımı ve sonunda quiz. 9–10 yaş için
+                  teknoloji tarihinden yapay zekaya büyük macera!
+                </p>
+
+                {/* Mini feature grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
+                  {[
+                    { icon: '🎮', label: '10 Level' },
+                    { icon: '⭐', label: '900 XP' },
+                    { icon: '🏆', label: '8 Rozet' },
+                    { icon: '🎯', label: '10 Soru' },
+                  ].map(f => (
+                    <div
+                      key={f.label}
+                      className="rounded-lg px-2 py-2 text-center"
+                      style={{
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                      }}
+                    >
+                      <div className="text-xl mb-1">{f.icon}</div>
+                      <div
+                        className="font-game text-xs neon-yellow"
+                        style={{ letterSpacing: '0.5px' }}
                       >
-                        ▶ Sunumu Başlat
-                      </button>
-                    </Link>
-                    <Link href={`/quiz/${p.version}`}>
-                      <button className="btn-outline text-sm" style={{ color: p.color, borderColor: p.color }}>
-                        🎯 Quiz'e Git
-                      </button>
-                    </Link>
-                  </div>
+                        {f.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex gap-3 flex-wrap">
+                  <Link href="/sunum">
+                    <button className="btn-primary text-sm">▶ Sunumu Başlat</button>
+                  </Link>
+                  <Link href="/quiz">
+                    <button
+                      className="btn-outline text-sm"
+                      style={{ color: 'var(--info)', borderColor: 'var(--info)' }}
+                    >
+                      🎯 Quiz'e Git
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>
-          ))}
+          </div>
 
           {/* Info box */}
-          <div className="game-card p-4 mt-2"
-            style={{ borderColor: 'rgba(192,132,252,0.3)', background: 'rgba(192,132,252,0.05)' }}>
+          <div
+            className="game-card p-4 mt-2"
+            style={{
+              borderColor: 'rgba(192,132,252,0.3)',
+              background: 'rgba(192,132,252,0.05)',
+            }}
+          >
             <div className="flex items-start gap-3">
               <span className="text-2xl">💡</span>
               <div>
-                <p className="font-game text-xs mb-1" style={{ color: '#c084fc' }}>NASIL KULLANILIR?</p>
+                <p className="font-game text-xs mb-1" style={{ color: '#c084fc' }}>
+                  NASIL KULLANILIR?
+                </p>
                 <p className="text-sm" style={{ color: 'var(--muted)' }}>
-                  1. Bir sunum teması seç → 2. Sunumu sınıfa anlat → 3. Öğrenciler isimlerini yazarak quize katılır
-                  → 4. Liderboard canlı güncellenir!
+                  1. Sunumu sınıfa anlat → 2. Öğrenciler telefondan bu sayfaya girer →
+                  3. İsimlerini yazarak quize katılır → 4. Liderboard canlı güncellenir!
                 </p>
               </div>
             </div>
@@ -126,8 +139,10 @@ export default function Portal() {
 
         {/* Right: Live Leaderboard */}
         <div className="lg:col-span-1">
-          <div className="game-card p-5 sticky top-6"
-            style={{ borderColor: 'rgba(255,159,28,0.3)' }}>
+          <div
+            className="game-card p-5 sticky top-6"
+            style={{ borderColor: 'rgba(255,159,28,0.3)' }}
+          >
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-game font-bold text-sm neon-yellow">🏆 LİDERBOARD</h2>
               <Link href="/liderboard">
@@ -149,7 +164,10 @@ export default function Portal() {
                   <div
                     key={r.id}
                     className="flex items-center gap-3 p-2 rounded-lg"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
+                    style={{
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                    }}
                   >
                     <span className="font-game text-sm w-6 text-center flex-shrink-0">
                       {rankEmoji(i)}
@@ -162,19 +180,24 @@ export default function Portal() {
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="font-game text-sm neon-green">{r.total_xp} XP</p>
-                      <p className="text-xs" style={{ color: 'rgba(255,159,28,0.8)' }}>
-                        {r.presentation_version.toUpperCase()}
-                      </p>
                     </div>
                   </div>
                 ))}
               </div>
             )}
 
-            <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <div
+              className="mt-4 pt-4"
+              style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+            >
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--success)' }} />
-                <span className="text-xs" style={{ color: 'var(--success)' }}>Canlı güncelleniyor</span>
+                <div
+                  className="w-2 h-2 rounded-full animate-pulse"
+                  style={{ background: 'var(--success)' }}
+                />
+                <span className="text-xs" style={{ color: 'var(--success)' }}>
+                  Canlı güncelleniyor
+                </span>
               </div>
             </div>
           </div>

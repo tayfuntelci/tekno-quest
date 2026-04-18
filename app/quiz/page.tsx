@@ -1,17 +1,10 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
-import { questions, Question, MatchPair, TOTAL_XP } from '@/lib/questions';
+import { questions, MatchPair, TOTAL_XP } from '@/lib/questions';
 import { saveQuizResult } from '@/lib/supabase';
 
 type Stage = 'name' | 'ready' | 'playing' | 'result';
-
-const versionLabel: Record<string, string> = {
-  v1: 'Renkli & Eğlenceli 🎨',
-  v2: 'Uzay & Fütüristik 🚀',
-  v3: 'Oyun Tarzı 🎮',
-};
 
 // ───── Name Entry ─────────────────────────────────────────────────────────────
 function NameEntry({ onStart }: { onStart: (name: string) => void }) {
@@ -57,13 +50,13 @@ function NameEntry({ onStart }: { onStart: (name: string) => void }) {
 }
 
 // ───── Ready Screen ───────────────────────────────────────────────────────────
-function ReadyScreen({ name, version, onGo }: { name: string; version: string; onGo: () => void }) {
+function ReadyScreen({ name, onGo }: { name: string; onGo: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-4">
       <div className="game-card p-8 w-full max-w-md text-center animate-slide-up">
         <div className="text-5xl mb-2">👋</div>
         <h2 className="font-game font-bold text-2xl neon-yellow mb-1">MERHABA, {name.toUpperCase()}!</h2>
-        <p className="text-sm mb-6" style={{ color: 'var(--muted)' }}>{versionLabel[version] ?? ''}</p>
+        <p className="text-sm mb-6" style={{ color: 'var(--muted)' }}>🚀 TEKNO QUEST</p>
         <div className="grid grid-cols-3 gap-3 mb-6">
           {[
             { icon: '📝', label: `${questions.length} Soru` },
@@ -168,7 +161,6 @@ function MatchCard({
   const shuffledRight = useState(() => [...pairs].sort(() => Math.random() - 0.5))[0];
   const [selected, setSelected] = useState<string | null>(null);
   const [matched, setMatched] = useState<Record<string, string>>({});
-  const [errors, setErrors] = useState<string[]>([]);
 
   const handleLeft = (left: string) => { if (answered !== null) return; setSelected(left); };
   const handleRight = (right: string) => {
@@ -180,11 +172,8 @@ function MatchCard({
       setSelected(null);
       if (Object.keys(next).length === pairs.length) onAnswer(true);
     } else {
-      setErrors(e => [...e, selected]);
       setSelected(null);
-      if (Object.keys(matched).length + 1 < pairs.length) {
-        // allow retry for wrong matches
-      } else {
+      if (Object.keys(matched).length + 1 >= pairs.length) {
         onAnswer(false);
       }
     }
@@ -244,10 +233,8 @@ function MatchCard({
 
 // ───── Playing Stage ──────────────────────────────────────────────────────────
 function PlayingStage({
-  version, playerName, onFinish,
+  onFinish,
 }: {
-  version: string;
-  playerName: string;
   onFinish: (xp: number, correct: number) => void;
 }) {
   const [idx, setIdx] = useState(0);
@@ -292,7 +279,7 @@ function PlayingStage({
 
   const next = () => {
     if (idx + 1 >= questions.length) {
-      onFinish(totalXP + (answered || matchAnswered !== null ? 0 : 0), correct);
+      onFinish(totalXP, correct);
     } else {
       setIdx(i => i + 1);
       setAnswered(null);
@@ -376,10 +363,9 @@ function PlayingStage({
 
 // ───── Result Stage ───────────────────────────────────────────────────────────
 function ResultStage({
-  playerName, version, totalXP, correct, saved,
+  playerName, totalXP, correct, saved,
 }: {
   playerName: string;
-  version: string;
   totalXP: number;
   correct: number;
   saved: boolean;
@@ -437,21 +423,20 @@ function ResultStage({
 
 // ───── Main Quiz Page ─────────────────────────────────────────────────────────
 export default function QuizPage() {
-  const { version } = useParams<{ version: string }>();
   const [stage, setStage] = useState<Stage>('name');
   const [playerName, setPlayerName] = useState('');
   const [result, setResult] = useState<{ xp: number; correct: number } | null>(null);
   const [saved, setSaved] = useState(false);
 
-  const handleName = (name: string) => { setPlayerName(name); setStage('ready'); };
-  const handleReady  = () => setStage('playing');
+  const handleName  = (name: string) => { setPlayerName(name); setStage('ready'); };
+  const handleReady = () => setStage('playing');
   const handleFinish = async (xp: number, correct: number) => {
     setResult({ xp, correct });
     setStage('result');
     try {
       await saveQuizResult({
         player_name: playerName,
-        presentation_version: version,
+        presentation_version: 'v1', // Tek sürüm — schema CHECK kısıtlaması için 'v1' sabit
         score: Math.round((correct / questions.length) * 100),
         total_xp: xp,
         correct_count: correct,
@@ -462,9 +447,9 @@ export default function QuizPage() {
   };
 
   if (stage === 'name')    return <NameEntry onStart={handleName} />;
-  if (stage === 'ready')   return <ReadyScreen name={playerName} version={version} onGo={handleReady} />;
-  if (stage === 'playing') return <PlayingStage version={version} playerName={playerName} onFinish={handleFinish} />;
+  if (stage === 'ready')   return <ReadyScreen name={playerName} onGo={handleReady} />;
+  if (stage === 'playing') return <PlayingStage onFinish={handleFinish} />;
   if (stage === 'result' && result)
-    return <ResultStage playerName={playerName} version={version} totalXP={result.xp} correct={result.correct} saved={saved} />;
+    return <ResultStage playerName={playerName} totalXP={result.xp} correct={result.correct} saved={saved} />;
   return null;
 }
