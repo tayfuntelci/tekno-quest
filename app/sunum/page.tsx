@@ -1,6 +1,9 @@
 'use client';
 import Link from 'next/link';
 
+// Cache-busting: her deploy için yeni versiyon değeri → browser eski sunum.html'i cache'den alamaz
+const SUNUM_VERSION = '20250420-3';
+
 export default function SunumPage() {
   return (
     <div className="sunum-page flex flex-col" style={{ height: '100dvh' }}>
@@ -25,7 +28,7 @@ export default function SunumPage() {
 
       {/* Iframe: kalan yüksekliği doldurur */}
       <iframe
-        src="/sunum.html"
+        src={`/sunum.html?v=${SUNUM_VERSION}`}
         className="sunum-iframe"
         title="Tekno Quest Sunum"
         allow="fullscreen"

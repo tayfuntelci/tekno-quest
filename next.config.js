@@ -5,7 +5,11 @@ const nextConfig = {
     return [
       {
         source: '/:path*.html',
-        headers: [{ key: 'X-Frame-Options', value: 'SAMEORIGIN' }],
+        headers: [
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          // Eski sunum.html'in CDN/browser cache'de takılmasını önle
+          { key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' },
+        ],
       },
     ];
   },
