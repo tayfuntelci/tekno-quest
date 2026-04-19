@@ -632,10 +632,17 @@ body { height: 100dvh; }
 .q-spacer { width: 30px; flex-shrink: 0; }
 .quest-icon { font-size: 44px; flex-shrink: 0; }
 .quest-text { flex: 1; }
-.quest-text strong {
+.quest-text > strong {
   display: block;
   font-size: clamp(17px, 2vw, 22px);
   color: var(--text); font-weight: 700; margin-bottom: 4px;
+}
+.q-know strong {
+  display: inline;
+  font-size: inherit;
+  color: inherit;
+  font-weight: 700;
+  margin: 0;
 }
 .quest-text span {
   font-size: clamp(13px, 1.5vw, 17px);
@@ -2083,7 +2090,7 @@ input[type=range].sslider::-webkit-slider-thumb {
         <div class="quest-text">
           <strong>✅ İLK BAĞLANTI — ODTÜ, Ankara</strong>
           <span>Türkiye internete ilk kez bağlandı — sadece 64 kbps hızla. Bir resim 5 dakikada yüklenirdi!</span>
-          <em class="q-know">💡 Biliyor muydun? İlk e-postayı Türkiye'den <strong>Mustafa Akgül</strong> attı — "İnternetin Dedesi" olarak anılır!</em>
+          <em class="q-know">💡 Biliyor muydun? Türkiye'nin ilk e-postasını gönderen kişi <strong>Prof. Mustafa Akgül</strong>'dür. Kendisi "Türk İnternetinin Babası" olarak anılır.</em>
         </div>
         <div class="quest-badge qb-done">TAMAMLANDI</div>
       </div>
@@ -2096,7 +2103,7 @@ input[type=range].sslider::-webkit-slider-thumb {
         <div class="quest-text">
           <strong>✅ İNTERNET EVLERE GİRDİ</strong>
           <span>Türk Telekom evlere çevirmeli internet getirdi. Modem sesi "tıkır tıkır" — telefon çalarsa internet kopardı!</span>
-          <em class="q-know">💡 Biliyor muydun? İlk internet kafelerde saat ücreti bugünkü parayla <strong>300 TL</strong> idi — ve hız sadece 56K!</em>
+          <em class="q-know">💡 Biliyor muydun? O yıllarda bir şarkı indirmek <strong>yaklaşık 20 dakika</strong> sürüyordu. Üstelik biri telefonu açarsa internet bağlantısı anında kesiliyordu!</em>
         </div>
         <div class="quest-badge qb-done">TAMAMLANDI</div>
       </div>
