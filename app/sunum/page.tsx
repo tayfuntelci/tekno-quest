@@ -3,40 +3,30 @@ import Link from 'next/link';
 
 export default function SunumPage() {
   return (
-    <div className="flex flex-col h-screen">
-      {/* Top bar */}
-      <div
-        className="flex items-center justify-between px-4 py-2 flex-shrink-0"
-        style={{
-          background: 'rgba(10,10,24,0.95)',
-          borderBottom: '1px solid rgba(255,230,0,0.15)',
-          zIndex: 10,
-        }}
-      >
-        <div className="flex items-center gap-3">
-          <Link href="/">
-            <button
-              className="text-sm px-3 py-1 rounded font-game"
-              style={{ color: 'var(--muted)', border: '1px solid rgba(255,255,255,0.1)' }}
-            >
-              ← Geri
-            </button>
-          </Link>
-          <span className="font-game text-sm neon-yellow">
-            🚀 TEKNO QUEST
-          </span>
-        </div>
-        <Link href="/quiz">
-          <button className="btn-primary text-sm">
-            🎯 Quize Geç →
-          </button>
+    <div className="sunum-page flex flex-col" style={{ height: '100dvh' }}>
+      {/* Top bar — her cihazda düzgün sığar */}
+      <div className="sunum-topbar">
+        <Link href="/" className="sunum-back">
+          <span className="sunum-back-arrow">←</span>
+          <span className="sunum-back-label">Geri</span>
+        </Link>
+
+        <span className="sunum-title">
+          <span className="sunum-title-icon">🚀</span>
+          <span className="sunum-title-text">TEKNO QUEST</span>
+        </span>
+
+        <Link href="/quiz" className="sunum-cta">
+          <span className="sunum-cta-icon">🎯</span>
+          <span className="sunum-cta-label">Quize Geç</span>
+          <span className="sunum-cta-arrow">→</span>
         </Link>
       </div>
 
       {/* Iframe: kalan yüksekliği doldurur */}
       <iframe
         src="/sunum.html"
-        className="flex-1 w-full border-0"
+        className="sunum-iframe"
         title="Tekno Quest Sunum"
         allow="fullscreen"
       />

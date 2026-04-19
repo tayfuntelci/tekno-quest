@@ -6,6 +6,15 @@ module.exports = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    screens: {
+      '2xs': '280px',  // Samsung Fold (katlanmış)
+      'xs':  '360px',  // küçük telefonlar
+      'sm':  '640px',
+      'md':  '768px',
+      'lg':  '1024px',
+      'xl':  '1280px',
+      '2xl': '1536px',
+    },
     extend: {
       colors: {
         bg:       '#0a0a18',

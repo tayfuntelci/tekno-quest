@@ -20,58 +20,58 @@ export default function Portal() {
   }, []);
 
   return (
-    <main className="min-h-screen relative z-10 px-4 py-8 md:py-12">
+    <main className="min-h-screen relative z-10 px-3 xs:px-4 py-6 xs:py-8 md:py-12">
       {/* Header */}
-      <div className="text-center mb-12">
-        <div className="text-6xl mb-4 animate-float inline-block">🌐</div>
+      <div className="text-center mb-8 xs:mb-12">
+        <div className="text-5xl xs:text-6xl mb-3 xs:mb-4 animate-float inline-block">🌐</div>
         <h1
           className="font-game font-bold neon-yellow mb-2"
-          style={{ fontSize: 'clamp(32px, 6vw, 64px)', letterSpacing: '2px' }}
+          style={{ fontSize: 'clamp(22px, 7vw, 64px)', letterSpacing: '1.5px', lineHeight: 1.15 }}
         >
           TEKNOLOJİ QUEST
         </h1>
-        <p className="text-lg" style={{ color: 'var(--muted)' }}>
+        <p className="text-sm xs:text-base sm:text-lg px-2" style={{ color: 'var(--muted)' }}>
           İnternetten Yapay Zekaya — Geleceğin Şifresi
         </p>
       </div>
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 xs:gap-6">
         {/* Left: Presentation (single card) */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-3 xs:space-y-4 min-w-0">
           <h2
-            className="font-game text-sm mb-4"
+            className="font-game text-xs xs:text-sm mb-3 xs:mb-4"
             style={{ color: 'var(--muted)', letterSpacing: '2px' }}
           >
             ▸ SUNUM &amp; QUIZ
           </h2>
 
           <div
-            className="game-card p-6"
+            className="game-card p-4 xs:p-6"
             style={{
               borderColor: 'rgba(255,230,0,0.35)',
               boxShadow: '0 0 28px rgba(255,230,0,0.12)',
             }}
           >
-            <div className="flex items-start gap-4">
-              <div className="text-5xl flex-shrink-0 animate-float">🚀</div>
+            <div className="flex items-start gap-3 xs:gap-4">
+              <div className="text-4xl xs:text-5xl flex-shrink-0 animate-float">🚀</div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
                   <span
-                    className="font-game font-bold text-xl neon-yellow"
+                    className="font-game font-bold text-base xs:text-xl neon-yellow"
                     style={{ letterSpacing: '1.5px' }}
                   >
                     TEKNO QUEST
                   </span>
                   <span className="xp-badge">+110 XP</span>
                 </div>
-                <p className="text-sm mb-5" style={{ color: 'var(--muted)', lineHeight: 1.6 }}>
+                <p className="text-xs xs:text-sm mb-4 xs:mb-5" style={{ color: 'var(--muted)', lineHeight: 1.6 }}>
                   Oyun mekanikleri ve uzay temasıyla harmanlanmış interaktif sunum —
                   10 level, XP barı, rozet kazanımı ve sonunda quiz. 9–10 yaş için
                   teknoloji tarihinden yapay zekaya büyük macera!
                 </p>
 
                 {/* Mini feature grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4 xs:mb-5">
                   {[
                     { icon: '🎮', label: '10 Level' },
                     { icon: '⭐', label: '900 XP' },
@@ -86,9 +86,9 @@ export default function Portal() {
                         border: '1px solid rgba(255,255,255,0.08)',
                       }}
                     >
-                      <div className="text-xl mb-1">{f.icon}</div>
+                      <div className="text-lg xs:text-xl mb-1">{f.icon}</div>
                       <div
-                        className="font-game text-xs neon-yellow"
+                        className="font-game text-[10px] xs:text-xs neon-yellow"
                         style={{ letterSpacing: '0.5px' }}
                       >
                         {f.label}
@@ -97,13 +97,13 @@ export default function Portal() {
                   ))}
                 </div>
 
-                <div className="flex gap-3 flex-wrap">
-                  <Link href="/sunum">
-                    <button className="btn-primary text-sm">▶ Sunumu Başlat</button>
+                <div className="flex gap-2 xs:gap-3 flex-wrap">
+                  <Link href="/sunum" className="flex-1 xs:flex-none min-w-[140px]">
+                    <button className="btn-primary text-xs xs:text-sm w-full">▶ Sunumu Başlat</button>
                   </Link>
-                  <Link href="/quiz">
+                  <Link href="/quiz" className="flex-1 xs:flex-none min-w-[120px]">
                     <button
-                      className="btn-outline text-sm"
+                      className="btn-outline text-xs xs:text-sm w-full"
                       style={{ color: 'var(--info)', borderColor: 'var(--info)' }}
                     >
                       🎯 Quiz'e Git
@@ -116,19 +116,19 @@ export default function Portal() {
 
           {/* Info box */}
           <div
-            className="game-card p-4 mt-2"
+            className="game-card p-3 xs:p-4 mt-2"
             style={{
               borderColor: 'rgba(192,132,252,0.3)',
               background: 'rgba(192,132,252,0.05)',
             }}
           >
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">💡</span>
-              <div>
-                <p className="font-game text-xs mb-1" style={{ color: '#c084fc' }}>
+            <div className="flex items-start gap-2 xs:gap-3">
+              <span className="text-xl xs:text-2xl flex-shrink-0">💡</span>
+              <div className="min-w-0">
+                <p className="font-game text-[10px] xs:text-xs mb-1" style={{ color: '#c084fc', letterSpacing: '1px' }}>
                   NASIL KULLANILIR?
                 </p>
-                <p className="text-sm" style={{ color: 'var(--muted)' }}>
+                <p className="text-xs xs:text-sm" style={{ color: 'var(--muted)', lineHeight: 1.55 }}>
                   1. Sunumu sınıfa anlat → 2. Öğrenciler telefondan bu sayfaya girer →
                   3. İsimlerini yazarak quize katılır → 4. Liderboard canlı güncellenir!
                 </p>
@@ -138,9 +138,9 @@ export default function Portal() {
         </div>
 
         {/* Right: Live Leaderboard */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 min-w-0">
           <div
-            className="game-card p-5 sticky top-6"
+            className="game-card p-4 xs:p-5 lg:sticky lg:top-6"
             style={{ borderColor: 'rgba(255,159,28,0.3)' }}
           >
             <div className="flex items-center justify-between mb-4">

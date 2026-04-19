@@ -53,20 +53,20 @@ export default function Leaderboard() {
   };
 
   return (
-    <main className="min-h-screen relative z-10 px-4 py-8 max-w-2xl mx-auto">
+    <main className="min-h-screen relative z-10 px-3 xs:px-4 py-6 xs:py-8 max-w-2xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <Link href="/">
-          <button className="btn-outline text-sm">← Geri</button>
+      <div className="flex items-center justify-between gap-2 mb-6 xs:mb-8">
+        <Link href="/" className="flex-shrink-0">
+          <button className="btn-outline text-xs xs:text-sm px-2 xs:px-3 py-1 xs:py-2">← Geri</button>
         </Link>
-        <div className="text-center">
-          <h1 className="font-game font-bold text-2xl neon-yellow">🏆 LİDERBOARD</h1>
+        <div className="text-center min-w-0 flex-1">
+          <h1 className="font-game font-bold text-lg xs:text-2xl neon-yellow whitespace-nowrap overflow-hidden text-ellipsis">🏆 LİDERBOARD</h1>
           <div className="flex items-center gap-2 justify-center mt-1">
-            <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--success)' }} />
-            <span className="text-xs" style={{ color: 'var(--success)' }}>Canlı güncelleniyor</span>
+            <div className="w-2 h-2 rounded-full animate-pulse flex-shrink-0" style={{ background: 'var(--success)' }} />
+            <span className="text-[10px] xs:text-xs" style={{ color: 'var(--success)' }}>Canlı güncelleniyor</span>
           </div>
         </div>
-        <div style={{ width: 80 }} />
+        <div className="hidden xs:block flex-shrink-0" style={{ width: 72 }} />
       </div>
 
       {/* Loading */}
@@ -97,37 +97,37 @@ export default function Leaderboard() {
           return (
             <div
               key={r.id}
-              className="game-card p-4 animate-slide-up"
+              className="game-card liderboard-card p-4 animate-slide-up"
               style={{
                 borderColor: i < 3 ? 'rgba(255,230,0,0.35)' : undefined,
                 boxShadow: i === 0 ? `0 0 25px rgba(255,215,0,0.12)` : undefined,
               }}
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
                 {/* Rank */}
-                <div className={`font-game font-bold text-xl w-8 text-center flex-shrink-0 ${rank.cls}`}>
+                <div className={`rank-num font-game font-bold text-xl w-8 text-center flex-shrink-0 ${rank.cls}`}>
                   {rank.emoji}
                 </div>
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-base truncate">{r.player_name}</span>
+                    <span className="player-name font-bold text-base truncate">{r.player_name}</span>
                   </div>
                   {/* Progress bar */}
                   <div className="flex items-center gap-2 mt-1">
                     <div className="progress-bar flex-1" style={{ height: '4px' }}>
                       <div className="progress-fill" style={{ width: `${pct}%` }} />
                     </div>
-                    <span className="text-xs flex-shrink-0" style={{ color: 'var(--muted)' }}>
-                      {r.correct_count}/{r.total_questions} doğru
+                    <span className="text-xs flex-shrink-0 whitespace-nowrap" style={{ color: 'var(--muted)' }}>
+                      {r.correct_count}/{r.total_questions}
                     </span>
                   </div>
                 </div>
 
                 {/* XP */}
                 <div className="text-right flex-shrink-0">
-                  <div className="font-game font-bold text-lg neon-green">{r.total_xp}</div>
+                  <div className="xp-value font-game font-bold text-lg neon-green">{r.total_xp}</div>
                   <div className="text-xs" style={{ color: 'var(--muted)' }}>XP</div>
                 </div>
               </div>

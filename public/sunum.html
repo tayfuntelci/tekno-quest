@@ -1603,12 +1603,99 @@ input[type=range].sslider::-webkit-slider-thumb {
   .level-pip { width: 28px; height: 24px; font-size: 7px; }
   .level-pip .pip-dots { bottom: -1px; }
   .level-pip .pip-dot { width: 2px; height: 2px; }
-  .arrow-btn { width: 36px; height: 36px; font-size: 13px; }
-  .arrow-left { left: 6px; }
-  .arrow-right { right: 6px; }
+  /* ≤500px — okları ALTA taşı, kartlarla çakışmasın */
+  .arrow-btn {
+    top: auto;
+    bottom: 54px; /* 42px bottom-nav'in hemen üstü */
+    transform: none;
+    width: 40px;
+    height: 36px;
+    font-size: 13px;
+    background: rgba(255,230,0,0.22);
+    border-width: 1.5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+  .arrow-btn:hover { transform: scale(1.08); }
+  .arrow-left  { left: 8px; }
+  .arrow-right { right: 8px; }
   .hud { height: 48px; }
   .pc-tl, .pc-tr { top: 48px; }
   .pc-bl, .pc-br { bottom: 42px; }
+}
+
+/* ===== Ultra-dar ekranlar: iPhone SE 1st gen, küçük Android (≤360px) ===== */
+@media (max-width: 360px) {
+  .slide { padding: 52px 10px 48px; gap: 6px; }
+  .arrow-btn { width: 36px; height: 32px; font-size: 11px; bottom: 50px; }
+  .arrow-left { left: 4px; }
+  .arrow-right { right: 4px; }
+  .hud { padding: 0 8px; height: 44px; }
+  .hud-logo { font-size: 9px; letter-spacing: 0.5px; }
+  .pc-tl, .pc-tr { top: 44px; }
+  .pc-bl, .pc-br { bottom: 42px; }
+  .s1-title { font-size: clamp(26px, 8vw, 36px); letter-spacing: 1px; }
+  .s1-tagline { font-size: 10px; letter-spacing: 1px; }
+  .level-title { font-size: 15px; }
+  .level-badge, .page-tag { font-size: 8px; padding: 2px 6px; }
+  .live-counters { grid-template-columns: 1fr; gap: 4px; }
+  .g3, .g4, .mini-cards, .mini-cards.mc2, .mini-cards.mc4,
+  .page-journey, .journey, .ai-timeline, .ai-tools,
+  .tr-tech, .golden-rules, .career-rpg, .d30-steps,
+  .ecom-row, .preview-9, .quote-row { grid-template-columns: 1fr !important; }
+  .game-card, .gr-card, .lc-box { padding: 10px 8px; }
+  .quest-icon { font-size: 20px; }
+  .quest-item { padding: 8px 10px; gap: 6px; }
+  .quest-year { min-width: 42px; font-size: 13px; }
+  .quest-list::before { left: 54px; }
+  .q-dot { left: 50px; }
+  .growth-row { grid-template-columns: 44px 1fr 56px; gap: 5px; }
+  .growth-val { font-size: 10px; }
+  .dl-row { grid-template-columns: 28px 1fr 56px; gap: 5px; }
+  .dl-time { font-size: 10px; }
+  .bottom-nav { height: 38px; gap: 2px; padding: 0 3px; }
+  .level-pip { width: 24px; height: 22px; font-size: 6px; }
+  .hud-right .badge-item:nth-child(n+5) { display: none; }
+  .hud-right .badge-item { font-size: 14px; }
+  .achievement-row { gap: 4px; }
+  .achievement { min-width: 64px; padding: 6px 8px; font-size: 10px; }
+}
+
+/* ===== Samsung Fold (katlanmış ≤320px) ===== */
+@media (max-width: 320px) {
+  .slide { padding: 48px 6px 46px; }
+  .arrow-btn { width: 32px; height: 30px; font-size: 10px; bottom: 48px; }
+  .s1-title { font-size: clamp(22px, 7vw, 28px); letter-spacing: 0.5px; }
+  .hud-logo { font-size: 8px; }
+  .hud-right .badge-item:nth-child(n+4) { display: none; }
+  .bottom-nav { height: 34px; }
+  .level-pip { width: 20px; height: 20px; font-size: 5px; }
+  .level-title { font-size: 13px; }
+}
+
+/* ===== Landscape telefonlar (yatay tutulduğunda) ===== */
+@media (max-width: 960px) and (orientation: landscape) and (max-height: 500px) {
+  .slide { padding: 42px 48px 40px; gap: 6px; }
+  .hud { height: 38px; }
+  .bottom-nav { height: 34px; }
+  .arrow-btn {
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+  }
+  .pc-tl, .pc-tr { top: 38px; }
+  .pc-bl, .pc-br { bottom: 34px; }
+  .level-title { font-size: 16px; }
+  .level-banner { gap: 8px; }
+}
+
+/* Güvenli alan — iPhone notch + home indicator */
+@supports (padding: env(safe-area-inset-top)) {
+  .hud { padding-top: env(safe-area-inset-top); height: calc(52px + env(safe-area-inset-top)); }
+  .bottom-nav { padding-bottom: env(safe-area-inset-bottom); height: calc(48px + env(safe-area-inset-bottom)); }
+  .pc-tl, .pc-tr { top: calc(52px + env(safe-area-inset-top)); }
+  .pc-bl, .pc-br { bottom: calc(48px + env(safe-area-inset-bottom)); }
 }
 </style>
 </head>
