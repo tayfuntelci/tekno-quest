@@ -91,7 +91,15 @@ body {
   color: var(--primary);
   text-shadow: 0 0 10px rgba(255,230,0,0.6);
   letter-spacing: 1.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 100%;
 }
+.hud-left, .hud-right { min-width: 0; flex-shrink: 1; }
+.hud-right { overflow: hidden; }
+.hud { gap: 6px; overflow: hidden; }
 .hud-level {
   background: var(--primary); color: #000;
   font-family: 'Chakra Petch'; font-weight: 700; font-size: 11px;
@@ -191,7 +199,7 @@ body {
 .arrow-right { right: 14px; }
 
 /* ============================ SLAYT ZEMİNİ ============================= */
-.presentation { width: 100vw; height: 100vh; position: relative; z-index: 2; }
+.presentation { width: 100vw; height: 100vh; height: 100dvh; position: relative; z-index: 2; }
 .slide {
   position: absolute; top:0; left:0; width:100%; height:100%;
   display: flex; flex-direction: column;
@@ -200,8 +208,13 @@ body {
   transition: opacity 0.45s ease;
   padding: 72px 60px 62px;
   gap: 18px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .slide.active { opacity: 1; pointer-events: all; }
+/* Scrollbar gizle */
+.slide::-webkit-scrollbar { width: 0; display: none; }
+.slide { scrollbar-width: none; }
 
 /* ======================== ORTAK BİLEŞENLER ============================= */
 .level-banner {
@@ -1603,35 +1616,42 @@ input[type=range].sslider::-webkit-slider-thumb {
   .level-pip { width: 28px; height: 24px; font-size: 7px; }
   .level-pip .pip-dots { bottom: -1px; }
   .level-pip .pip-dot { width: 2px; height: 2px; }
-  /* ≤500px — okları ALTA taşı, kartlarla çakışmasın */
+  /* ≤500px — okları ALTA taşı + HUD'u sıkıştır */
   .arrow-btn {
     top: auto;
-    bottom: 54px; /* 42px bottom-nav'in hemen üstü */
+    bottom: 50px; /* 42px bottom-nav + 8px gap */
     transform: none;
-    width: 40px;
-    height: 36px;
-    font-size: 13px;
-    background: rgba(255,230,0,0.22);
+    width: 38px;
+    height: 34px;
+    font-size: 12px;
+    background: rgba(10,10,25,0.92);
     border-width: 1.5px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    box-shadow: 0 0 0 8px rgba(10,10,25,0.55), 0 4px 14px rgba(0,0,0,0.6);
+    backdrop-filter: blur(6px);
   }
-  .arrow-btn:hover { transform: scale(1.08); }
-  .arrow-left  { left: 8px; }
-  .arrow-right { right: 8px; }
-  .hud { height: 48px; }
+  .arrow-btn:hover { transform: scale(1.08); background: rgba(255,230,0,0.25); }
+  .arrow-left  { left: 6px; }
+  .arrow-right { right: 6px; }
+  .hud { height: 48px; padding: 0 10px; gap: 4px; }
+  .hud-logo { font-size: 9px; letter-spacing: 0.5px; max-width: 90px; }
+  .hud-level { font-size: 10px; padding: 3px 6px; }
+  .hud-page { font-size: 9px; padding: 2px 5px; min-width: 30px; }
   .pc-tl, .pc-tr { top: 48px; }
   .pc-bl, .pc-br { bottom: 42px; }
+  .slide { justify-content: flex-start; padding-top: 60px; padding-bottom: 100px; }
 }
 
 /* ===== Ultra-dar ekranlar: iPhone SE 1st gen, küçük Android (≤360px) ===== */
 @media (max-width: 360px) {
-  .slide { padding: 52px 10px 48px; gap: 6px; }
-  .arrow-btn { width: 36px; height: 32px; font-size: 11px; bottom: 50px; }
+  .slide { padding: 48px 10px 92px; gap: 6px; }
+  .arrow-btn { width: 34px; height: 30px; font-size: 10px; bottom: 46px; }
   .arrow-left { left: 4px; }
   .arrow-right { right: 4px; }
-  .hud { padding: 0 8px; height: 44px; }
-  .hud-logo { font-size: 9px; letter-spacing: 0.5px; }
-  .pc-tl, .pc-tr { top: 44px; }
+  .hud { padding: 0 6px; height: 42px; gap: 3px; }
+  .hud-logo { display: none; }  /* TEKNO QUEST yazısı tamamen gizlensin */
+  .hud-level { font-size: 9px; padding: 2px 5px; }
+  .hud-page { font-size: 8px; padding: 2px 4px; min-width: 26px; }
+  .pc-tl, .pc-tr { top: 42px; }
   .pc-bl, .pc-br { bottom: 42px; }
   .s1-title { font-size: clamp(26px, 8vw, 36px); letter-spacing: 1px; }
   .s1-tagline { font-size: 10px; letter-spacing: 1px; }
@@ -1662,14 +1682,50 @@ input[type=range].sslider::-webkit-slider-thumb {
 
 /* ===== Samsung Fold (katlanmış ≤320px) ===== */
 @media (max-width: 320px) {
-  .slide { padding: 48px 6px 46px; }
-  .arrow-btn { width: 32px; height: 30px; font-size: 10px; bottom: 48px; }
+  .slide { padding: 46px 6px 88px; }
+  .arrow-btn { width: 30px; height: 28px; font-size: 9px; bottom: 42px; }
   .s1-title { font-size: clamp(22px, 7vw, 28px); letter-spacing: 0.5px; }
-  .hud-logo { font-size: 8px; }
   .hud-right .badge-item:nth-child(n+4) { display: none; }
   .bottom-nav { height: 34px; }
   .level-pip { width: 20px; height: 20px; font-size: 5px; }
   .level-title { font-size: 13px; }
+}
+
+/* ===== Fold açık / Küçük tablet (501-820px) — arada kalmış aralık ===== */
+@media (min-width: 501px) and (max-width: 820px) {
+  /* Oklar yanlarda kalsın ama yumuşak halo'lu */
+  .arrow-btn {
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 42px;
+    background: rgba(10,10,25,0.92);
+    box-shadow: 0 0 0 10px rgba(10,10,25,0.4), 0 4px 16px rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+  }
+  .arrow-btn:hover { transform: translateY(-50%) scale(1.08); }
+  .arrow-left  { left: 8px; }
+  .arrow-right { right: 8px; }
+  /* Slide padding'i arrow genişliği için güvenli */
+  .slide { padding-left: 62px; padding-right: 62px; padding-bottom: 60px; justify-content: flex-start; padding-top: 74px; }
+  /* HUD'u rahatla */
+  .hud { padding: 0 10px; gap: 6px; }
+  .hud-logo { font-size: 11px; max-width: 120px; letter-spacing: 0.5px; }
+  .hud-level { font-size: 10px; padding: 3px 7px; }
+  .hud-page { font-size: 9px; padding: 2px 6px; min-width: 32px; }
+  .hud-center { display: none; } /* XP barı HUD'dan kaldır, slide içinde görünsün */
+  .hud-right { gap: 4px; }
+  .hud-right .badge-item { font-size: 14px; }
+  .hud-right .badge-item:nth-child(n+7) { display: none; }
+}
+/* 701-820px arası biraz daha nefes */
+@media (min-width: 701px) and (max-width: 820px) {
+  .slide { padding-left: 70px; padding-right: 70px; justify-content: center; }
+  .arrow-btn { width: 44px; height: 44px; }
+  .hud-logo { max-width: 160px; font-size: 12px; }
+  .hud-right .badge-item:nth-child(n+7) { display: inline-block; }
+  .hud-right .badge-item:nth-child(n+9) { display: none; }
 }
 
 /* ===== Landscape telefonlar (yatay tutulduğunda) ===== */
