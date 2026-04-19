@@ -31,14 +31,17 @@
 
 * { margin:0; padding:0; box-sizing:border-box; }
 
-body {
+html, body {
   font-family: 'Exo 2', sans-serif;
   background: var(--bg);
-  overflow: hidden;
-  width: 100vw; height: 100vh;
+  width: 100%;
+  height: 100%;
   color: var(--text);
   user-select: none;
+  overflow: hidden;
 }
+html { height: 100%; }
+body { height: 100dvh; }
 
 /* ======================== ARKA PLAN KATMANLARI ========================= */
 .grid-bg {
@@ -199,9 +202,18 @@ body {
 .arrow-right { right: 14px; }
 
 /* ============================ SLAYT ZEMİNİ ============================= */
-.presentation { width: 100vw; height: 100vh; height: 100dvh; position: relative; z-index: 2; }
+.presentation {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
 .slide {
-  position: absolute; top:0; left:0; width:100%; height:100%;
+  position: absolute; top:0; left:0; width:100%;
+  height: 100%;
+  min-height: 100%;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   opacity: 0; pointer-events: none;
@@ -209,7 +221,10 @@ body {
   padding: 72px 60px 62px;
   gap: 18px;
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 .slide.active { opacity: 1; pointer-events: all; }
 /* Scrollbar gizle */
@@ -430,12 +445,31 @@ body {
 }
 .msg-map-title {
   font-family: 'Chakra Petch'; font-weight: 700;
-  font-size: clamp(16px, 1.9vw, 22px);
-  color: var(--info); letter-spacing: 1.5px; margin-bottom: 14px;
+  font-size: clamp(13px, 1.9vw, 22px);
+  color: var(--info); letter-spacing: 1px; margin-bottom: 14px;
   text-align: center;
   text-shadow: 0 0 12px rgba(0,245,255,0.35);
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
 }
-.msg-map-svg { width: 100%; height: 280px; display: block; }
+.msg-map-svg {
+  width: 100%;
+  height: auto;
+  max-height: 280px;
+  aspect-ratio: 950 / 280;
+  display: block;
+}
+@media (max-width: 640px) {
+  .msg-map-svg { aspect-ratio: 600 / 280; }
+  .msg-map { padding: 14px 14px 12px; }
+  .city-label { font-size: 28px !important; }
+}
+@media (max-width: 360px) {
+  .msg-map-svg { aspect-ratio: 480 / 280; }
+  .city-label { font-size: 34px !important; }
+}
 .msg-packet {
   fill: var(--primary);
   filter: drop-shadow(0 0 8px var(--primary));
@@ -555,7 +589,8 @@ body {
 .quest-item { display: flex; align-items: center; gap: 18px; padding: 18px 26px; position: relative; }
 .quest-item:hover { transform: translateX(6px); }
 .quest-item .q-dot {
-  position: absolute; left: 156px;
+  position: absolute; left: 156px; top: 50%;
+  transform: translateY(-50%);
   width: 12px; height: 12px; background: var(--info);
   border-radius: 50%; box-shadow: 0 0 14px var(--info);
   z-index: 2;
@@ -1224,6 +1259,8 @@ body {
   width: 100%; max-width: 1100px;
   position: relative; overflow: hidden;
 }
+@media (max-width: 640px) { .smart-full { padding: 18px 16px; } }
+@media (max-width: 360px) { .smart-full { padding: 14px 12px; } }
 .smart-full::before {
   content: ''; position: absolute; top: 0; left: 0;
   width: 100%; height: 3px;
@@ -1596,12 +1633,23 @@ input[type=range].sslider::-webkit-slider-thumb {
   .gc-icon { font-size: clamp(40px, 9vw, 54px); }
   .page-journey, .mini-cards.mc4, .mini-cards.mc2 { grid-template-columns: 1fr; }
   .journey { grid-template-columns: repeat(2, 1fr); }
-  .quest-list::before { left: 70px; }
-  .q-dot { left: 66px; }
-  .quest-year { min-width: 54px; font-size: 16px; }
-  .q-spacer { width: 10px; }
-  .quest-icon { font-size: 24px; }
-  .quest-item { padding: 10px 12px; }
+  /* Dar ekranda timeline çizgisi ve dot'ları gizle — sadece sade kart görünümü */
+  .quest-list::before { display: none; }
+  .q-dot { display: none; }
+  .q-spacer { display: none; }
+  .quest-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 12px 14px;
+  }
+  .quest-year {
+    min-width: auto;
+    font-size: 18px;
+    margin-bottom: 2px;
+  }
+  .quest-icon { font-size: 26px; position: absolute; top: 12px; right: 14px; }
+  .quest-text { width: 100%; }
   .q-know { font-size: 11px; padding: 6px 8px; }
   .speed-chart { min-height: 260px; }
   .growth-row { grid-template-columns: 60px 1fr 80px; gap: 8px; }
@@ -1663,11 +1711,9 @@ input[type=range].sslider::-webkit-slider-thumb {
   .tr-tech, .golden-rules, .career-rpg, .d30-steps,
   .ecom-row, .preview-9, .quote-row { grid-template-columns: 1fr !important; }
   .game-card, .gr-card, .lc-box { padding: 10px 8px; }
-  .quest-icon { font-size: 20px; }
-  .quest-item { padding: 8px 10px; gap: 6px; }
-  .quest-year { min-width: 42px; font-size: 13px; }
-  .quest-list::before { left: 54px; }
-  .q-dot { left: 50px; }
+  .quest-icon { font-size: 20px; top: 10px; right: 10px; }
+  .quest-item { padding: 10px 10px; gap: 4px; }
+  .quest-year { min-width: auto; font-size: 14px; }
   .growth-row { grid-template-columns: 44px 1fr 56px; gap: 5px; }
   .growth-val { font-size: 10px; }
   .dl-row { grid-template-columns: 28px 1fr 56px; gap: 5px; }
@@ -1721,7 +1767,7 @@ input[type=range].sslider::-webkit-slider-thumb {
 }
 /* 701-820px arası biraz daha nefes */
 @media (min-width: 701px) and (max-width: 820px) {
-  .slide { padding-left: 70px; padding-right: 70px; justify-content: center; }
+  .slide { padding-left: 70px; padding-right: 70px; padding-top: 74px; padding-bottom: 70px; justify-content: flex-start; }
   .arrow-btn { width: 44px; height: 44px; }
   .hud-logo { max-width: 160px; font-size: 12px; }
   .hud-right .badge-item:nth-child(n+7) { display: inline-block; }
