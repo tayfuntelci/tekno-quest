@@ -1546,7 +1546,16 @@ input[type=range].sslider::-webkit-slider-thumb {
   border-radius: 8px;
   background: rgba(78,205,196,0.08);
   text-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
+.final-cta:hover {
+  background: rgba(78,205,196,0.18);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 24px rgba(78,205,196,0.45);
+}
+.final-cta:active { transform: translateY(0) scale(0.98); }
 .press-start {
   font-family: 'Chakra Petch'; font-size: 11px;
   color: rgba(240,240,255,0.45);
@@ -2907,7 +2916,7 @@ input[type=range].sslider::-webkit-slider-thumb {
         <div class="quote-card">"Mühendislik milletin geleceğidir."<span class="quote-author">— S. BAYRAKTAR</span></div>
       </div>
 
-      <div class="final-cta">🎯 SIRADA QUIZ VAR — BİLDİĞİNİ GÖSTER!</div>
+      <div class="final-cta" onclick="goToQuiz()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goToQuiz();}">🎯 SIRADA QUIZ VAR — BİLDİĞİNİ GÖSTER!</div>
       <div style="font-size:clamp(13px, 1.5vw, 16px); color:rgba(255,255,255,0.65); max-width:800px; text-align:center; line-height:1.55; font-style:italic;">
         "Dünyayı değiştirmek için yaş sınırı yok. Sen de bugünden başlayabilirsin!"
       </div>
@@ -3081,6 +3090,20 @@ input[type=range].sslider::-webkit-slider-thumb {
   }
 
   function changeSlide(d) { goTo(current + d); }
+
+  // iframe içinden parent'ı /quiz sayfasına yönlendir
+  function goToQuiz() {
+    try {
+      if (window.top && window.top !== window.self) {
+        window.top.location.href = '/quiz';
+      } else {
+        window.location.href = '/quiz';
+      }
+    } catch (e) {
+      // cross-origin koruması olursa yeni sekmede aç
+      window.open('/quiz', '_top');
+    }
+  }
 
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight' || e.key === ' ') changeSlide(1);
