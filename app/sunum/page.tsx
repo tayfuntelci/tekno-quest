@@ -2,7 +2,7 @@
 import Link from 'next/link';
 
 // Cache-busting: her deploy için yeni versiyon değeri → browser eski sunum.html'i cache'den alamaz
-const SUNUM_VERSION = '20250420-6';
+const SUNUM_VERSION = '20250420-7';
 
 export default function SunumPage() {
   return (
