@@ -81,13 +81,13 @@ body { height: 100dvh; }
 .hud {
   position: fixed; top: 0; left: 0; right: 0;
   height: 56px;
-  background: rgba(10,10,25,0.95);
+  background: #0a0a19;
   border-bottom: 2px solid var(--primary);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 20px; z-index: 200;
-  box-shadow: 0 4px 30px rgba(255,230,0,0.1);
-  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.85), 0 4px 30px rgba(255,230,0,0.1);
 }
+.bottom-nav { background: #0a0a19 !important; box-shadow: 0 -6px 24px rgba(0,0,0,0.85); }
 .hud-left  { display:flex; align-items:center; gap:10px; }
 .hud-logo {
   font-family: 'Chakra Petch'; font-weight: 700; font-size: 12px;
@@ -233,9 +233,12 @@ body { height: 100dvh; }
 
 /* ======================== ORTAK BİLEŞENLER ============================= */
 .level-banner {
-  display: flex; align-items: center; gap: 14px;
+  display: flex; align-items: center; justify-content: center; gap: 14px;
   margin-bottom: 4px;
+  flex-wrap: wrap;
+  max-width: 100%;
 }
+.level-title { max-width: 100%; overflow-wrap: anywhere; word-break: break-word; }
 .level-badge {
   font-family: 'Chakra Petch'; font-weight: 700; font-size: 12px;
   background: var(--primary); color: #000;
@@ -309,12 +312,26 @@ body { height: 100dvh; }
 }
 
 /* ====================== SLAYT 1 — KAPAK ================================= */
-.orbit-container { position: relative; width: 180px; height: 180px; margin-bottom: 10px; }
+.orbit-container { position: relative; width: 180px; height: 180px; margin-bottom: 24px; flex-shrink: 0; }
 .planet {
   position: absolute; top: 50%; left: 50%;
   transform: translate(-50%,-50%); font-size: 78px;
   animation: planetPulse 3s ease-in-out infinite;
   filter: drop-shadow(0 0 30px rgba(0,245,255,0.8));
+}
+@media (max-width: 640px) {
+  .orbit-container { width: 120px; height: 120px; margin-bottom: 28px; }
+  .planet { font-size: 56px; }
+  .orbit-ring-1 { width: 96px !important; height: 96px !important; }
+  .orbit-ring-2 { width: 130px !important; height: 130px !important; }
+  @keyframes moonOrbit { to { transform: rotate(360deg) translateX(55px) rotate(-360deg); } }
+  .orbit-moon { font-size: 18px !important; }
+}
+@media (max-width: 360px) {
+  .orbit-container { width: 96px; height: 96px; margin-bottom: 22px; }
+  .planet { font-size: 44px; }
+  .orbit-ring-1 { width: 76px !important; height: 76px !important; }
+  .orbit-ring-2 { width: 106px !important; height: 106px !important; }
 }
 @keyframes planetPulse {
   0%,100% { transform: translate(-50%,-50%) scale(1); }
@@ -1774,11 +1791,45 @@ input[type=range].sslider::-webkit-slider-thumb {
   .hud-right .badge-item:nth-child(n+9) { display: none; }
 }
 
-/* ===== Landscape telefonlar (yatay tutulduğunda) ===== */
-@media (max-width: 960px) and (orientation: landscape) and (max-height: 500px) {
-  .slide { padding: 42px 48px 40px; gap: 6px; }
-  .hud { height: 38px; }
-  .bottom-nav { height: 34px; }
+/* ==================================================================== */
+/* MOBİL SCROLL REFACTOR (≤820px) — iframe/iOS scroll bug'ını at:        */
+/* Slide artık position:static, body scroll eder, sadece .active görünür */
+/* ==================================================================== */
+@media (max-width: 820px) {
+  html, body {
+    height: auto;
+    min-height: 100dvh;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .presentation {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+  .slide {
+    position: static;
+    display: none;         /* Sadece .active göster */
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+    opacity: 1;
+    pointer-events: auto;
+    transition: none;
+    overflow: visible;     /* Body scroll etsin */
+    touch-action: auto;
+  }
+  .slide.active {
+    display: flex;
+  }
+  /* HUD ve bottom-nav zaten position:fixed — onlar ekrana yapışık kalır */
+  /* Ama iframe içinde alt nav yerine arrows ve pips yine fixed'de kalsın */
+  .bottom-nav { position: fixed; }
+  .arrow-btn { position: fixed; }
+  .pixel-corner { position: fixed; }
+}
   .arrow-btn {
     top: 50%;
     bottom: auto;
