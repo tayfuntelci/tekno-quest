@@ -408,7 +408,12 @@ body { height: 100dvh; }
   background: rgba(57,255,20,0.08);
   animation: glowGreen 2s ease-in-out infinite;
   letter-spacing: 2.5px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s ease, background 0.15s ease;
 }
+.intro-start:hover { background: rgba(57,255,20,0.18); transform: translateY(-2px) scale(1.03); }
+.intro-start:active { transform: translateY(0) scale(0.98); }
 @keyframes glowGreen {
   0%,100% { box-shadow: 0 0 12px rgba(57,255,20,0.35); }
   50%     { box-shadow: 0 0 28px rgba(57,255,20,0.7); }
@@ -1931,7 +1936,7 @@ input[type=range].sslider::-webkit-slider-thumb {
       </div>
     </div>
 
-    <div class="intro-start">▶ OYUNA BAŞLA</div>
+    <div class="intro-start" onclick="changeSlide(1)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();changeSlide(1);}">▶ OYUNA BAŞLA</div>
     <div class="keyboard-hint">← → TUŞLARI İLE İLERLE</div>
   </div>
 
