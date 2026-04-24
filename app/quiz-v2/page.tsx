@@ -1,18 +1,7 @@
 'use client';
-/* ============================================================
- * ⚠️  V1 KİLİTLİ — DEĞİŞTİRMEYİN!
- * Bu dosya "Tekno Quest V1 (Uzay Teması)" sürümüne aittir.
- * V1 donduruldu (git tag: v1.0-frozen). Tüm yeni değişiklikler
- * V2 dosyalarında yapılmalıdır:
- *   - app/quiz-v2/page.tsx
- *   - app/sunum-v2/page.tsx
- *   - public/sunum-v2.html
- *   - lib/questions-v2.ts
- * © 2026 Tayfun Telci — Tüm hakları saklıdır.
- * ============================================================ */
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { questions, MatchPair, TOTAL_XP, Question } from '@/lib/questions';
+import { questions, MatchPair, TOTAL_XP, Question } from '@/lib/questions-v2';
 import {
   CHARACTERS, Character, CharacterId, PowerUpId,
   getRank, getStreakInfo,
@@ -1527,6 +1516,12 @@ export default function QuizPage() {
   const [finalStats, setFinalStats] = useState<FinalStats | null>(null);
   const [saved, setSaved] = useState(false);
 
+  // V2 teması — body sınıfı ile scoped CSS aktifleştirilir
+  useEffect(() => {
+    document.body.classList.add('theme-v2');
+    return () => { document.body.classList.remove('theme-v2'); };
+  }, []);
+
   const character = characterId ? CHARACTERS.find(c => c.id === characterId)! : null;
 
   const handleFinish = async (stats: FinalStats) => {
@@ -1535,7 +1530,7 @@ export default function QuizPage() {
     try {
       await saveQuizResult({
         player_name: playerName,
-        presentation_version: 'v1',
+        presentation_version: 'v2',
         score: Math.round((stats.correct / questions.length) * 100),
         total_xp: stats.totalXp,
         correct_count: stats.correct,

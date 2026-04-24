@@ -45,6 +45,7 @@ export default function Portal() {
             ▸ SUNUM &amp; QUIZ
           </h2>
 
+          {/* V1 — Uzay Teması (orijinal) */}
           <div
             className="game-card p-4 xs:p-6"
             style={{
@@ -60,53 +61,87 @@ export default function Portal() {
                     className="font-game font-bold text-base xs:text-xl neon-yellow"
                     style={{ letterSpacing: '1.5px' }}
                   >
-                    TEKNO QUEST
+                    TEKNO QUEST · V1
                   </span>
-                  <span className="xp-badge">+110 XP</span>
+                  <span className="xp-badge">UZAY TEMASI</span>
                 </div>
                 <p className="text-xs xs:text-sm mb-4 xs:mb-5" style={{ color: 'var(--muted)', lineHeight: 1.6 }}>
-                  Oyun mekanikleri ve uzay temasıyla harmanlanmış interaktif sunum —
-                  10 level, XP barı, rozet kazanımı ve sonunda quiz. 9–10 yaş için
-                  teknoloji tarihinden yapay zekaya büyük macera!
+                  Orijinal uzay temalı sürüm — neon renkler, karanlık gökyüzü,
+                  roket animasyonları. 10 level, XP barı, rozetler ve quiz.
                 </p>
-
-                {/* Mini feature grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4 xs:mb-5">
-                  {[
-                    { icon: '🎮', label: '10 Level' },
-                    { icon: '⭐', label: '900 XP' },
-                    { icon: '🏆', label: '8 Rozet' },
-                    { icon: '🎯', label: '10 Soru' },
-                  ].map(f => (
-                    <div
-                      key={f.label}
-                      className="rounded-lg px-2 py-2 text-center"
-                      style={{
-                        background: 'rgba(255,255,255,0.04)',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                      }}
-                    >
-                      <div className="text-lg xs:text-xl mb-1">{f.icon}</div>
-                      <div
-                        className="font-game text-[10px] xs:text-xs neon-yellow"
-                        style={{ letterSpacing: '0.5px' }}
-                      >
-                        {f.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
 
                 <div className="flex gap-2 xs:gap-3 flex-wrap">
                   <Link href="/sunum" className="flex-1 xs:flex-none min-w-[140px]">
-                    <button className="btn-primary text-xs xs:text-sm w-full">▶ Sunumu Başlat</button>
+                    <button className="btn-primary text-xs xs:text-sm w-full">▶ V1 Sunum</button>
                   </Link>
                   <Link href="/quiz" className="flex-1 xs:flex-none min-w-[120px]">
                     <button
                       className="btn-outline text-xs xs:text-sm w-full"
                       style={{ color: 'var(--info)', borderColor: 'var(--info)' }}
                     >
-                      🎯 Quiz'e Git
+                      🎯 V1 Quiz
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* V2 — Gökyüzü Teması (çocuk psikoloğu önerileri) */}
+          <div
+            className="game-card p-4 xs:p-6"
+            style={{
+              borderColor: 'rgba(249,115,22,0.45)',
+              boxShadow: '0 0 28px rgba(249,115,22,0.12)',
+              background:
+                'linear-gradient(135deg, rgba(224,242,254,0.06) 0%, rgba(249,115,22,0.04) 100%)',
+            }}
+          >
+            <div className="flex items-start gap-3 xs:gap-4">
+              <div className="text-4xl xs:text-5xl flex-shrink-0 animate-float">🌤️</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <span
+                    className="font-game font-bold text-base xs:text-xl"
+                    style={{ letterSpacing: '1.5px', color: '#fb923c' }}
+                  >
+                    TEKNO QUEST · V2
+                  </span>
+                  <span
+                    className="xp-badge"
+                    style={{
+                      background: 'rgba(249,115,22,0.15)',
+                      color: '#fb923c',
+                      borderColor: 'rgba(249,115,22,0.4)',
+                    }}
+                  >
+                    GÖKYÜZÜ · YENİ
+                  </span>
+                </div>
+                <p className="text-xs xs:text-sm mb-4 xs:mb-5" style={{ color: 'var(--muted)', lineHeight: 1.6 }}>
+                  Çocuk psikoloğu önerilerine göre yeniden tasarlandı — açık mavi gökyüzü,
+                  yumuşak renkler, sade animasyonlar. Aynı içerik, daha rahat gözler.
+                </p>
+
+                <div className="flex gap-2 xs:gap-3 flex-wrap">
+                  <Link href="/sunum-v2" className="flex-1 xs:flex-none min-w-[140px]">
+                    <button
+                      className="btn-primary text-xs xs:text-sm w-full"
+                      style={{
+                        background: '#f97316',
+                        color: '#fff',
+                        borderColor: '#ea580c',
+                      }}
+                    >
+                      ▶ V2 Sunum
+                    </button>
+                  </Link>
+                  <Link href="/quiz-v2" className="flex-1 xs:flex-none min-w-[120px]">
+                    <button
+                      className="btn-outline text-xs xs:text-sm w-full"
+                      style={{ color: '#fb923c', borderColor: '#fb923c' }}
+                    >
+                      🎯 V2 Quiz
                     </button>
                   </Link>
                 </div>
@@ -129,8 +164,9 @@ export default function Portal() {
                   NASIL KULLANILIR?
                 </p>
                 <p className="text-xs xs:text-sm" style={{ color: 'var(--muted)', lineHeight: 1.55 }}>
-                  1. Sunumu sınıfa anlat → 2. Öğrenciler telefondan bu sayfaya girer →
-                  3. İsimlerini yazarak quize katılır → 4. Liderboard canlı güncellenir!
+                  1. <strong style={{ color: '#ffe600' }}>V1 = Uzay teması</strong> (neon / karanlık)
+                  &nbsp;·&nbsp; <strong style={{ color: '#fb923c' }}>V2 = Gökyüzü teması</strong> (açık / sade).
+                  Her iki sürümde de aynı içerik var ve liderboard ortak çalışır.
                 </p>
               </div>
             </div>

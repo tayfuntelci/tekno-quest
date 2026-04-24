@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <!--
   ============================================================
-  ⚠️  V1 KİLİTLİ — DEĞİŞTİRMEYİN!
-  Bu dosya "Tekno Quest V1 (Uzay Teması)" sürümüne aittir.
-  V1 donduruldu (git tag: v1.0-frozen). Tüm yeni değişiklikler
-  public/sunum-v2.html dosyasında yapılmalıdır.
-  ============================================================
   TEKNO QUEST — Teknoloji Sunumu + Quiz Platformu
   Copyright © 2026 Tayfun Telci. Tüm hakları saklıdır.
   All Rights Reserved.
@@ -1893,6 +1888,328 @@ input[type=range].sslider::-webkit-slider-thumb {
   .pc-tl, .pc-tr { top: calc(52px + env(safe-area-inset-top)); }
   .pc-bl, .pc-br { bottom: calc(48px + env(safe-area-inset-bottom)); }
 }
+
+/* ============================================================
+   TEKNO QUEST · V2 — GÖKYÜZÜ TEMASI
+   Çocuk psikoloğu önerilerine göre yeniden tasarım:
+   - Açık mavi gökyüzü arkaplan (koyu/yorucu değil)
+   - Lacivert yazı (okunaklı, kontrast)
+   - Turuncu vurgular (sıcak, dikkat çekici)
+   - Yumuşak yeşil/sarı ikonlar
+   - NEON yok, parlama yok
+   - Animasyonlar daha yavaş
+   ============================================================ */
+:root {
+  --bg:        #e0f2fe;   /* açık gökyüzü mavisi */
+  --bg-soft:   #f0f9ff;
+  --text:      #1e3a8a;   /* lacivert */
+  --dim:       rgba(30,58,138,0.08);
+  --primary:   #f97316;   /* turuncu vurgu */
+  --success:   #16a34a;   /* yumuşak yeşil */
+  --info:      #0284c7;   /* gök mavisi */
+  --purple:    #7c3aed;
+  --warm:      #f97316;
+  --pink:      #ec4899;
+  --mint:      #14b8a6;
+  --red:       #dc2626;
+  --holo-bg:     rgba(255,255,255,0.75);
+  --holo-border: rgba(249,115,22,0.3);
+  --grid:        rgba(30,58,138,0.035);
+}
+
+html, body {
+  background:
+    radial-gradient(ellipse at 20% 15%, rgba(255,255,255,0.85) 0%, transparent 45%),
+    radial-gradient(ellipse at 80% 85%, rgba(255,255,255,0.7) 0%, transparent 50%),
+    linear-gradient(180deg, #bae6fd 0%, #e0f2fe 50%, #f0f9ff 100%);
+  color: var(--text);
+}
+
+/* Arka plan katmanları — V2: yumuşat */
+.grid-bg { opacity: 0.4; }
+.scanline { display: none; }           /* tarayıcı çizgisi yok */
+.star { background: rgba(255,255,255,0.85); box-shadow: 0 0 4px rgba(255,255,255,0.6); }
+@keyframes twinkle { 0%,100%{opacity:0.4} 50%{opacity:0.9} }  /* daha yumuşak */
+
+/* Particles (kar tanesi gibi hafif bulutcuklar) */
+.particle { background: rgba(255,255,255,0.6) !important; filter: blur(0.5px); }
+
+/* Pixel köşeler — turuncu */
+.pc-tl, .pc-tr, .pc-bl, .pc-br {
+  border-color: var(--primary) !important;
+}
+
+/* ====== V2: NEON METİN GÖLGELERİNİ KALDIR ====== */
+[class*="neon"],
+.title, .subtitle, .big-text, .mega-title,
+.level-title, .level-label,
+.intro-title, .intro-subtitle,
+.final-title, .final-cta {
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+}
+
+/* Genel "glow" efektlerini sıfırla */
+* {
+  --glow: none;
+}
+
+/* ====== V2: Sadece ANA CTA butonları turuncu ====== */
+.intro-start, .final-cta, .oath-btn, .btn-primary {
+  background: #f97316 !important;
+  color: #ffffff !important;
+  border: 2px solid #ea580c !important;
+  box-shadow: 0 2px 8px rgba(249,115,22,0.25) !important;
+  text-shadow: none !important;
+}
+.intro-start:hover, .final-cta:hover, .oath-btn:hover, .btn-primary:hover {
+  background: #ea580c !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(249,115,22,0.35) !important;
+}
+
+/* Kişilik testi seçenekleri — beyaz kart + lacivert yazı (ayırt edilebilir) */
+.cq-opt {
+  background: rgba(255,255,255,0.92) !important;
+  color: #1e3a8a !important;
+  border: 2px solid rgba(249,115,22,0.35) !important;
+  text-shadow: none !important;
+  font-weight: 600;
+}
+.cq-opt:hover {
+  background: rgba(255,237,213,0.95) !important;
+  border-color: #f97316 !important;
+  color: #ea580c !important;
+}
+.cq-opt.selected, .cq-opt:active {
+  background: #f97316 !important;
+  color: #fff !important;
+  border-color: #ea580c !important;
+}
+
+/* Navigasyon okları — yumuşak turuncu daire */
+.arrow-btn {
+  background: rgba(255,255,255,0.9) !important;
+  color: #f97316 !important;
+  border: 2px solid #f97316 !important;
+  box-shadow: 0 2px 6px rgba(30,58,138,0.08) !important;
+  text-shadow: none !important;
+}
+.arrow-btn:hover {
+  background: #f97316 !important;
+  color: #fff !important;
+}
+
+/* ====== V2: Kartlar / Panolar ====== */
+.card, .quest-card, .info-box, .holo-panel, .fact-card,
+.stat-card, .timeline-card, .profession-card,
+.q-know, .q-box, .quest-text, .level-banner {
+  background: rgba(255,255,255,0.85) !important;
+  border: 1px solid rgba(30,58,138,0.15) !important;
+  color: var(--text) !important;
+  box-shadow: 0 2px 10px rgba(30,58,138,0.06) !important;
+  backdrop-filter: blur(4px);
+}
+
+/* Vurgulu (strong) yazılar: turuncu */
+strong, b, .highlight, .accent {
+  color: #ea580c !important;
+}
+
+/* Başlık renkleri */
+h1, h2, h3, .title, .big-title, .mega-title {
+  color: var(--text) !important;
+  text-shadow: none !important;
+}
+
+/* HUD barı */
+.hud, .bottom-nav {
+  background: rgba(255,255,255,0.85) !important;
+  border-color: rgba(30,58,138,0.12) !important;
+  color: var(--text) !important;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 0 rgba(30,58,138,0.06) !important;
+}
+.hud *, .bottom-nav * {
+  color: var(--text) !important;
+  text-shadow: none !important;
+}
+
+/* XP barı: turuncu */
+.xp-fill, .progress-fill {
+  background: linear-gradient(90deg, #f97316 0%, #fb923c 100%) !important;
+  box-shadow: 0 0 6px rgba(249,115,22,0.4) !important;
+}
+
+/* ====== V2: Sadece V1 neon-pulse / flash / shake türü rahatsız edici animasyonlar yavaşlatılsın ====== */
+[class*="pulse"], [class*="flash"], [class*="shake"], [class*="blink"],
+.neon-pulse, .badge-blink {
+  animation-duration: 2.4s !important;
+}
+.star { animation-duration: 4s !important; }
+
+/* Pulse / glow animasyonları iptal */
+@keyframes neonPulse { 0%,100%{filter: none} }
+@keyframes glowBox   { 0%,100%{box-shadow: 0 2px 10px rgba(30,58,138,0.06)} }
+
+/* V2'de aşırı parlak sarı neon kullanımı temizlensin */
+.neon-yellow, [style*="color: #ffe600"], [style*="color:#ffe600"] {
+  color: #ea580c !important;
+  text-shadow: none !important;
+}
+.neon-green {
+  color: var(--success) !important;
+  text-shadow: none !important;
+}
+.neon-blue, .neon-info {
+  color: var(--info) !important;
+  text-shadow: none !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   V2 METİN REHABİLİTASYONU — Beyaz/açık tonlu metinler okunmuyordu.
+   Açık gökyüzü arkaplanda tüm metinleri lacivert'e zorla;
+   yalnızca özel accent renkleri istisna (strong, success, info).
+   ════════════════════════════════════════════════════════════ */
+body h1, body h2, body h3, body h4, body h5, body h6,
+body p, body li, body span, body div,
+body .slide-title, body .slide-sub,
+body .intro-title, body .intro-subtitle,
+body .final-title, body .final-sub, body .final-tag,
+body .gc-text, body .gc-title,
+body .quest-text, body .q-know, body .q-title, body .q-desc,
+body .mc-text, body .mc-label,
+body .pj-desc, body .pj-title,
+body .pr-by, body .pr-name, body .pr-year, body .pr-desc,
+body .ai-details, body .ai-desc,
+body .ai-life li, body .ai-types li,
+body .sc-desc, body .sc-can, body .sc-cant, body .sc-title,
+body .cm-text, body .cm-title,
+body .sf-text, body .sf-col h4,
+body .fb-text, body .fb-title,
+body .tb-text, body .tb-col h3,
+body .level-title, body .level-label, body .level-banner,
+body .keyboard-hint, body .hbar-label,
+body .os-label, body .lc-label, body .lc-num,
+body .orbit-label, body .orbit-num,
+body .timeline-text, body .timeline-year,
+body .profession-title, body .profession-desc,
+body .fact-title, body .fact-text,
+body .stat-title, body .stat-value,
+body .pixel-title, body .pixel-text,
+body .blue-text, body .white-text, body .light-text,
+body .data-label, body .data-value,
+body .step-title, body .step-desc,
+body .hud *, body .bottom-nav * {
+  color: #1e3a8a !important;
+  text-shadow: none !important;
+}
+
+/* İstisnalar — vurgu renkleri korunur */
+body strong, body b { color: #ea580c !important; }
+body .neon-green, body .xp-label, body .xp-count,
+body .sf-col.real h4, body .tb-col.new h3 { color: #16a34a !important; }
+body .neon-blue, body .info-text,
+body .sf-col.fic h4, body .tb-col.old h3 { color: #0284c7 !important; }
+body .mini-card.warm .mc-label, body .warm-label { color: #ea580c !important; }
+body .mini-card.purple .mc-label { color: #7c3aed !important; }
+body .mini-card.mint .mc-label { color: #14b8a6 !important; }
+body .mini-card.pink .mc-label { color: #ec4899 !important; }
+
+/* Kart arkaplanları beyaz-şeffaf → okunaklı */
+body .mini-card, body .timeline-card, body .fact-card,
+body .stat-card, body .os-card, body .pj-card, body .pr-card,
+body .sf-col, body .tb-col, body .sc-card, body .cm-card,
+body .fb-card, body .step-card, body .profession-card,
+/* Ek olarak bulunan koyu-lacivert kartlar */
+body .msg-map, body .one-second-panel, body .growth-chart, body .dl-race,
+body .jrn-step, body .pj-step, body .quote-card, body .extras-col,
+body .ai-tool, body .ai-tl-cell, body .ai-types, body .ai-life, body .career-quiz,
+body .day-2030, body .crypto-box, body .money-box, body .new-jobs, body .study {
+  background: rgba(255,255,255,0.88) !important;
+  border: 1px solid rgba(30,58,138,0.15) !important;
+  box-shadow: 0 2px 10px rgba(30,58,138,0.06) !important;
+  color: #1e3a8a !important;
+}
+
+/* Şifre girdisi gibi siyah inputlar */
+body .pw-input {
+  background: rgba(255,255,255,0.9) !important;
+  color: #1e3a8a !important;
+  border: 1px solid rgba(30,58,138,0.25) !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   V2 GÖKYÜZÜ ATMOSFERİ — güneş + kayan bulutlar
+   V1'deki "uzay hissi"nin gündüz versiyonu
+   ════════════════════════════════════════════════════════════ */
+
+/* Güneş (sağ üstte) */
+body::before {
+  content: '';
+  position: fixed;
+  top: -80px;
+  right: -80px;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(254,240,138,0.9) 0%, rgba(253,186,116,0.5) 35%, transparent 70%);
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  animation: sunGlow 8s ease-in-out infinite;
+  filter: blur(2px);
+}
+@keyframes sunGlow {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50%      { transform: scale(1.08); opacity: 1; }
+}
+
+/* Bulut katmanı 1 — yavaş, büyük bulutlar (stars-bg'yi dönüştür) */
+.stars-bg {
+  background-image:
+    radial-gradient(ellipse 120px 50px at 10% 30%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(ellipse 160px 55px at 35% 70%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 65%),
+    radial-gradient(ellipse 140px 50px at 65% 20%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(ellipse 180px 60px at 85% 55%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 65%),
+    radial-gradient(ellipse 100px 40px at 15% 85%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 60%);
+  background-size: 100% 100%;
+  animation: cloudDriftSlow 80s linear infinite;
+  opacity: 0.9 !important;
+}
+.stars-bg .star { display: none; }  /* eski yıldızları gizle */
+
+@keyframes cloudDriftSlow {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100vw); }
+}
+
+/* Bulut katmanı 2 — daha hızlı, küçük bulutlar (particles-container'ı dönüştür) */
+.particles-container {
+  background-image:
+    radial-gradient(ellipse 70px 25px at 20% 15%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(ellipse 90px 30px at 60% 45%, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0) 65%),
+    radial-gradient(ellipse 60px 22px at 40% 80%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(ellipse 80px 28px at 90% 25%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 65%);
+  background-size: 100% 100%;
+  animation: cloudDriftFast 50s linear infinite;
+  opacity: 0.75 !important;
+}
+.particles-container .particle { display: none; }
+
+@keyframes cloudDriftFast {
+  0%   { transform: translateX(100vw); }
+  100% { transform: translateX(0); }
+}
+
+/* Grid-bg tamamen kapatılsın — gökyüzü hissini bozuyor */
+.grid-bg { display: none; }
+
+/* HUD arkaplanı belirginleştir (yazılar görünsün) */
+body .hud, body .bottom-nav {
+  background: rgba(255,255,255,0.92) !important;
+  border-bottom: 1px solid rgba(30,58,138,0.12) !important;
+  color: #1e3a8a !important;
+}
 </style>
 </head>
 <body>
@@ -2220,7 +2537,7 @@ input[type=range].sslider::-webkit-slider-thumb {
         <div class="sc-gen" style="color:#888">1G</div>
         <div class="sc-speed">~2 kb/s</div>
         <div class="sc-stars">⭐☆☆☆☆</div>
-        <div class="sc-can">Anneni ara 📞</div>
+        <div class="sc-can">Telefon araması yapabilirsin 📞</div>
         <div class="sc-bar" style="height:24px; background:rgba(150,150,150,0.3); border:1px solid rgba(150,150,150,0.5);"><div class="sc-bar-label">Sadece Ses</div></div>
       </div>
       <div class="sc-wrap">
@@ -2443,7 +2760,7 @@ input[type=range].sslider::-webkit-slider-thumb {
     </div>
 
     <div class="fact-box">
-      ✨ Bu fanteziden çok uzak değil — teknolojinin büyük kısmı bugün bile mevcut! Sadece yaygınlaşması gerekiyor.
+      ✨ Bu hayalden çok uzak değil — teknolojinin büyük kısmı bugün bile mevcut! Sadece yaygınlaşması gerekiyor.
     </div>
   </div>
 

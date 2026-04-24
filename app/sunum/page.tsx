@@ -1,4 +1,13 @@
 'use client';
+/* ============================================================
+ * ⚠️  V1 KİLİTLİ — DEĞİŞTİRMEYİN!
+ * Bu dosya "Tekno Quest V1 (Uzay Teması)" sürümüne aittir.
+ * V1 donduruldu (git tag: v1.0-frozen). Tüm yeni değişiklikler
+ * V2 dosyalarında yapılmalıdır:
+ *   - app/sunum-v2/page.tsx
+ *   - public/sunum-v2.html
+ * © 2026 Tayfun Telci — Tüm hakları saklıdır.
+ * ============================================================ */
 import Link from 'next/link';
 
 // Cache-busting: her deploy için yeni versiyon değeri → browser eski sunum.html'i cache'den alamaz

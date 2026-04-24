@@ -8,8 +8,8 @@ import { usePathname } from 'next/navigation';
 export default function Footer() {
   const pathname = usePathname();
 
-  // Sunum sayfasında footer iframe'i bozmasın
-  if (pathname === '/sunum') return null;
+  // Sunum sayfalarında footer iframe'i bozmasın (V1 + V2)
+  if (pathname === '/sunum' || pathname === '/sunum-v2') return null;
 
   return (
     <footer

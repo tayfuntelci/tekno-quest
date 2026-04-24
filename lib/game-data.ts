@@ -10,7 +10,7 @@ export type PowerUpId = 'fifty' | 'skip' | 'double' | 'lucky-start';
 export interface Character {
   id: CharacterId;
   emoji: string;
-  className: string;         // "Uzay Kaşifi" vs
+  className: string;         // "Bilge Baykuş" vs
   color: string;             // renk kodu
   glow: string;              // glow rengi
   bio: string;               // kısa tanıtım
@@ -23,11 +23,11 @@ export interface Character {
 export const CHARACTERS: Character[] = [
   {
     id: 'aylin',
-    emoji: '🚀',
-    className: 'Uzay Kaşifi',
-    color: '#00cfff',
-    glow: 'rgba(0,207,255,0.35)',
-    bio: 'Yıldızları izler, gizemi çözer. Zor sorularda doğru cevabı daraltır.',
+    emoji: '🦉',
+    className: 'Bilge Baykuş',
+    color: '#8b5cf6',
+    glow: 'rgba(139,92,246,0.35)',
+    bio: 'Gecenin zekâsıyla dikkatli bakar. Zor bir soruda iki yanlış seçeneği eleyip gerçeği aydınlatır.',
     power: 'fifty',
     powerLabel: '50/50',
     powerDesc: 'Bir soruda 2 yanlış seçeneği siler — cevap 2\'ye düşer!',
@@ -35,11 +35,11 @@ export const CHARACTERS: Character[] = [
   },
   {
     id: 'kerem',
-    emoji: '🤖',
-    className: 'Robot Mühendisi',
-    color: '#39ff14',
-    glow: 'rgba(57,255,20,0.35)',
-    bio: 'Sistemleri bilir. Zor bir soruda duraklamadan bir sonrakine geçer.',
+    emoji: '🐿️',
+    className: 'Hızlı Sincap',
+    color: '#16a34a',
+    glow: 'rgba(22,163,74,0.35)',
+    bio: 'Daldan dala sıçrar. Zor bir cevizi atlayıp bir sonraki soruya hızla koşar.',
     power: 'skip',
     powerLabel: 'Atla',
     powerDesc: 'Bir soruyu atla — XP kazanmazsın ama serin (streak) bozulmaz!',
@@ -47,23 +47,23 @@ export const CHARACTERS: Character[] = [
   },
   {
     id: 'selin',
-    emoji: '🧬',
-    className: 'Bio-Kaşif',
-    color: '#A855F7',
-    glow: 'rgba(168,85,247,0.35)',
-    bio: 'Detaylara odaklanır. Bir soruyu kazandığında çifte ödül alır.',
+    emoji: '🐝',
+    className: 'Çalışkan Arı',
+    color: '#f59e0b',
+    glow: 'rgba(245,158,11,0.4)',
+    bio: 'Doğru çiçeği buldukça ödülü ikiye katlar. Detay kaçırmaz, çalışkandır.',
     power: 'double',
-    powerLabel: 'Çifte Puan',
+    powerLabel: 'Çifte Bal',
     powerDesc: 'Bir soruyu seçersin, doğru cevap verirsen XP iki kat olur!',
-    powerEmoji: '💎',
+    powerEmoji: '🍯',
   },
   {
     id: 'emir',
-    emoji: '⚡',
-    className: 'Hız Şampiyonu',
-    color: '#ffe600',
-    glow: 'rgba(255,230,0,0.35)',
-    bio: 'Hızlı düşünür. Daha başlangıçta büyük bir bonusla kazanır.',
+    emoji: '🦊',
+    className: 'Şanslı Tilki',
+    color: '#ea580c',
+    glow: 'rgba(234,88,12,0.38)',
+    bio: 'Kurnaz ve şanslı. Yarışa bir adım önde başlar, fırsatları görür.',
     power: 'lucky-start',
     powerLabel: 'Şanslı Başlangıç',
     powerDesc: 'Oyuna 20 bonus XP ile başlarsın — rakiplerden bir adım önde!',

@@ -1,9 +1,4 @@
 // ============================================================
-// ⚠️  V1 KİLİTLİ — DEĞİŞTİRMEYİN!
-// Bu dosya "Tekno Quest V1" sürümüne aittir.
-// V1 donduruldu (git tag: v1.0-frozen). Tüm yeni değişiklikler
-// lib/questions-v2.ts dosyasında yapılmalıdır.
-// ============================================================
 // Teknoloji Quest — Quiz Soruları
 // 9-10 yaş için hazırlanmış, 5 bölüm, 15 soru, 205 temel XP
 // Sunumdaki içerikle uyumlu (LV1-LV9)

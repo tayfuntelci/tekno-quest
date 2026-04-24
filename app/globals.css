@@ -2136,3 +2136,404 @@ img, svg, video { max-width: 100%; height: auto; }
   .char-card .char-emoji { font-size: 30px !important; }
   .char-card .char-class { font-size: 11px !important; letter-spacing: 0.3px !important; }
 }
+
+/* ============================================================
+   TEKNO QUEST · V2 — GÖKYÜZÜ TEMASI (quiz-v2 için scoped override)
+   body.theme-v2 sınıfı aktifken devreye girer.
+   Çocuk psikoloğu önerilerine göre:
+   açık mavi gökyüzü arkaplan, lacivert yazı, turuncu vurgu,
+   neon yok, parlama yok, animasyonlar yavaş.
+   ============================================================ */
+body.theme-v2 {
+  --bg:      #e0f2fe;
+  --surface: #ffffff;
+  --border:  rgba(30,58,138,0.15);
+  --primary: #f97316;
+  --success: #16a34a;
+  --danger:  #dc2626;
+  --info:    #0284c7;
+  --text:    #1e3a8a;
+  --muted:   rgba(30,58,138,0.55);
+  background:
+    radial-gradient(ellipse at 20% 15%, rgba(255,255,255,0.9) 0%, transparent 45%),
+    radial-gradient(ellipse at 80% 85%, rgba(255,255,255,0.75) 0%, transparent 50%),
+    linear-gradient(180deg, #bae6fd 0%, #e0f2fe 50%, #f0f9ff 100%) !important;
+  color: var(--text);
+}
+
+/* V2: neon gölgeleri kaldır */
+body.theme-v2 [class*="neon"],
+body.theme-v2 .neon-yellow,
+body.theme-v2 .neon-green,
+body.theme-v2 .neon-blue {
+  text-shadow: none !important;
+  color: var(--text) !important;
+}
+body.theme-v2 .neon-yellow { color: #ea580c !important; }
+body.theme-v2 .neon-green  { color: #16a34a !important; }
+
+/* V2: kartlar açık zeminli */
+body.theme-v2 .game-card,
+body.theme-v2 .hero-card,
+body.theme-v2 .char-card,
+body.theme-v2 .sc-card {
+  background: rgba(255,255,255,0.92) !important;
+  border: 1px solid rgba(30,58,138,0.15) !important;
+  box-shadow: 0 2px 12px rgba(30,58,138,0.07) !important;
+  color: var(--text) !important;
+}
+
+/* V2: butonlar turuncu */
+body.theme-v2 .btn-primary {
+  background: #f97316 !important;
+  color: #ffffff !important;
+  border-color: #ea580c !important;
+  box-shadow: 0 2px 8px rgba(249,115,22,0.3) !important;
+  text-shadow: none !important;
+}
+body.theme-v2 .btn-primary:hover {
+  background: #ea580c !important;
+}
+body.theme-v2 .btn-outline {
+  color: #f97316 !important;
+  border-color: #f97316 !important;
+  background: rgba(255,255,255,0.7) !important;
+  text-shadow: none !important;
+}
+
+/* V2: XP badge */
+body.theme-v2 .xp-badge {
+  background: rgba(249,115,22,0.15) !important;
+  color: #ea580c !important;
+  border-color: rgba(249,115,22,0.4) !important;
+  text-shadow: none !important;
+}
+
+/* V2: genel yazı stili */
+body.theme-v2 h1, body.theme-v2 h2, body.theme-v2 h3 {
+  color: var(--text) !important;
+  text-shadow: none !important;
+}
+body.theme-v2 strong { color: #ea580c; }
+
+/* V2: animasyonları yavaşlat */
+/* V2: yalnızca V1'in rahatsız edici pulse/blink animasyonlarını yavaşlat */
+body.theme-v2 [class*="pulse"],
+body.theme-v2 [class*="flash"],
+body.theme-v2 [class*="shake"],
+body.theme-v2 [class*="blink"] {
+  animation-duration: 2.4s !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   V2 QUIZ — KARAKTER SEÇ EKRANI
+   char-bio ve diğer açık metinleri lacivert yap
+   ════════════════════════════════════════════════════════════ */
+body.theme-v2 .char-bio,
+body.theme-v2 .char-desc,
+body.theme-v2 .char-sub,
+body.theme-v2 .hud-sub,
+body.theme-v2 .hud-title,
+body.theme-v2 .hud-xp-label,
+body.theme-v2 .mp-slots,
+body.theme-v2 .q-gate-big,
+body.theme-v2 .q-gate-small,
+body.theme-v2 .q-gate-texts,
+body.theme-v2 .trophy-inner,
+body.theme-v2 .rocket-body,
+body.theme-v2 .node-num {
+  color: #1e3a8a !important;
+  text-shadow: none !important;
+}
+body.theme-v2 .char-class { color: #0284c7 !important; text-shadow: none !important; }
+
+/* Soru modal'ı — koyu tema yerine beyaz */
+body.theme-v2 .q-modal-backdrop {
+  background: rgba(30, 58, 138, 0.25) !important;
+  backdrop-filter: blur(4px);
+}
+body.theme-v2 .q-modal-card,
+body.theme-v2 .arena-card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(30, 58, 138, 0.18) !important;
+  box-shadow: 0 8px 28px rgba(30, 58, 138, 0.15) !important;
+  color: #1e3a8a !important;
+}
+body.theme-v2 .q-gate {
+  background: rgba(2, 132, 199, 0.12) !important;
+  border: 1px solid rgba(2, 132, 199, 0.3) !important;
+}
+body.theme-v2 .q-gate-big { color: #0284c7 !important; }
+
+/* Soru seçenekleri — beyaz kart + lacivert yazı */
+body.theme-v2 .game-option {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 2px solid rgba(30, 58, 138, 0.15) !important;
+  color: #1e3a8a !important;
+  text-shadow: none !important;
+}
+body.theme-v2 .game-option:hover {
+  background: rgba(255, 237, 213, 0.95) !important;
+  border-color: #f97316 !important;
+  color: #ea580c !important;
+}
+body.theme-v2 .game-option.correct {
+  background: rgba(22, 163, 74, 0.15) !important;
+  border-color: #16a34a !important;
+  color: #15803d !important;
+}
+body.theme-v2 .game-option.wrong {
+  background: rgba(220, 38, 38, 0.15) !important;
+  border-color: #dc2626 !important;
+  color: #b91c1c !important;
+}
+
+/* Mini-HUD koyu kutuları */
+body.theme-v2 .char-mini,
+body.theme-v2 .node-tap-hint,
+body.theme-v2 .node-lock {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #1e3a8a !important;
+  border: 1px solid rgba(30, 58, 138, 0.15) !important;
+}
+
+/* Kategori/section rozetleri — cyan yerine mavi ton */
+body.theme-v2 [class*="rounded-full"][class*="px-3"] {
+  background: rgba(2, 132, 199, 0.12) !important;
+  color: #0284c7 !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   V2 QUIZ HARİTASI — 2.5D bahçe: volumetric trees + gradient hills
+   SVG içinde gradient fill kullanılır → gerçek ışık/gölge hissi
+   ════════════════════════════════════════════════════════════ */
+body.theme-v2 .space-backdrop {
+  background:
+    /* 1) Sol ağaç — radial gradient yaprak kümesi + silindirik gövde */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'><defs><radialGradient id='fA' cx='30%25' cy='28%25' r='75%25'><stop offset='0%25' stop-color='%23bbf7d0'/><stop offset='38%25' stop-color='%2334d066'/><stop offset='75%25' stop-color='%2316a34a'/><stop offset='100%25' stop-color='%23052e16'/></radialGradient><linearGradient id='tA' x1='0%25' x2='100%25'><stop offset='0%25' stop-color='%23422006'/><stop offset='40%25' stop-color='%2378350f'/><stop offset='70%25' stop-color='%23a16207'/><stop offset='100%25' stop-color='%23422006'/></linearGradient><radialGradient id='sA' cx='50%25' cy='50%25' r='50%25'><stop offset='0%25' stop-color='%23000' stop-opacity='0.45'/><stop offset='100%25' stop-color='%23000' stop-opacity='0'/></radialGradient></defs><ellipse cx='100' cy='265' rx='65' ry='12' fill='url(%23sA)'/><rect x='89' y='170' width='22' height='85' fill='url(%23tA)' rx='5'/><path d='M93 180 q3 30 0 70 M103 175 q-2 35 2 75' stroke='%23422006' stroke-width='1.6' fill='none' opacity='0.55'/><circle cx='60' cy='130' r='48' fill='url(%23fA)'/><circle cx='140' cy='135' r='46' fill='url(%23fA)'/><circle cx='100' cy='85' r='54' fill='url(%23fA)'/><circle cx='75' cy='105' r='30' fill='url(%23fA)'/><ellipse cx='85' cy='70' rx='16' ry='22' fill='%23bbf7d0' opacity='0.5'/><ellipse cx='125' cy='115' rx='10' ry='14' fill='%23bbf7d0' opacity='0.35'/></svg>") no-repeat 1% 50%,
+    /* 2) Sağ ağaç — yeşil (lime tonu), diğerlerinden varyasyonlu */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='280' viewBox='0 0 200 280'><defs><radialGradient id='fB' cx='32%25' cy='28%25' r='78%25'><stop offset='0%25' stop-color='%23d9f99d'/><stop offset='35%25' stop-color='%2384cc16'/><stop offset='75%25' stop-color='%234d7c0f'/><stop offset='100%25' stop-color='%231a2e05'/></radialGradient><linearGradient id='tB' x1='0%25' x2='100%25'><stop offset='0%25' stop-color='%23422006'/><stop offset='50%25' stop-color='%2378350f'/><stop offset='100%25' stop-color='%23422006'/></linearGradient><radialGradient id='sB' cx='50%25' cy='50%25' r='50%25'><stop offset='0%25' stop-color='%23000' stop-opacity='0.45'/><stop offset='100%25' stop-color='%23000' stop-opacity='0'/></radialGradient></defs><ellipse cx='100' cy='265' rx='65' ry='12' fill='url(%23sB)'/><rect x='89' y='170' width='22' height='85' fill='url(%23tB)' rx='5'/><path d='M93 180 q3 30 0 70 M103 175 q-2 35 2 75' stroke='%23422006' stroke-width='1.6' fill='none' opacity='0.55'/><circle cx='60' cy='130' r='48' fill='url(%23fB)'/><circle cx='140' cy='135' r='46' fill='url(%23fB)'/><circle cx='100' cy='85' r='54' fill='url(%23fB)'/><circle cx='75' cy='105' r='30' fill='url(%23fB)'/><ellipse cx='85' cy='70' rx='16' ry='22' fill='%23d9f99d' opacity='0.55'/><ellipse cx='125' cy='115' rx='10' ry='14' fill='%2384cc16' opacity='0.4'/></svg>") no-repeat 99% 53%,
+    /* 3) Sol alt ağaç — küçük koyu yeşil, YUMUŞAK radial gölge */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='210' viewBox='0 0 150 210'><defs><radialGradient id='fC' cx='30%25' cy='28%25' r='75%25'><stop offset='0%25' stop-color='%2386efac'/><stop offset='45%25' stop-color='%2322c55e'/><stop offset='80%25' stop-color='%23166534'/><stop offset='100%25' stop-color='%23052e16'/></radialGradient><linearGradient id='tC' x1='0%25' x2='100%25'><stop offset='0%25' stop-color='%23422006'/><stop offset='50%25' stop-color='%2378350f'/><stop offset='100%25' stop-color='%23422006'/></linearGradient><radialGradient id='sC' cx='50%25' cy='50%25' r='50%25'><stop offset='0%25' stop-color='%23000' stop-opacity='0.4'/><stop offset='70%25' stop-color='%23000' stop-opacity='0.12'/><stop offset='100%25' stop-color='%23000' stop-opacity='0'/></radialGradient></defs><ellipse cx='75' cy='199' rx='38' ry='7' fill='url(%23sC)'/><rect x='66' y='130' width='18' height='66' fill='url(%23tC)' rx='4'/><circle cx='45' cy='90' r='36' fill='url(%23fC)'/><circle cx='105' cy='95' r='34' fill='url(%23fC)'/><circle cx='75' cy='55' r='40' fill='url(%23fC)'/><ellipse cx='62' cy='45' rx='12' ry='18' fill='%2386efac' opacity='0.55'/></svg>") no-repeat 4% 93%,
+    /* 4) Sağ alt ağaç — YUMUŞAK radial gölge */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='210' viewBox='0 0 150 210'><defs><radialGradient id='fD' cx='30%25' cy='28%25' r='75%25'><stop offset='0%25' stop-color='%23bbf7d0'/><stop offset='40%25' stop-color='%234ade80'/><stop offset='75%25' stop-color='%2315803d'/><stop offset='100%25' stop-color='%23052e16'/></radialGradient><linearGradient id='tD' x1='0%25' x2='100%25'><stop offset='0%25' stop-color='%23422006'/><stop offset='50%25' stop-color='%2378350f'/><stop offset='100%25' stop-color='%23422006'/></linearGradient><radialGradient id='sD' cx='50%25' cy='50%25' r='50%25'><stop offset='0%25' stop-color='%23000' stop-opacity='0.4'/><stop offset='70%25' stop-color='%23000' stop-opacity='0.12'/><stop offset='100%25' stop-color='%23000' stop-opacity='0'/></radialGradient></defs><ellipse cx='75' cy='199' rx='38' ry='7' fill='url(%23sD)'/><rect x='66' y='130' width='18' height='66' fill='url(%23tD)' rx='4'/><circle cx='45' cy='90' r='36' fill='url(%23fD)'/><circle cx='105' cy='95' r='34' fill='url(%23fD)'/><circle cx='75' cy='55' r='40' fill='url(%23fD)'/><ellipse cx='62' cy='45' rx='12' ry='18' fill='%23bbf7d0' opacity='0.55'/></svg>") no-repeat 96% 95%,
+    /* 5) Dağlar + uzak tepeler — GRADIENT ile volumetric (beyaz kar bandı KALDIRILDI) */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1600' height='260' viewBox='0 0 1600 260' preserveAspectRatio='none'><defs><linearGradient id='mF' x1='0' x2='0' y1='0' y2='1'><stop offset='0%25' stop-color='%23cbd5e1' stop-opacity='0.75'/><stop offset='100%25' stop-color='%2364748b' stop-opacity='0.45'/></linearGradient><linearGradient id='mM' x1='0' x2='0' y1='0' y2='1'><stop offset='0%25' stop-color='%2394b5d4'/><stop offset='100%25' stop-color='%235d7fa3'/></linearGradient><linearGradient id='mN' x1='0' x2='0' y1='0' y2='1'><stop offset='0%25' stop-color='%23a3c99e'/><stop offset='100%25' stop-color='%234d8c3e'/></linearGradient><linearGradient id='mH' x1='0' x2='0' y1='0' y2='1'><stop offset='0%25' stop-color='%2386d87a'/><stop offset='100%25' stop-color='%233d7a2f'/></linearGradient></defs><path d='M0 180 L180 60 L320 130 L480 40 L620 100 L780 55 L920 115 L1080 65 L1240 105 L1400 55 L1600 120 L1600 260 L0 260 Z' fill='url(%23mF)'/><path d='M0 195 L140 115 L280 160 L440 100 L600 155 L760 115 L920 160 L1080 110 L1240 155 L1400 110 L1600 160 L1600 260 L0 260 Z' fill='url(%23mM)' opacity='0.82'/><path d='M0 220 Q160 170 320 200 Q500 155 680 195 Q880 145 1080 185 Q1280 160 1460 195 Q1540 210 1600 200 L1600 260 L0 260 Z' fill='url(%23mN)'/><path d='M0 240 Q200 200 400 225 Q620 180 840 215 Q1060 175 1280 215 Q1440 195 1600 225 L1600 260 L0 260 Z' fill='url(%23mH)'/></svg>") no-repeat 0 12%,
+    /* 6) Çalı şeridi — radial gradient ile 3D hacim, cast shadow */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='520' height='110' viewBox='0 0 520 110'><defs><radialGradient id='b1' cx='35%25' cy='30%25' r='75%25'><stop offset='0%25' stop-color='%2386efac'/><stop offset='45%25' stop-color='%2322c55e'/><stop offset='80%25' stop-color='%23166534'/><stop offset='100%25' stop-color='%23052e16'/></radialGradient><radialGradient id='b2' cx='30%25' cy='28%25' r='78%25'><stop offset='0%25' stop-color='%23bbf7d0'/><stop offset='40%25' stop-color='%234ade80'/><stop offset='80%25' stop-color='%2315803d'/><stop offset='100%25' stop-color='%23052e16'/></radialGradient><radialGradient id='bsh' cx='50%25' cy='50%25' r='50%25'><stop offset='0%25' stop-color='%23000' stop-opacity='0.4'/><stop offset='100%25' stop-color='%23000' stop-opacity='0'/></radialGradient></defs><g><ellipse cx='50' cy='100' rx='55' ry='8' fill='url(%23bsh)'/><circle cx='18' cy='72' r='24' fill='url(%23b1)'/><circle cx='50' cy='56' r='32' fill='url(%23b1)'/><circle cx='88' cy='68' r='26' fill='url(%23b1)'/><ellipse cx='35' cy='50' rx='8' ry='14' fill='%2386efac' opacity='0.55'/><ellipse cx='65' cy='42' rx='9' ry='16' fill='%2386efac' opacity='0.5'/><circle cx='46' cy='34' r='3.5' fill='%23fbbf24'/><circle cx='70' cy='40' r='3.5' fill='%23ef4444'/><circle cx='30' cy='44' r='2.5' fill='%23f472b6'/></g><g transform='translate(160,0)'><ellipse cx='50' cy='100' rx='55' ry='8' fill='url(%23bsh)'/><circle cx='18' cy='74' r='22' fill='url(%23b2)'/><circle cx='50' cy='58' r='30' fill='url(%23b2)'/><circle cx='88' cy='70' r='24' fill='url(%23b2)'/><ellipse cx='38' cy='52' rx='8' ry='14' fill='%23bbf7d0' opacity='0.55'/><ellipse cx='68' cy='48' rx='8' ry='14' fill='%23bbf7d0' opacity='0.5'/><circle cx='52' cy='42' r='3.5' fill='%23f472b6'/><circle cx='75' cy='46' r='3.5' fill='%23fbbf24'/><circle cx='32' cy='50' r='2.5' fill='%23a78bfa'/></g><g transform='translate(320,0)'><ellipse cx='50' cy='100' rx='55' ry='8' fill='url(%23bsh)'/><circle cx='20' cy='76' r='22' fill='url(%23b1)'/><circle cx='52' cy='60' r='30' fill='url(%23b1)'/><circle cx='88' cy='72' r='24' fill='url(%23b1)'/><ellipse cx='40' cy='54' rx='8' ry='14' fill='%2386efac' opacity='0.55'/><ellipse cx='70' cy='50' rx='8' ry='14' fill='%2386efac' opacity='0.5'/><circle cx='54' cy='44' r='3.5' fill='%23a78bfa'/><circle cx='76' cy='48' r='3.5' fill='%23fbbf24'/><circle cx='34' cy='54' r='2.5' fill='%23fb923c'/></g><g transform='translate(455,0)'><ellipse cx='35' cy='100' rx='45' ry='7' fill='url(%23bsh)'/><circle cx='15' cy='78' r='18' fill='url(%23b2)'/><circle cx='38' cy='64' r='24' fill='url(%23b2)'/><circle cx='60' cy='74' r='20' fill='url(%23b2)'/><ellipse cx='28' cy='58' rx='7' ry='12' fill='%23bbf7d0' opacity='0.55'/><circle cx='40' cy='50' r='3.5' fill='%23fb923c'/><circle cx='55' cy='54' r='3' fill='%23fbbf24'/></g></svg>") repeat-x 0 100%,
+    /* 7) Ana gradient — doygun bahçe yeşili (çiçek tile ::after'a taşındı, sadece yeşil alan) */
+    linear-gradient(180deg,
+      #bfe6f5 0%,
+      #d4eef4 6%,
+      #dcf2d8 11%,
+      #a8e084 18%,
+      #81c763 32%,
+      #6ab858 55%,
+      #5ba849 80%,
+      #4c9a3c 100%
+    ) !important;
+  background-size:
+    200px auto,
+    200px auto,
+    150px auto,
+    150px auto,
+    100% 260px,
+    auto 110px,
+    auto !important;
+  background-repeat:
+    no-repeat,
+    no-repeat,
+    no-repeat,
+    no-repeat,
+    no-repeat,
+    repeat-x,
+    no-repeat !important;
+  /* position: fixed; inset: 0 — orijinal .space-backdrop kuralından miras alınır */
+  overflow: hidden !important;
+}
+body.theme-v2 .sb-layer,
+body.theme-v2 .sb-nebula { display: none !important; }
+
+/* Güneş — sağ üst köşede parlak halo */
+body.theme-v2 .space-backdrop::before {
+  content: '';
+  position: absolute;
+  top: 25px;
+  right: 50px;
+  width: 95px;
+  height: 95px;
+  background: radial-gradient(circle, #fef9c3 12%, rgba(253,224,71,0.8) 32%, rgba(251,191,36,0.4) 55%, transparent 82%);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(1px);
+  z-index: 2;
+}
+
+/* Çim+çiçek dokusu — SADECE alt yeşil alanda görünür (mask ile gök/dağ boş) */
+body.theme-v2 .space-backdrop::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='520' height='520' viewBox='0 0 520 520'><defs><radialGradient id='dy' cx='50%25' cy='50%25' r='55%25'><stop offset='0%25' stop-color='%23fff'/><stop offset='70%25' stop-color='%23fef9c3'/><stop offset='100%25' stop-color='%23fbbf24'/></radialGradient><radialGradient id='sf' cx='50%25' cy='50%25' r='55%25'><stop offset='0%25' stop-color='%23fde68a'/><stop offset='60%25' stop-color='%23fbbf24'/><stop offset='100%25' stop-color='%23d97706'/></radialGradient><radialGradient id='rs' cx='45%25' cy='40%25' r='60%25'><stop offset='0%25' stop-color='%23fecaca'/><stop offset='55%25' stop-color='%23ef4444'/><stop offset='100%25' stop-color='%237f1d1d'/></radialGradient><radialGradient id='pk' cx='45%25' cy='40%25' r='60%25'><stop offset='0%25' stop-color='%23fce7f3'/><stop offset='50%25' stop-color='%23f472b6'/><stop offset='100%25' stop-color='%239d174d'/></radialGradient><radialGradient id='pr' cx='45%25' cy='40%25' r='60%25'><stop offset='0%25' stop-color='%23ddd6fe'/><stop offset='55%25' stop-color='%23a78bfa'/><stop offset='100%25' stop-color='%234c1d95'/></radialGradient><radialGradient id='tl' cx='50%25' cy='30%25' r='70%25'><stop offset='0%25' stop-color='%23fca5a5'/><stop offset='55%25' stop-color='%23dc2626'/><stop offset='100%25' stop-color='%23450a0a'/></radialGradient><radialGradient id='fsh' cx='50%25' cy='50%25' r='50%25'><stop offset='0%25' stop-color='%23000' stop-opacity='0.35'/><stop offset='100%25' stop-color='%23000' stop-opacity='0'/></radialGradient><linearGradient id='st' x1='0' x2='0' y1='0' y2='1'><stop offset='0%25' stop-color='%2322c55e'/><stop offset='100%25' stop-color='%23166534'/></linearGradient></defs><g stroke='%23166534' stroke-width='1.4' stroke-linecap='round' fill='none' opacity='0.65'><path d='M20 80 q2 -12 4 0 M18 80 q2 -10 4 0 M24 80 q2 -11 4 0'/><path d='M110 40 q2 -11 4 0 M108 40 q2 -9 4 0 M114 40 q2 -10 4 0'/><path d='M220 120 q2 -12 4 0 M218 120 q2 -10 4 0 M224 120 q2 -11 4 0'/><path d='M330 60 q2 -11 4 0 M328 60 q2 -9 4 0 M334 60 q2 -10 4 0'/><path d='M440 140 q2 -12 4 0 M438 140 q2 -10 4 0 M444 140 q2 -11 4 0'/><path d='M60 210 q2 -12 4 0 M58 210 q2 -10 4 0 M64 210 q2 -11 4 0'/><path d='M170 270 q2 -12 4 0 M168 270 q2 -10 4 0 M174 270 q2 -11 4 0'/><path d='M290 230 q2 -12 4 0 M288 230 q2 -10 4 0 M294 230 q2 -11 4 0'/><path d='M400 290 q2 -12 4 0 M398 290 q2 -10 4 0 M404 290 q2 -11 4 0'/><path d='M490 210 q2 -12 4 0 M488 210 q2 -10 4 0 M494 210 q2 -11 4 0'/><path d='M30 360 q2 -13 4 0 M28 360 q2 -11 4 0 M34 360 q2 -12 4 0'/><path d='M140 400 q2 -13 4 0 M138 400 q2 -11 4 0 M144 400 q2 -12 4 0'/><path d='M260 370 q2 -13 4 0 M258 370 q2 -11 4 0 M264 370 q2 -12 4 0'/><path d='M380 410 q2 -13 4 0 M378 410 q2 -11 4 0 M384 410 q2 -12 4 0'/></g><g transform='translate(80,75)'><ellipse cx='0' cy='8' rx='14' ry='3' fill='url(%23fsh)'/><g fill='url(%23dy)'><ellipse cx='0' cy='-7' rx='3.2' ry='5.5'/><ellipse cx='0' cy='7' rx='3.2' ry='5.5'/><ellipse cx='-7' cy='0' rx='5.5' ry='3.2'/><ellipse cx='7' cy='0' rx='5.5' ry='3.2'/><ellipse cx='-5' cy='-5' rx='4' ry='2.8' transform='rotate(-45 -5 -5)'/><ellipse cx='5' cy='-5' rx='4' ry='2.8' transform='rotate(45 5 -5)'/><ellipse cx='-5' cy='5' rx='4' ry='2.8' transform='rotate(45 -5 5)'/><ellipse cx='5' cy='5' rx='4' ry='2.8' transform='rotate(-45 5 5)'/></g><circle cx='0' cy='0' r='2.8' fill='%23d97706'/></g><g transform='translate(180,95)'><ellipse cx='0' cy='14' rx='13' ry='3' fill='url(%23fsh)'/><rect x='-1.2' y='-5' width='2.4' height='18' fill='url(%23st)'/><ellipse cx='-4' cy='2' rx='5' ry='2.4' fill='%2322c55e' transform='rotate(-28 -4 2)'/><ellipse cx='4' cy='4' rx='5' ry='2.4' fill='%2322c55e' transform='rotate(28 4 4)'/><path d='M-4 -5 q0 -11 4 -14 q4 3 4 14 Z' fill='url(%23tl)'/><ellipse cx='-1' cy='-9' rx='2.8' ry='5' fill='%23dc2626' opacity='0.85'/></g><g transform='translate(280,70)'><ellipse cx='0' cy='12' rx='13' ry='3' fill='url(%23fsh)'/><rect x='-1' y='2' width='2' height='12' fill='url(%23st)'/><circle cx='0' cy='-2' r='5.5' fill='url(%23pk)'/><circle cx='-4' cy='-4' r='4' fill='url(%23pk)'/><circle cx='4' cy='-4' r='4' fill='url(%23pk)'/><circle cx='-3' cy='2' r='3.2' fill='url(%23pk)'/><circle cx='3' cy='2' r='3.2' fill='url(%23pk)'/><circle cx='0' cy='-2' r='1.8' fill='%23fde68a'/></g><g transform='translate(400,90)'><ellipse cx='0' cy='10' rx='12' ry='3' fill='url(%23fsh)'/><g fill='url(%23sf)'><ellipse cx='0' cy='-9' rx='2.6' ry='5'/><ellipse cx='0' cy='9' rx='2.6' ry='5'/><ellipse cx='-9' cy='0' rx='5' ry='2.6'/><ellipse cx='9' cy='0' rx='5' ry='2.6'/><ellipse cx='-6' cy='-6' rx='3.5' ry='2.5' transform='rotate(-45 -6 -6)'/><ellipse cx='6' cy='-6' rx='3.5' ry='2.5' transform='rotate(45 6 -6)'/><ellipse cx='-6' cy='6' rx='3.5' ry='2.5' transform='rotate(45 -6 6)'/><ellipse cx='6' cy='6' rx='3.5' ry='2.5' transform='rotate(-45 6 6)'/></g><circle cx='0' cy='0' r='3.5' fill='%237c2d12'/><circle cx='-1' cy='-1' r='1.4' fill='%23a16207' opacity='0.6'/></g><g transform='translate(60,225)'><ellipse cx='0' cy='12' rx='12' ry='3' fill='url(%23fsh)'/><rect x='-1' y='-4' width='2' height='16' fill='url(%23st)'/><path d='M-6 -10 q6 -7 10 -4 q-3 7 -5 10' fill='url(%23pr)'/><path d='M6 -12 q-6 -7 -10 -4 q3 7 5 10' fill='%239333ea'/><circle cx='0' cy='-10' r='2.2' fill='%23fde68a'/></g><g transform='translate(170,235)'><ellipse cx='0' cy='13' rx='14' ry='3.2' fill='url(%23fsh)'/><g fill='url(%23dy)'><ellipse cx='0' cy='-8' rx='3.4' ry='6'/><ellipse cx='0' cy='8' rx='3.4' ry='6'/><ellipse cx='-8' cy='0' rx='6' ry='3.4'/><ellipse cx='8' cy='0' rx='6' ry='3.4'/><ellipse cx='-5.5' cy='-5.5' rx='4.2' ry='3' transform='rotate(-45 -5.5 -5.5)'/><ellipse cx='5.5' cy='-5.5' rx='4.2' ry='3' transform='rotate(45 5.5 -5.5)'/><ellipse cx='-5.5' cy='5.5' rx='4.2' ry='3' transform='rotate(45 -5.5 5.5)'/><ellipse cx='5.5' cy='5.5' rx='4.2' ry='3' transform='rotate(-45 5.5 5.5)'/></g><circle cx='0' cy='0' r='3' fill='%23d97706'/></g><g transform='translate(290,230)'><ellipse cx='0' cy='24' rx='10' ry='3' fill='url(%23fsh)'/><rect x='-1' y='0' width='2.5' height='22' fill='url(%23st)'/><path d='M0 0 C -8 -5 -8 -13 0 -16 C 8 -13 8 -5 0 0 Z' fill='url(%23sf)'/><path d='M-3 -4 q3 -3 3 -9' stroke='%23d97706' stroke-width='0.8' fill='none' opacity='0.7'/></g><g transform='translate(400,225)'><ellipse cx='0' cy='10' rx='12' ry='3' fill='url(%23fsh)'/><rect x='-1' y='0' width='2' height='10' fill='url(%23st)'/><circle cx='0' cy='-2' r='6' fill='url(%23pk)'/><circle cx='0' cy='-2' r='2.6' fill='%23fde68a'/></g><g transform='translate(470,275)'><ellipse cx='0' cy='14' rx='11' ry='3' fill='url(%23fsh)'/><rect x='-1' y='-4' width='2' height='16' fill='url(%23st)'/><path d='M-4 -5 q4 -5 8 -3 q-2 5 -4 7' fill='%23f87171'/><path d='M6 -7 q-5 -5 -8 -3 q2 5 4 7' fill='url(%23rs)'/></g><g transform='translate(110,345)'><ellipse cx='0' cy='10' rx='13' ry='3' fill='url(%23fsh)'/><rect x='-1' y='0' width='2' height='10' fill='url(%23st)'/><circle cx='0' cy='-2' r='7' fill='url(%23pk)'/><circle cx='0' cy='-2' r='3' fill='%23fde68a'/><path d='M-6 4 q2 -4 6 -3 M6 4 q-2 -4 -6 -3' stroke='%23166534' stroke-width='1.2' fill='none'/></g><g transform='translate(220,340)'><ellipse cx='4' cy='25' rx='13' ry='3.2' fill='url(%23fsh)'/><rect x='3' y='-2' width='2.4' height='26' fill='url(%23st)'/><ellipse cx='-2' cy='0' rx='5' ry='2.4' fill='%2322c55e' transform='rotate(-28 -2 0)'/><ellipse cx='10' cy='0' rx='5' ry='2.4' fill='%2322c55e' transform='rotate(28 10 0)'/><path d='M0 -10 q0 -11 4 -14 q4 3 4 14 Z' fill='url(%23tl)'/><ellipse cx='3' cy='-16' rx='2.4' ry='5' fill='%23ef4444' opacity='0.85'/></g><g transform='translate(330,345)'><ellipse cx='0' cy='11' rx='12' ry='3' fill='url(%23fsh)'/><g fill='url(%23sf)'><ellipse cx='0' cy='-10' rx='2.8' ry='5.2'/><ellipse cx='0' cy='10' rx='2.8' ry='5.2'/><ellipse cx='-10' cy='0' rx='5.2' ry='2.8'/><ellipse cx='10' cy='0' rx='5.2' ry='2.8'/><ellipse cx='-7' cy='-7' rx='3.8' ry='2.6' transform='rotate(-45 -7 -7)'/><ellipse cx='7' cy='-7' rx='3.8' ry='2.6' transform='rotate(45 7 -7)'/><ellipse cx='-7' cy='7' rx='3.8' ry='2.6' transform='rotate(45 -7 7)'/><ellipse cx='7' cy='7' rx='3.8' ry='2.6' transform='rotate(-45 7 7)'/></g><circle cx='0' cy='0' r='3.8' fill='%237c2d12'/></g><g transform='translate(440,365)'><ellipse cx='0' cy='10' rx='12' ry='3' fill='url(%23fsh)'/><rect x='-1' y='0' width='2' height='10' fill='url(%23st)'/><circle cx='0' cy='-2' r='6.5' fill='url(%23pr)'/><circle cx='0' cy='-2' r='2.8' fill='%23fde68a'/></g><g transform='translate(60,445)'><ellipse cx='0' cy='12' rx='13' ry='3' fill='url(%23fsh)'/><g fill='url(%23dy)'><ellipse cx='0' cy='-8' rx='3.2' ry='5.5'/><ellipse cx='0' cy='8' rx='3.2' ry='5.5'/><ellipse cx='-8' cy='0' rx='5.5' ry='3.2'/><ellipse cx='8' cy='0' rx='5.5' ry='3.2'/></g><circle cx='0' cy='0' r='2.8' fill='%23d97706'/></g><g transform='translate(170,465)'><ellipse cx='0' cy='13' rx='11' ry='3' fill='url(%23fsh)'/><rect x='-1' y='-4' width='2' height='16' fill='url(%23st)'/><path d='M-4 0 q4 -5 7 -3 q-2 5 -3 7' fill='url(%23pk)'/><path d='M7 -2 q-4 -5 -7 -3 q2 5 3 7' fill='%23ec4899'/></g><g transform='translate(290,448)'><ellipse cx='4' cy='26' rx='11' ry='3' fill='url(%23fsh)'/><rect x='3' y='0' width='2.4' height='24' fill='url(%23st)'/><path d='M0 0 C -8 -5 -8 -13 0 -16 C 8 -13 8 -5 0 0 Z' fill='url(%23tl)'/></g><g transform='translate(400,475)'><ellipse cx='0' cy='9' rx='12' ry='3' fill='url(%23fsh)'/><rect x='-1' y='0' width='2' height='9' fill='url(%23st)'/><circle cx='0' cy='-2' r='6' fill='url(%23pk)'/><circle cx='0' cy='-2' r='2.4' fill='%23fbbf24'/></g></svg>");
+  background-repeat: repeat;
+  background-size: 520px 520px;
+  /* MASK — sadece alt yeşil alan (45%+) görünür; gök ve dağlar tamamen boş */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 42%, rgba(0,0,0,0.4) 46%, black 52%, black 100%);
+          mask-image: linear-gradient(to bottom, transparent 0%, transparent 42%, rgba(0,0,0,0.4) 46%, black 52%, black 100%);
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+          mask-size: 100% 100%;
+}
+
+/* (eski pattern kaldırıldı, backdrop layer'ına taşındı) */
+
+/* Bulutlar devre dışı — gökyüzü temiz gradient kalacak */
+body.theme-v2 .game-map::before {
+  display: none !important;
+}
+
+/* Galaxy/rocket-fly sakin */
+body.theme-v2 .rocket-fly,
+body.theme-v2 .galaxy-bg {
+  opacity: 0.25 !important;
+  filter: hue-rotate(90deg) saturate(0.5) brightness(1.2);
+}
+
+/* Süper güç hatırlatıcı — bahçe temasında koyu kontrastlı, okunabilir */
+body.theme-v2 .powerbar-reminder {
+  background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%) !important;
+  border: 2px solid #ea580c !important;
+  color: #7c2d12 !important;
+  font-weight: 800 !important;
+  font-size: 13px !important;
+  padding: 10px 20px !important;
+  box-shadow:
+    0 6px 18px rgba(60, 40, 20, 0.35),
+    0 0 0 3px rgba(249, 115, 22, 0.18),
+    inset 0 -3px 8px rgba(194, 65, 12, 0.15) !important;
+  backdrop-filter: none !important;
+  letter-spacing: 0.3px !important;
+}
+body.theme-v2 .powerbar-reminder .pr-icon {
+  filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.85)) !important;
+  font-size: 20px !important;
+}
+body.theme-v2 .powerbar-reminder .pr-text {
+  color: #7c2d12 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+@keyframes pbrPulseV2 {
+  0%, 100% { box-shadow: 0 6px 18px rgba(60,40,20,0.35), 0 0 0 3px rgba(249,115,22,0.18), inset 0 -3px 8px rgba(194,65,12,0.15); }
+  50%      { box-shadow: 0 8px 24px rgba(60,40,20,0.45), 0 0 0 4px rgba(249,115,22,0.35), inset 0 -3px 8px rgba(194,65,12,0.2); }
+}
+body.theme-v2 .powerbar-reminder {
+  animation: powerBarIn 0.5s ease, pbrPulseV2 2.2s ease-in-out 0.5s infinite !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   V2 HARİTA — Düğümler: bahçede doğal taş/çiçek işaret taşları
+   ════════════════════════════════════════════════════════════ */
+/* Gelecek (kilitli) düğümler — yumuşak taş görünümü */
+body.theme-v2 .board-node.future .node-inner {
+  background: radial-gradient(circle at 30% 28%, #fefce8 0%, #fde68a 45%, #fbbf24 85%) !important;
+  border: 3px solid #d97706 !important;
+  box-shadow:
+    inset 0 -4px 8px rgba(180, 83, 9, 0.25),
+    0 4px 10px rgba(60, 40, 20, 0.25) !important;
+  color: #78350f !important;
+}
+body.theme-v2 .board-node.future .node-num {
+  color: #78350f !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.4) !important;
+}
+/* Kilit ikonunu gizle — bahçede kilit olmaz, çiçekli taşlar var */
+body.theme-v2 .node-lock {
+  background: rgba(254, 243, 199, 0.95) !important;
+  color: #92400e !important;
+  border: 1px solid rgba(180, 83, 9, 0.3) !important;
+}
+/* Mevcut düğüm — canlı turuncu çiçek gibi */
+body.theme-v2 .board-node.current .node-inner {
+  background: radial-gradient(circle at 30% 28%, #fff7ed 0%, #fb923c 45%, #ea580c 90%) !important;
+  border: 3px solid #c2410c !important;
+  box-shadow:
+    inset 0 -4px 10px rgba(154, 52, 18, 0.35),
+    0 0 22px rgba(251, 146, 60, 0.6),
+    0 4px 12px rgba(60, 40, 20, 0.3) !important;
+}
+body.theme-v2 .board-node.current .node-current {
+  color: #fff !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+}
+/* Tamamlanan düğüm — yeşil/altın rozet */
+body.theme-v2 .board-node.done .node-inner {
+  background: radial-gradient(circle at 30% 28%, #f0fdf4 0%, #86efac 45%, #16a34a 90%) !important;
+  border: 3px solid #15803d !important;
+  box-shadow:
+    inset 0 -4px 8px rgba(22, 101, 52, 0.3),
+    0 3px 10px rgba(22, 101, 52, 0.25) !important;
+}
+body.theme-v2 .board-node.done .node-check {
+  color: #fff !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.25) !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   V2 HARİTA — Bahçe yürüyüş yolu (kenarlı iki katmanlı toprak yol)
+   ════════════════════════════════════════════════════════════ */
+/* Alt katman: koyu harç (mortar) — taşlar arası koyu boşluk olarak görünür */
+body.theme-v2 .map-path-bg {
+  stroke: #5c3a1f !important;        /* koyu harç rengi */
+  stroke-width: 32 !important;
+  stroke-dasharray: none !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  filter: drop-shadow(0 4px 6px rgba(40, 25, 10, 0.4)) !important;
+  opacity: 1 !important;
+}
+/* Üst katman: arnavut kaldırımı taşları — dasharray ile oval taş bloklar */
+body.theme-v2 .map-path-fg {
+  stroke: #d4b483 !important;        /* sıcak taş bej */
+  stroke-width: 24 !important;
+  /* Taşlar: 14px genişliğinde, aralarında 5px harç boşluğu */
+  stroke-dasharray: 14 5 !important;
+  stroke-linecap: round !important;  /* her taş oval/yuvarlak uçlu */
+  stroke-linejoin: round !important;
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,0.25)) drop-shadow(0 -1px 1px rgba(92,58,31,0.4)) !important;
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   V2 HUD — Koyu gece yerine açık beyaz kart
+   ════════════════════════════════════════════════════════════ */
+body.theme-v2 .game-hud {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border: 1px solid rgba(30, 58, 138, 0.18) !important;
+  box-shadow: 0 4px 16px rgba(30, 58, 138, 0.12) !important;
+  backdrop-filter: blur(10px) !important;
+}
+body.theme-v2 .hud-xp-num {
+  color: #ea580c !important;
+  text-shadow: none !important;
+}
+body.theme-v2 .hud-streak {
+  background: rgba(249, 115, 22, 0.14) !important;
+  border-color: rgba(249, 115, 22, 0.4) !important;
+  color: #ea580c !important;
+}
+body.theme-v2 .hud-streak strong { color: #ea580c !important; }
+
+/* XP badge tutarlılık */
+body.theme-v2 .inline-block[class*="rounded-full"][class*="xp"],
+body.theme-v2 [class*="xp-badge"] {
+  background: rgba(249, 115, 22, 0.15) !important;
+  color: #ea580c !important;
+  border-color: rgba(249,115,22,0.4) !important;
+}
