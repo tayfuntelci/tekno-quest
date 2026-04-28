@@ -232,7 +232,8 @@ body { height: 100dvh; }
   height: 100%;
   min-height: 100%;
   display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
+  align-items: center;
+  justify-content: safe center;   /* uzun içerikte üst scroll erişilebilir kalır */
   opacity: 0; pointer-events: none;
   transition: opacity 0.45s ease;
   padding: 72px 60px 62px;
@@ -250,12 +251,24 @@ body { height: 100dvh; }
 
 /* ======================== ORTAK BİLEŞENLER ============================= */
 .level-banner {
-  display: flex; align-items: center; justify-content: center; gap: 14px;
+  display: flex; align-items: center; justify-content: center;
+  column-gap: 14px; row-gap: 6px;
   margin-bottom: 4px;
   flex-wrap: wrap;
   max-width: 100%;
+  flex-shrink: 0;
 }
-.level-title { max-width: 100%; overflow-wrap: anywhere; word-break: break-word; }
+.level-title {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  flex-basis: 100%;        /* uzun title'lar tam satır kaplasın */
+  flex-grow: 0;
+}
+@media (min-width: 821px) {
+  /* Geniş ekranda title yan yana kalabilir ama overflow olursa wrap eder */
+  .level-title { flex-basis: auto; }
+}
 .level-badge {
   font-family: 'Chakra Petch'; font-weight: 700; font-size: 12px;
   background: var(--primary); color: #000;
@@ -494,7 +507,9 @@ body { height: 100dvh; }
   padding: 24px 30px 18px;
   width: 100%; max-width: 1100px;
   overflow: hidden;
+  flex-shrink: 0;        /* flex container içinde içerik çökmesin */
 }
+.msg-map-svg { flex-shrink: 0; }
 .msg-map-title {
   font-family: 'Chakra Petch'; font-weight: 700;
   font-size: clamp(13px, 1.9vw, 22px);
