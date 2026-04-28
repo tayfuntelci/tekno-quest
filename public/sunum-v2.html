@@ -289,8 +289,21 @@ body { height: 100dvh; }
   border: 1px solid var(--holo-border);
   border-radius: 12px;
   backdrop-filter: blur(8px);
-  position: relative; overflow: hidden;
+  position: relative; overflow: visible;
   transition: all 0.3s;
+  padding: 22px 28px;
+}
+/* Default (game-card OLMAYAN) holo-card içeriği için stiller */
+.holo-card > .gc-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(16px, 1.9vw, 22px);
+  color: var(--primary);
+  margin-bottom: 10px; letter-spacing: 1px; line-height: 1.3;
+}
+.holo-card > .gc-text {
+  font-size: clamp(14px, 1.6vw, 17px);
+  color: rgba(240,240,255,0.9);
+  line-height: 1.6; font-weight: 400;
 }
 .holo-card::before {
   content:''; position:absolute; top:0; left:0;
@@ -917,6 +930,7 @@ body { height: 100dvh; }
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 18px; width: 100%; max-width: 1200px;
 }
+@media (max-width: 1100px) { .ai-split { grid-template-columns: 1fr; } }
 .ai-types, .ai-life {
   background: rgba(0,30,60,0.55);
   border-radius: 12px; padding: 22px 26px;
@@ -1865,16 +1879,15 @@ input[type=range].sslider::-webkit-slider-thumb {
   /* HUD ve bottom-nav zaten position:fixed — onlar ekrana yapışık kalır */
   /* Ama iframe içinde alt nav yerine arrows ve pips yine fixed'de kalsın */
   .bottom-nav { position: fixed; }
-  .arrow-btn { position: fixed; }
-  .pixel-corner { position: fixed; }
-}
   .arrow-btn {
+    position: fixed;
     top: 50%;
     bottom: auto;
     transform: translateY(-50%);
     width: 36px;
     height: 36px;
   }
+  .pixel-corner { position: fixed; }
   .pc-tl, .pc-tr { top: 38px; }
   .pc-bl, .pc-br { bottom: 34px; }
   .level-title { font-size: 16px; }
@@ -3531,7 +3544,7 @@ body .hud, body .bottom-nav {
       <div class="level-title mint-title">⏰ EKRAN SÜRESİ DENGESİ</div>
       <div class="page-tag">SAYFA 2/5</div>
     </div>
-    <div class="slide-sub">Süper güce sahipsin — ama gözlerin ve uykun da önemli!</div>
+    <div class="slide-sub">Teknoloji harika — ama gözlerin ve uykun da önemli!</div>
 
     <div class="smart-full">
       <div class="sf-head"><div class="sf-emo">⏰</div><h3>KAÇ SAAT YETERLİ?</h3></div>
