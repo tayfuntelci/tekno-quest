@@ -230,31 +230,30 @@ body { height: 100dvh; }
 .slide {
   position: absolute; top:0; left:0; width:100%;
   height: 100%;
-  min-height: 100%;
   display: flex; flex-direction: column;
   align-items: center;
-  justify-content: flex-start;   /* scroll erişilebilir kalsın */
+  justify-content: flex-start;
   opacity: 0; pointer-events: none;
   transition: opacity 0.45s ease;
   padding: 72px 60px 62px;
   gap: 18px;
-  overflow-y: auto;
+  overflow-y: scroll;            /* scroll her zaman var */
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   touch-action: pan-y;
 }
-/* Pseudo-element trick: yer varsa içeriği dikey merkeze al, yer yoksa
-   esneklikle 0'a sıkışır ve scroll erişilebilir kalır */
-.slide::before, .slide::after {
-  content: '';
-  flex: 1 1 0;
-  min-height: 0;
-}
+.slide > * { flex-shrink: 0; }   /* hiçbir öğe sıkışmasın, scroll devreye girsin */
 .slide.active { opacity: 1; pointer-events: all; }
-/* Scrollbar gizle */
-.slide::-webkit-scrollbar { width: 0; display: none; }
-.slide { scrollbar-width: none; }
+/* İnce scrollbar — kullanıcı scroll edebileceğini görsün */
+.slide::-webkit-scrollbar { width: 8px; }
+.slide::-webkit-scrollbar-track { background: rgba(30,58,138,0.06); }
+.slide::-webkit-scrollbar-thumb {
+  background: rgba(249,115,22,0.45);
+  border-radius: 4px;
+}
+.slide::-webkit-scrollbar-thumb:hover { background: rgba(249,115,22,0.7); }
+.slide { scrollbar-width: thin; scrollbar-color: rgba(249,115,22,0.5) transparent; }
 
 /* ======================== ORTAK BİLEŞENLER ============================= */
 .level-banner {
@@ -1578,8 +1577,9 @@ input[type=range].sslider::-webkit-slider-thumb {
 }
 
 .quote-row {
-  display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 10px; width: 100%; max-width: 1100px;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 12px; width: 100%; max-width: 900px;
+  margin: 0 auto;
 }
 .quote-card {
   background: rgba(0,30,60,0.55);
@@ -1700,7 +1700,7 @@ input[type=range].sslider::-webkit-slider-thumb {
   .extras-grid { grid-template-columns: 1fr; }
   .golden-rules { grid-template-columns: repeat(2, 1fr); }
   .gr-card { padding: 14px 10px; }
-  .quote-row { grid-template-columns: repeat(2, 1fr); }
+  .quote-row { grid-template-columns: 1fr; }
   .achievement-row { gap: 6px; }
   .achievement { min-width: 78px; padding: 8px 10px; }
   /* HUD sıkıştır */
@@ -1883,8 +1883,6 @@ input[type=range].sslider::-webkit-slider-thumb {
     min-height: 100dvh;
     overflow: visible;
   }
-  /* Mobilde pseudo spacer'ları kapat — body scroll yapıyor */
-  .slide::before, .slide::after { display: none; }
   .slide {
     position: static;
     display: none;         /* Sadece .active göster */
@@ -2463,111 +2461,163 @@ body .hud, body .bottom-nav {
         🌊 DENİZİN DİBİNDEKİ DEV AĞ
       </div>
 
-      <svg viewBox="0 0 800 380" style="width:100%; max-height:340px; margin-bottom:20px;" xmlns="http://www.w3.org/2000/svg">
-        <!-- Okyanus zemin (gradient) -->
+      <svg viewBox="0 0 1000 500" style="width:100%; max-height:420px; margin-bottom:20px;" xmlns="http://www.w3.org/2000/svg">
+        <!-- Okyanus zemin (gradient + ızgara) -->
         <defs>
           <linearGradient id="oceanBg" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="#0a2540"/>
             <stop offset="100%" stop-color="#0c3a6e"/>
           </linearGradient>
-          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(120,180,220,0.1)" stroke-width="0.5"/>
+          <pattern id="oceanGrid" width="50" height="50" patternUnits="userSpaceOnUse">
+            <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(120,180,220,0.08)" stroke-width="0.5"/>
           </pattern>
         </defs>
-        <rect width="800" height="380" fill="url(#oceanBg)"/>
-        <rect width="800" height="380" fill="url(#grid)"/>
+        <rect width="1000" height="500" fill="url(#oceanBg)"/>
+        <rect width="1000" height="500" fill="url(#oceanGrid)"/>
 
-        <!-- Kıtalar — gerçekçi sadeleştirilmiş hatlar (Robinson projeksiyonuna yakın) -->
-        <g fill="#2d6a4f" stroke="#52b788" stroke-width="0.8" opacity="0.92">
-          <!-- Kuzey Amerika (Alaska + Kanada + ABD + Meksika) -->
-          <path d="M 60,60 Q 90,55 130,62 L 175,70 Q 210,75 240,90 L 250,120 Q 245,150 225,165 L 200,170 L 175,168 L 150,178 L 130,200 Q 115,215 105,210 L 95,195 L 100,170 L 90,150 L 75,135 L 65,115 L 55,90 Z" />
+        <!-- KITALAR (Mercator-yakın gerçekçi hatlar) -->
+        <g fill="#3a7a4a" stroke="#5fa372" stroke-width="0.6" opacity="0.95">
+          <!-- KUZEY AMERİKA (Alaska + Kanada + ABD + Meksika) -->
+          <path d="M 70,90 Q 100,82 135,80 L 165,82 Q 195,86 220,92 L 245,100 Q 268,108 285,125 L 290,150 Q 285,172 270,188 L 250,195 L 230,200 L 215,210 L 220,232 Q 220,250 213,265 L 205,275 L 196,270 L 192,255 L 190,235 L 184,218 L 175,210 L 162,205 L 148,200 L 132,193 L 118,185 L 105,175 L 92,160 L 82,145 L 75,128 L 68,110 Z"/>
+          <!-- Florida çıkıntısı -->
+          <path d="M 240,210 L 244,232 L 238,238 L 234,222 L 236,212 Z"/>
           <!-- Orta Amerika -->
-          <path d="M 175,200 L 195,215 L 200,240 L 185,245 L 170,225 Z"/>
-          <!-- Güney Amerika -->
-          <path d="M 215,235 Q 240,232 260,250 L 270,285 Q 268,315 248,340 L 230,355 L 215,340 L 210,315 L 205,285 L 207,260 Z"/>
-          <!-- Grönland -->
-          <path d="M 305,40 Q 325,35 345,45 L 350,75 L 340,90 L 320,88 L 308,70 Z"/>
-          <!-- Avrupa (İskandinavya + Batı + İtalya + İspanya) -->
-          <path d="M 380,55 L 405,50 L 425,65 L 420,82 L 410,88 Z M 388,95 Q 405,90 430,98 L 450,110 L 470,108 L 478,125 L 460,135 L 445,138 L 425,128 L 405,120 L 390,115 Z"/>
-          <!-- İngiltere/İrlanda -->
-          <path d="M 365,90 L 380,88 L 382,108 L 372,114 L 363,108 Z"/>
-          <!-- Afrika -->
-          <path d="M 410,150 Q 445,145 480,155 L 500,170 L 510,200 L 505,235 L 490,265 L 470,290 L 445,295 L 425,280 L 410,250 L 405,215 L 408,180 Z"/>
-          <!-- Madagaskar -->
-          <path d="M 522,255 L 532,275 L 530,295 L 522,300 L 518,278 Z"/>
-          <!-- Asya gövde (Türkiye'den Sibirya'ya) -->
-          <path d="M 460,90 L 510,80 Q 580,70 640,80 L 700,90 L 730,110 L 715,130 L 690,140 L 650,138 L 600,135 L 555,128 L 510,118 L 480,115 L 465,108 Z"/>
-          <!-- Hindistan -->
-          <path d="M 580,150 L 610,155 L 620,175 L 615,200 L 595,210 L 580,195 L 575,170 Z"/>
-          <!-- Çin/Güneydoğu Asya -->
-          <path d="M 625,140 Q 660,135 695,145 L 715,165 L 705,185 L 680,195 L 650,190 L 625,170 Z"/>
-          <!-- Endonezya/Malezya adaları -->
-          <path d="M 680,210 L 720,215 L 740,228 L 720,235 L 690,232 L 670,220 Z"/>
-          <path d="M 745,225 L 755,235 L 750,245 L 740,242 Z"/>
-          <!-- Japonya -->
-          <path d="M 738,115 L 748,128 L 745,145 L 735,142 L 730,125 Z"/>
-          <!-- Avustralya -->
-          <path d="M 690,260 Q 720,255 755,265 L 770,285 L 760,300 L 730,305 L 700,298 L 685,280 Z"/>
-          <!-- Yeni Zelanda -->
-          <path d="M 775,310 L 783,320 L 780,335 L 772,330 Z"/>
+          <path d="M 210,278 L 222,285 L 232,298 L 248,312 L 258,325 L 252,330 L 240,322 L 228,308 L 218,295 L 210,285 Z"/>
+          <!-- GÜNEY AMERİKA -->
+          <path d="M 268,332 Q 290,328 312,344 L 328,372 Q 332,402 322,432 L 308,460 L 295,478 L 285,485 L 278,478 L 270,460 L 264,440 L 260,415 L 258,390 L 262,365 L 266,348 Z"/>
+          <!-- GRÖNLAND -->
+          <path d="M 380,55 Q 410,52 432,62 L 440,82 L 432,105 L 412,112 L 392,102 L 382,80 Z"/>
+          <!-- İZLANDA -->
+          <path d="M 478,88 L 498,85 L 502,98 L 488,103 L 478,98 Z"/>
+          <!-- BRİTANYA + İRLANDA -->
+          <path d="M 502,128 L 518,125 L 524,148 L 514,155 L 504,148 L 502,135 Z"/>
+          <path d="M 488,142 L 498,142 L 500,156 L 488,158 L 487,148 Z"/>
+          <!-- İSKANDİNAVYA -->
+          <path d="M 542,80 Q 562,75 580,82 L 590,100 L 585,118 L 568,128 L 552,125 L 542,108 L 538,92 Z"/>
+          <!-- BATI/ORTA AVRUPA (Fransa, Almanya, Polonya, Doğu) -->
+          <path d="M 510,158 Q 535,155 565,160 L 595,165 L 615,170 L 620,180 L 605,188 L 580,190 L 555,188 L 530,182 L 515,175 L 510,168 Z"/>
+          <!-- İBER (İspanya/Portekiz) -->
+          <path d="M 488,178 L 510,178 L 515,195 L 502,205 L 488,200 L 484,188 Z"/>
+          <!-- İTALYA (çizme) -->
+          <path d="M 558,192 L 568,195 L 572,212 L 580,222 L 575,230 L 567,225 L 562,212 L 558,200 Z"/>
+          <!-- TÜRKİYE / ANADOLU -->
+          <path d="M 612,192 Q 640,188 668,192 L 678,200 L 672,212 L 650,215 L 622,212 L 608,205 L 605,198 Z"/>
+          <!-- AFRİKA -->
+          <path d="M 502,222 Q 540,218 578,225 L 605,238 L 622,260 L 632,290 L 632,322 L 625,355 L 615,385 L 600,408 L 580,420 L 558,418 L 540,402 L 528,375 L 520,345 L 512,315 L 505,285 L 502,255 L 500,235 Z"/>
+          <!-- MADAGASKAR -->
+          <path d="M 658,348 L 670,372 L 668,398 L 656,398 L 652,378 L 654,358 Z"/>
+          <!-- SİBİRYA / RUSYA -->
+          <path d="M 590,98 Q 640,90 700,92 L 770,98 L 830,108 L 880,122 L 905,138 L 895,158 L 870,168 L 830,168 L 790,165 L 750,162 L 712,158 L 680,152 L 648,145 L 622,135 L 600,120 Z"/>
+          <!-- ÇİN + DOĞU ASYA -->
+          <path d="M 720,170 Q 760,168 800,175 L 830,185 L 845,200 L 838,220 L 815,232 L 785,232 L 755,225 L 730,212 L 720,195 Z"/>
+          <!-- HİNDİSTAN -->
+          <path d="M 698,212 L 725,218 L 740,242 L 738,272 L 720,285 L 700,278 L 690,255 L 690,232 Z"/>
+          <!-- GÜNEYDOĞU ASYA (Tayland/Vietnam) -->
+          <path d="M 768,238 L 790,242 L 802,260 L 798,278 L 782,278 L 772,260 Z"/>
+          <!-- ENDONEZYA / MALEZYA -->
+          <path d="M 790,295 Q 820,292 855,298 L 880,308 L 870,318 L 838,322 L 810,318 L 792,310 Z"/>
+          <path d="M 858,310 L 880,312 L 885,322 L 870,325 Z"/>
+          <!-- FİLİPİNLER -->
+          <path d="M 870,260 L 880,272 L 880,290 L 870,288 L 866,275 Z"/>
+          <!-- JAPONYA -->
+          <path d="M 905,170 L 922,182 L 930,205 L 920,218 L 905,212 L 898,192 Z"/>
+          <!-- AVUSTRALYA -->
+          <path d="M 838,360 Q 875,355 915,365 L 945,378 L 950,398 L 932,412 L 895,418 L 862,412 L 838,398 L 832,378 Z"/>
+          <!-- YENİ ZELANDA -->
+          <path d="M 968,432 L 978,442 L 974,458 L 964,452 Z"/>
         </g>
 
-        <!-- Denizaltı kablo rotaları (animated dashed lines) -->
-        <g stroke="#ffe600" stroke-width="1.6" fill="none" opacity="0.85" stroke-dasharray="6 5" stroke-linecap="round">
-          <!-- Atlantik (NYC → Londra) -->
-          <path d="M 215,150 Q 290,115 380,108"/>
-          <!-- Atlantik güney (NYC → Lizbon → Afrika) -->
-          <path d="M 215,165 Q 290,180 380,165"/>
-          <!-- Akdeniz (İstanbul → Mısır → Hindistan) -->
-          <path d="M 470,135 Q 510,165 555,180 Q 580,185 600,180"/>
-          <!-- Hint Okyanusu (Afrika → Hindistan) -->
-          <path d="M 495,225 Q 540,215 590,200"/>
-          <!-- Pasifik (Japonya → ABD batı kıyısı) -->
-          <path d="M 745,135 Q 600,90 230,120" />
-          <!-- Pasifik güney (Avustralya → ABD) -->
-          <path d="M 700,275 Q 500,280 245,260"/>
-          <!-- Avrupa-Asya iç hat -->
-          <path d="M 460,118 Q 540,108 645,120"/>
-          <animate attributeName="stroke-dashoffset" values="0;-22" dur="1.8s" repeatCount="indefinite"/>
+        <!-- GERÇEK DENİZALTI KABLOLARI (rotalar yaklaşık ama doğru) -->
+        <!-- Veri kaynağı: TeleGeography Submarine Cable Map -->
+        <g stroke="#ffe600" stroke-width="2" fill="none" opacity="0.85" stroke-dasharray="7 5" stroke-linecap="round">
+          <!-- MAREA + Dunant: NYC ↔ Bilbao (Atlantik) -->
+          <path d="M 245,210 Q 340,215 488,200"/>
+          <!-- TAT-14: NYC ↔ İngiltere -->
+          <path d="M 245,200 Q 340,180 502,148"/>
+          <!-- AAE-1 + SEA-ME-WE-5: Marsilya → İstanbul → Süveyş → Mumbai → Singapur -->
+          <path d="M 545,200 Q 600,200 638,202 Q 670,210 685,250 Q 695,290 750,295"/>
+          <!-- Türkiye Akdeniz hattı: İstanbul → Mısır → Hindistan -->
+          <path d="M 638,202 Q 615,235 605,260 Q 605,290 690,260"/>
+          <!-- KAFOS: Türkiye → Köstence (Karadeniz altı) -->
+          <path d="M 638,202 Q 642,180 615,168"/>
+          <!-- 2Africa: Avrupa → Afrika çevresi → Hindistan -->
+          <path d="M 502,205 Q 510,290 540,395 Q 600,420 660,400 Q 700,360 700,260"/>
+          <!-- JUPITER + FASTER: Tokyo → ABD batı kıyısı (Pasifik kuzey) -->
+          <path d="M 920,205 Q 700,165 245,225"/>
+          <!-- Hawaiki / Southern Cross: Sydney → Yeni Zelanda → ABD batı -->
+          <path d="M 880,395 Q 940,425 970,440"/>
+          <path d="M 880,395 Q 700,330 250,265"/>
+          <!-- INDIGO: Avustralya → Singapur -->
+          <path d="M 870,378 Q 855,330 855,300"/>
+          <!-- SEA-US: Endonezya → Filipinler → Guam → ABD batı -->
+          <path d="M 855,310 Q 875,275 880,265"/>
+          <animate attributeName="stroke-dashoffset" values="0;-24" dur="1.8s" repeatCount="indefinite"/>
         </g>
 
-        <!-- Büyük veri merkezleri / kablo bağlantı noktaları -->
+        <!-- Veri merkezleri / büyük şehirler (animated pulse) -->
         <g>
-          <circle cx="215" cy="150" r="3" fill="#ff6b6b"/>
-          <circle cx="215" cy="150" r="6" fill="none" stroke="#ff6b6b" stroke-width="1" opacity="0.5">
-            <animate attributeName="r" values="3;9;3" dur="2s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" repeatCount="indefinite"/>
+          <!-- NYC -->
+          <circle cx="245" cy="210" r="4" fill="#ff6b6b"/>
+          <circle cx="245" cy="210" r="8" fill="none" stroke="#ff6b6b" stroke-width="1.2" opacity="0.6">
+            <animate attributeName="r" values="4;12;4" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.7;0;0.7" dur="2s" repeatCount="indefinite"/>
           </circle>
-          <circle cx="380" cy="108" r="3" fill="#ff6b6b"/>
-          <circle cx="470" cy="135" r="3" fill="#ffe600"/>
-          <circle cx="470" cy="135" r="6" fill="none" stroke="#ffe600" stroke-width="1" opacity="0.5">
-            <animate attributeName="r" values="3;9;3" dur="2s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" repeatCount="indefinite"/>
+          <!-- Londra -->
+          <circle cx="514" cy="142" r="4" fill="#ff6b6b"/>
+          <!-- Marsilya -->
+          <circle cx="555" cy="195" r="3.5" fill="#ff6b6b"/>
+          <!-- İstanbul (vurgu — sarı) -->
+          <circle cx="638" cy="202" r="5" fill="#ffe600"/>
+          <circle cx="638" cy="202" r="9" fill="none" stroke="#ffe600" stroke-width="1.5" opacity="0.7">
+            <animate attributeName="r" values="5;14;5" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.8;0;0.8" dur="2s" repeatCount="indefinite"/>
           </circle>
-          <circle cx="600" cy="180" r="3" fill="#ff6b6b"/>
-          <circle cx="745" cy="135" r="3" fill="#ff6b6b"/>
-          <circle cx="700" cy="275" r="3" fill="#ff6b6b"/>
+          <!-- Mumbai -->
+          <circle cx="710" cy="258" r="4" fill="#ff6b6b"/>
+          <!-- Singapur -->
+          <circle cx="810" cy="298" r="4" fill="#ff6b6b"/>
+          <!-- Tokyo -->
+          <circle cx="920" cy="205" r="4" fill="#ff6b6b"/>
+          <circle cx="920" cy="205" r="8" fill="none" stroke="#ff6b6b" stroke-width="1.2" opacity="0.6">
+            <animate attributeName="r" values="4;12;4" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.7;0;0.7" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Sydney -->
+          <circle cx="880" cy="395" r="4" fill="#ff6b6b"/>
         </g>
 
         <!-- Kıta etiketleri -->
-        <g fill="rgba(255,255,255,0.78)" font-size="11" font-family="Exo 2, Arial, sans-serif" font-weight="600" text-anchor="middle" letter-spacing="0.5">
-          <text x="150" y="125">K. AMERİKA</text>
-          <text x="240" y="295">G. AMERİKA</text>
-          <text x="425" y="85">AVRUPA</text>
-          <text x="455" y="225">AFRİKA</text>
-          <text x="615" y="115">ASYA</text>
-          <text x="725" y="290">AVUSTRALYA</text>
+        <g fill="rgba(255,255,255,0.85)" font-size="13" font-family="Exo 2, Arial, sans-serif" font-weight="700" text-anchor="middle" letter-spacing="0.8">
+          <text x="178" y="172">K. AMERİKA</text>
+          <text x="298" y="412">G. AMERİKA</text>
+          <text x="555" y="170">AVRUPA</text>
+          <text x="572" y="318">AFRİKA</text>
+          <text x="785" y="158">ASYA</text>
+          <text x="892" y="445">AVUSTRALYA</text>
         </g>
-        <!-- Önemli şehirler -->
-        <g fill="#ffe600" font-size="9" font-family="Exo 2, Arial, sans-serif" font-weight="700">
-          <text x="222" y="146">⬤ NYC</text>
-          <text x="386" y="105">⬤ Londra</text>
-          <text x="476" y="132">⬤ İstanbul</text>
-          <text x="606" y="178">⬤ Mumbai</text>
-          <text x="751" y="132">⬤ Tokyo</text>
-          <text x="704" y="273">⬤ Sydney</text>
+
+        <!-- Şehir etiketleri -->
+        <g fill="#ffe600" font-size="11" font-family="Exo 2, Arial, sans-serif" font-weight="700">
+          <text x="252" y="206">NYC</text>
+          <text x="521" y="138">Londra</text>
+          <text x="562" y="191">Marsilya</text>
+          <text x="645" y="198">İSTANBUL</text>
+          <text x="717" y="254">Mumbai</text>
+          <text x="817" y="294">Singapur</text>
+          <text x="927" y="201">Tokyo</text>
+          <text x="887" y="391">Sydney</text>
         </g>
       </svg>
+
+      <!-- Türkiye'nin denizaltı kablo bağlantısı (gerçek bilgi) -->
+      <div style="margin-top:18px; padding:14px 18px; background:rgba(255,230,0,0.08); border:1px solid rgba(255,230,0,0.35); border-radius:10px; max-width:1000px; margin-left:auto; margin-right:auto;">
+        <div style="font-family:'Chakra Petch'; font-weight:700; font-size:1rem; color:var(--primary); margin-bottom:6px; text-align:center;">
+          🇹🇷 TÜRKİYE NEREDEN BAĞLANIYOR?
+        </div>
+        <div style="font-size:0.95rem; line-height:1.55; color:rgba(255,255,255,0.88); text-align:center;">
+          İstanbul, dünya internetinin en önemli geçiş noktalarından biri. Kablolar Karadeniz'in dibinden Romanya'ya, Akdeniz'in dibinden de Mısır'a oradan da Hindistan'a uzanıyor.
+        </div>
+      </div>
 
       <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-top:10px;">
         <div style="text-align:center; padding:14px; background:rgba(0,255,200,0.08); border:1px solid rgba(0,255,200,0.3); border-radius:8px;">
@@ -3892,7 +3942,6 @@ body .hud, body .bottom-nav {
         <div class="quote-card">"Hayal gücü, bilgiden daha önemlidir."<span class="quote-author">— EINSTEIN</span></div>
         <div class="quote-card">"Kalbinin ve sezgilerinin peşinden git."<span class="quote-author">— STEVE JOBS</span></div>
         <div class="quote-card">"İmkansız olan gerçekte imkan değildir."<span class="quote-author">— ELON MUSK</span></div>
-        <div class="quote-card">"Mühendislik milletin geleceğidir."<span class="quote-author">— S. BAYRAKTAR</span></div>
       </div>
 
       <div class="final-cta" onclick="goToQuiz()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goToQuiz();}">🎯 SIRADA QUIZ VAR — BİLDİĞİNİ GÖSTER!</div>
