@@ -233,7 +233,7 @@ body { height: 100dvh; }
   min-height: 100%;
   display: flex; flex-direction: column;
   align-items: center;
-  justify-content: safe center;   /* uzun içerikte üst scroll erişilebilir kalır */
+  justify-content: flex-start;   /* scroll erişilebilir kalsın */
   opacity: 0; pointer-events: none;
   transition: opacity 0.45s ease;
   padding: 72px 60px 62px;
@@ -243,6 +243,13 @@ body { height: 100dvh; }
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   touch-action: pan-y;
+}
+/* Pseudo-element trick: yer varsa içeriği dikey merkeze al, yer yoksa
+   esneklikle 0'a sıkışır ve scroll erişilebilir kalır */
+.slide::before, .slide::after {
+  content: '';
+  flex: 1 1 0;
+  min-height: 0;
 }
 .slide.active { opacity: 1; pointer-events: all; }
 /* Scrollbar gizle */
@@ -1876,6 +1883,8 @@ input[type=range].sslider::-webkit-slider-thumb {
     min-height: 100dvh;
     overflow: visible;
   }
+  /* Mobilde pseudo spacer'ları kapat — body scroll yapıyor */
+  .slide::before, .slide::after { display: none; }
   .slide {
     position: static;
     display: none;         /* Sadece .active göster */
@@ -2454,29 +2463,109 @@ body .hud, body .bottom-nav {
         🌊 DENİZİN DİBİNDEKİ DEV AĞ
       </div>
 
-      <svg viewBox="0 0 800 300" style="width:100%; max-height:280px; margin-bottom:20px;" xmlns="http://www.w3.org/2000/svg">
-        <rect width="800" height="300" fill="#0a1a3a" opacity="0.4"/>
-        <g fill="#2a4060" opacity="0.7">
-          <path d="M 80 80 Q 130 70 180 90 L 200 150 L 160 200 L 100 180 Z"/>
-          <path d="M 150 210 L 200 220 L 180 280 L 130 270 Z"/>
-          <path d="M 360 80 Q 420 70 480 90 L 500 130 L 440 150 L 380 140 Z"/>
-          <path d="M 400 150 L 470 160 L 460 250 L 410 270 Z"/>
-          <path d="M 520 90 Q 600 80 680 100 L 700 170 L 620 180 L 540 150 Z"/>
-          <path d="M 620 200 L 700 210 L 690 260 L 630 250 Z"/>
+      <svg viewBox="0 0 800 380" style="width:100%; max-height:340px; margin-bottom:20px;" xmlns="http://www.w3.org/2000/svg">
+        <!-- Okyanus zemin (gradient) -->
+        <defs>
+          <linearGradient id="oceanBg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0a2540"/>
+            <stop offset="100%" stop-color="#0c3a6e"/>
+          </linearGradient>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(120,180,220,0.1)" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="800" height="380" fill="url(#oceanBg)"/>
+        <rect width="800" height="380" fill="url(#grid)"/>
+
+        <!-- Kıtalar — gerçekçi sadeleştirilmiş hatlar (Robinson projeksiyonuna yakın) -->
+        <g fill="#2d6a4f" stroke="#52b788" stroke-width="0.8" opacity="0.92">
+          <!-- Kuzey Amerika (Alaska + Kanada + ABD + Meksika) -->
+          <path d="M 60,60 Q 90,55 130,62 L 175,70 Q 210,75 240,90 L 250,120 Q 245,150 225,165 L 200,170 L 175,168 L 150,178 L 130,200 Q 115,215 105,210 L 95,195 L 100,170 L 90,150 L 75,135 L 65,115 L 55,90 Z" />
+          <!-- Orta Amerika -->
+          <path d="M 175,200 L 195,215 L 200,240 L 185,245 L 170,225 Z"/>
+          <!-- Güney Amerika -->
+          <path d="M 215,235 Q 240,232 260,250 L 270,285 Q 268,315 248,340 L 230,355 L 215,340 L 210,315 L 205,285 L 207,260 Z"/>
+          <!-- Grönland -->
+          <path d="M 305,40 Q 325,35 345,45 L 350,75 L 340,90 L 320,88 L 308,70 Z"/>
+          <!-- Avrupa (İskandinavya + Batı + İtalya + İspanya) -->
+          <path d="M 380,55 L 405,50 L 425,65 L 420,82 L 410,88 Z M 388,95 Q 405,90 430,98 L 450,110 L 470,108 L 478,125 L 460,135 L 445,138 L 425,128 L 405,120 L 390,115 Z"/>
+          <!-- İngiltere/İrlanda -->
+          <path d="M 365,90 L 380,88 L 382,108 L 372,114 L 363,108 Z"/>
+          <!-- Afrika -->
+          <path d="M 410,150 Q 445,145 480,155 L 500,170 L 510,200 L 505,235 L 490,265 L 470,290 L 445,295 L 425,280 L 410,250 L 405,215 L 408,180 Z"/>
+          <!-- Madagaskar -->
+          <path d="M 522,255 L 532,275 L 530,295 L 522,300 L 518,278 Z"/>
+          <!-- Asya gövde (Türkiye'den Sibirya'ya) -->
+          <path d="M 460,90 L 510,80 Q 580,70 640,80 L 700,90 L 730,110 L 715,130 L 690,140 L 650,138 L 600,135 L 555,128 L 510,118 L 480,115 L 465,108 Z"/>
+          <!-- Hindistan -->
+          <path d="M 580,150 L 610,155 L 620,175 L 615,200 L 595,210 L 580,195 L 575,170 Z"/>
+          <!-- Çin/Güneydoğu Asya -->
+          <path d="M 625,140 Q 660,135 695,145 L 715,165 L 705,185 L 680,195 L 650,190 L 625,170 Z"/>
+          <!-- Endonezya/Malezya adaları -->
+          <path d="M 680,210 L 720,215 L 740,228 L 720,235 L 690,232 L 670,220 Z"/>
+          <path d="M 745,225 L 755,235 L 750,245 L 740,242 Z"/>
+          <!-- Japonya -->
+          <path d="M 738,115 L 748,128 L 745,145 L 735,142 L 730,125 Z"/>
+          <!-- Avustralya -->
+          <path d="M 690,260 Q 720,255 755,265 L 770,285 L 760,300 L 730,305 L 700,298 L 685,280 Z"/>
+          <!-- Yeni Zelanda -->
+          <path d="M 775,310 L 783,320 L 780,335 L 772,330 Z"/>
         </g>
-        <g stroke="#ffe600" stroke-width="1.5" fill="none" opacity="0.8" stroke-dasharray="4 4">
-          <path d="M 180 130 Q 280 100 380 120"/>
-          <path d="M 180 170 Q 280 220 380 200"/>
-          <path d="M 500 120 Q 570 100 620 130"/>
-          <path d="M 450 200 Q 540 230 620 220"/>
-          <path d="M 700 160 Q 750 200 700 240"/>
-          <animate attributeName="stroke-dashoffset" values="0;-16" dur="1.5s" repeatCount="indefinite"/>
+
+        <!-- Denizaltı kablo rotaları (animated dashed lines) -->
+        <g stroke="#ffe600" stroke-width="1.6" fill="none" opacity="0.85" stroke-dasharray="6 5" stroke-linecap="round">
+          <!-- Atlantik (NYC → Londra) -->
+          <path d="M 215,150 Q 290,115 380,108"/>
+          <!-- Atlantik güney (NYC → Lizbon → Afrika) -->
+          <path d="M 215,165 Q 290,180 380,165"/>
+          <!-- Akdeniz (İstanbul → Mısır → Hindistan) -->
+          <path d="M 470,135 Q 510,165 555,180 Q 580,185 600,180"/>
+          <!-- Hint Okyanusu (Afrika → Hindistan) -->
+          <path d="M 495,225 Q 540,215 590,200"/>
+          <!-- Pasifik (Japonya → ABD batı kıyısı) -->
+          <path d="M 745,135 Q 600,90 230,120" />
+          <!-- Pasifik güney (Avustralya → ABD) -->
+          <path d="M 700,275 Q 500,280 245,260"/>
+          <!-- Avrupa-Asya iç hat -->
+          <path d="M 460,118 Q 540,108 645,120"/>
+          <animate attributeName="stroke-dashoffset" values="0;-22" dur="1.8s" repeatCount="indefinite"/>
         </g>
-        <g fill="#b8c5d6" font-size="10" font-family="Exo 2, sans-serif">
-          <text x="120" y="140">K. Amerika</text>
-          <text x="410" y="110">Avrupa</text>
-          <text x="420" y="220">Afrika</text>
-          <text x="600" y="150">Asya</text>
+
+        <!-- Büyük veri merkezleri / kablo bağlantı noktaları -->
+        <g>
+          <circle cx="215" cy="150" r="3" fill="#ff6b6b"/>
+          <circle cx="215" cy="150" r="6" fill="none" stroke="#ff6b6b" stroke-width="1" opacity="0.5">
+            <animate attributeName="r" values="3;9;3" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="380" cy="108" r="3" fill="#ff6b6b"/>
+          <circle cx="470" cy="135" r="3" fill="#ffe600"/>
+          <circle cx="470" cy="135" r="6" fill="none" stroke="#ffe600" stroke-width="1" opacity="0.5">
+            <animate attributeName="r" values="3;9;3" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="600" cy="180" r="3" fill="#ff6b6b"/>
+          <circle cx="745" cy="135" r="3" fill="#ff6b6b"/>
+          <circle cx="700" cy="275" r="3" fill="#ff6b6b"/>
+        </g>
+
+        <!-- Kıta etiketleri -->
+        <g fill="rgba(255,255,255,0.78)" font-size="11" font-family="Exo 2, Arial, sans-serif" font-weight="600" text-anchor="middle" letter-spacing="0.5">
+          <text x="150" y="125">K. AMERİKA</text>
+          <text x="240" y="295">G. AMERİKA</text>
+          <text x="425" y="85">AVRUPA</text>
+          <text x="455" y="225">AFRİKA</text>
+          <text x="615" y="115">ASYA</text>
+          <text x="725" y="290">AVUSTRALYA</text>
+        </g>
+        <!-- Önemli şehirler -->
+        <g fill="#ffe600" font-size="9" font-family="Exo 2, Arial, sans-serif" font-weight="700">
+          <text x="222" y="146">⬤ NYC</text>
+          <text x="386" y="105">⬤ Londra</text>
+          <text x="476" y="132">⬤ İstanbul</text>
+          <text x="606" y="178">⬤ Mumbai</text>
+          <text x="751" y="132">⬤ Tokyo</text>
+          <text x="704" y="273">⬤ Sydney</text>
         </g>
       </svg>
 
