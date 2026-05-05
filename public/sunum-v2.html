@@ -440,6 +440,14 @@ body { height: 100dvh; }
   display: flex; align-items: center; justify-content: center; gap: 6px;
 }
 .counter-group-label.tr-label { margin-top: 18px; }
+.tr-flag {
+  width: 22px; height: 14px;
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
 .counter-source {
   font-size: clamp(10px, 0.95vw, 12px);
   color: rgba(255,255,255,0.5);
@@ -2338,7 +2346,15 @@ body .hud, body .bottom-nav {
         </div>
       </div>
 
-      <div class="counter-group-label tr-label" aria-label="Türkiye istatistikleri">🇹🇷 TÜRKİYE</div>
+      <div class="counter-group-label tr-label" aria-label="Türkiye istatistikleri">
+        <svg class="tr-flag" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="30" height="20" fill="#E30A17"/>
+          <circle cx="11" cy="10" r="5" fill="#fff"/>
+          <circle cx="12.5" cy="10" r="4" fill="#E30A17"/>
+          <polygon fill="#fff" points="17.6,10 21.1,8.86 18.94,11.83 18.94,8.17 21.1,11.14"/>
+        </svg>
+        TÜRKİYE
+      </div>
       <div class="live-counters" role="group" aria-label="Türkiye'de günlük istatistikler">
         <div class="lc-box">
           <div class="lc-num" id="lc4" aria-live="polite">0</div>
