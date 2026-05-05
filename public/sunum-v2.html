@@ -2479,10 +2479,10 @@ body .hud, body .bottom-nav {
         <!-- GERÇEK DETAYLI DÜNYA HARİTASI (Wikimedia public domain — yeşile boyandı) -->
         <image href="/world-map.svg" x="0" y="0" width="4378" height="2435" opacity="0.95"/>
 
-        <!-- TÜRKİYE TURUNCU VURGU (Anadolu yarımadasını kapatan halo) -->
+        <!-- TÜRKİYE TURUNCU VURGU (Anadolu yarımadası — daha sola/yukarı, doğru pozisyona) -->
         <g>
-          <ellipse cx="2542" cy="700" rx="180" ry="80" fill="#f97316" opacity="0.45"/>
-          <ellipse cx="2542" cy="700" rx="180" ry="80" fill="none" stroke="#ea580c" stroke-width="6" opacity="0.7"/>
+          <ellipse cx="2470" cy="640" rx="190" ry="80" fill="#f97316" opacity="0.4"/>
+          <ellipse cx="2470" cy="640" rx="190" ry="80" fill="none" stroke="#ea580c" stroke-width="6" opacity="0.75"/>
         </g>
 
         <!-- GERÇEK DENİZALTI KABLOLARI (kaynak: TeleGeography Submarine Cable Map) -->
@@ -2511,17 +2511,17 @@ body .hud, body .bottom-nav {
 
           <!-- ═══════ AKDENİZ + SÜVEYŞ HATTI ═══════ -->
           <!-- SEA-ME-WE-5: Marsilya → İstanbul → Mısır → Mumbai -->
-          <path d="M 2249,636 C 2350,650 2450,658 2542,663"/>
+          <path d="M 2249,636 C 2300,640 2370,620 2420,610"/>
           <!-- AAE-1: Marsilya → Süveyş → Mumbai -->
           <path d="M 2249,636 C 2400,720 2500,810 2578,812 C 2750,860 2900,920 3065,961"/>
           <!-- TURCYOS: İstanbul → Kıbrıs → Mısır -->
-          <path d="M 2542,663 C 2580,750 2600,790 2578,812"/>
+          <path d="M 2420,610 C 2480,720 2560,790 2578,812"/>
           <!-- İtalya → Mısır (MedLoop) -->
           <path d="M 2400,690 C 2480,760 2540,800 2566,812"/>
 
           <!-- ═══════ KARADENİZ HATTI ═══════ -->
           <!-- KAFOS: İstanbul → Köstence (Karadeniz altı) -->
-          <path d="M 2542,663 C 2530,640 2520,625 2530,622"/>
+          <path d="M 2420,610 C 2410,580 2400,565 2440,560"/>
 
           <!-- ═══════ HİNDİSTAN OKYANUSU ═══════ -->
           <!-- Mumbai → Singapur (SEA-ME-WE devamı) -->
@@ -2578,9 +2578,9 @@ body .hud, body .bottom-nav {
           </circle>
           <!-- Marsilya (5,43) -->
           <circle cx="2249" cy="636" r="14" fill="#ef4444"/>
-          <!-- İSTANBUL (29,41) — BÜYÜK SARI VURGU -->
-          <circle cx="2542" cy="663" r="28" fill="#fbbf24" stroke="#92400e" stroke-width="6"/>
-          <circle cx="2542" cy="663" r="50" fill="none" stroke="#fbbf24" stroke-width="8" opacity="0.7">
+          <!-- İSTANBUL — BÜYÜK SARI VURGU (Türkiye'nin kuzey-batısına, Boğaz'a) -->
+          <circle cx="2420" cy="610" r="28" fill="#fbbf24" stroke="#92400e" stroke-width="6"/>
+          <circle cx="2420" cy="610" r="50" fill="none" stroke="#fbbf24" stroke-width="8" opacity="0.7">
             <animate attributeName="r" values="28;75;28" dur="2s" repeatCount="indefinite"/>
             <animate attributeName="opacity" values="0.9;0;0.9" dur="2s" repeatCount="indefinite"/>
           </circle>
@@ -2613,8 +2613,10 @@ body .hud, body .bottom-nav {
             <text x="3892" y="700">Tokyo</text>
             <text x="4025" y="1740">Sydney</text>
           </g>
-          <!-- İSTANBUL (büyük, turuncu vurgu) -->
-          <text x="2542" y="617" fill="#fff7ed" stroke="#7c2d12" stroke-width="11" paint-order="stroke" font-size="82" font-weight="900">İSTANBUL</text>
+          <!-- İSTANBUL etiketi: noktanın SAĞ ÜSTÜNDE (Marsilya etiketini örtmesin) -->
+          <text x="2475" y="555" fill="#fff7ed" stroke="#7c2d12" stroke-width="11" paint-order="stroke" font-size="82" font-weight="900" text-anchor="start">İSTANBUL</text>
+          <!-- İstanbul'dan etiketin yanına ince çizgi (gösterge) -->
+          <line x1="2445" y1="595" x2="2475" y2="565" stroke="#92400e" stroke-width="3" opacity="0.7"/>
         </g>
       </svg>
 
