@@ -2486,30 +2486,79 @@ body .hud, body .bottom-nav {
         </g>
 
         <!-- GERÇEK DENİZALTI KABLOLARI (kaynak: TeleGeography Submarine Cable Map) -->
-        <!-- Şehir koordinatları equirectangular projection ile hesaplandı -->
-        <g stroke="#fbbf24" stroke-width="8" fill="none" opacity="0.92" stroke-dasharray="22 14" stroke-linecap="round">
-          <!-- MAREA / Dunant: NYC (-74,41) ↔ Bilbao (-3,43) — Atlantik -->
-          <path d="M 1289,663 C 1600,720 1900,710 2154,636"/>
-          <!-- TAT-14 / Grace Hopper: NYC ↔ Londra (0,51) -->
-          <path d="M 1289,663 C 1500,580 1900,540 2189,528"/>
-          <!-- SEA-ME-WE-5 + AAE-1: Marsilya (5,43) → İstanbul → Mumbai → Singapur -->
-          <path d="M 2249,636 C 2350,650 2440,660 2542,663 C 2620,750 2750,860 2900,950 C 3000,990 3050,995 3065,961 C 3150,1050 3300,1150 3454,1204"/>
-          <!-- TURCYOS + İstanbul Akdeniz hattı: İstanbul → Mısır → Mumbai -->
-          <path d="M 2542,710 C 2580,810 2620,900 2700,950 C 2900,980 3000,970 3065,961"/>
+        <!-- ~25 ana kablo rotası — gerçek hatlar ama tüm 500+ kablo değil -->
+        <g stroke="#fbbf24" stroke-width="6" fill="none" opacity="0.85" stroke-dasharray="22 14" stroke-linecap="round">
+
+          <!-- ═══════ ATLANTİK KUZEY (NYC ↔ Avrupa) — 5 kablo ═══════ -->
+          <!-- MAREA: NYC → Bilbao -->
+          <path d="M 1289,663 C 1500,720 1850,720 2154,636"/>
+          <!-- Dunant: NYC → Saint-Hilaire (Fransa) -->
+          <path d="M 1289,663 C 1550,690 1900,680 2200,615"/>
+          <!-- TAT-14: NYC → Bude (İngiltere) -->
+          <path d="M 1289,663 C 1500,560 1850,520 2128,542"/>
+          <!-- Grace Hopper: NYC → İngiltere/İspanya -->
+          <path d="M 1289,663 C 1450,640 1700,615 2189,528"/>
+          <!-- AEC-1: Boston → İrlanda -->
+          <path d="M 1325,649 C 1600,560 1850,540 2095,548"/>
+
+          <!-- ═══════ ATLANTİK GÜNEY ═══════ -->
+          <!-- SACS: Brezilya (Fortaleza) → Angola -->
+          <path d="M 1715,1272 C 1900,1300 2100,1280 2280,1240"/>
+          <!-- EllaLink: Brezilya → Portekiz -->
+          <path d="M 1763,1326 C 1900,1100 2000,900 2079,703"/>
+          <!-- SAex-2: Brezilya → Güney Afrika -->
+          <path d="M 1763,1326 C 1900,1500 2200,1650 2408,1678"/>
+
+          <!-- ═══════ AKDENİZ + SÜVEYŞ HATTI ═══════ -->
+          <!-- SEA-ME-WE-5: Marsilya → İstanbul → Mısır → Mumbai -->
+          <path d="M 2249,636 C 2350,650 2450,658 2542,663"/>
+          <!-- AAE-1: Marsilya → Süveyş → Mumbai -->
+          <path d="M 2249,636 C 2400,720 2500,810 2578,812 C 2750,860 2900,920 3065,961"/>
+          <!-- TURCYOS: İstanbul → Kıbrıs → Mısır -->
+          <path d="M 2542,663 C 2580,750 2600,790 2578,812"/>
+          <!-- İtalya → Mısır (MedLoop) -->
+          <path d="M 2400,690 C 2480,760 2540,800 2566,812"/>
+
+          <!-- ═══════ KARADENİZ HATTI ═══════ -->
           <!-- KAFOS: İstanbul → Köstence (Karadeniz altı) -->
-          <path d="M 2542,663 C 2530,600 2480,560 2440,540"/>
-          <!-- 2Africa: Avrupa → Afrika çevresi → Hindistan -->
-          <path d="M 2200,720 C 2150,1050 2200,1400 2350,1700 C 2600,1900 2900,1900 3050,1700 C 3150,1450 3120,1200 3065,961"/>
-          <!-- JUPITER + FASTER: Tokyo ↔ ABD batı (Pasifik kuzey) -->
-          <path d="M 3892,731 C 3300,500 2200,400 1100,500 C 900,560 850,650 1100,720"/>
-          <!-- Hawaiki: Sydney → Yeni Zelanda -->
-          <path d="M 4025,1678 C 4150,1750 4250,1780 4300,1750"/>
-          <!-- Sydney → ABD batı kıyısı (Pasifik) -->
-          <path d="M 4025,1678 C 3500,1500 2500,1300 1100,900"/>
-          <!-- INDIGO: Avustralya → Singapur -->
-          <path d="M 3950,1600 C 3800,1500 3600,1350 3454,1204"/>
-          <!-- SEA-US / SJC: Filipinler → Guam → ABD batı -->
-          <path d="M 3700,1100 C 3500,950 3200,800 2900,750"/>
+          <path d="M 2542,663 C 2530,640 2520,625 2530,622"/>
+
+          <!-- ═══════ HİNDİSTAN OKYANUSU ═══════ -->
+          <!-- Mumbai → Singapur (SEA-ME-WE devamı) -->
+          <path d="M 3065,961 C 3200,1050 3340,1130 3454,1204"/>
+          <!-- AAE-1 devamı: Hindistan → Tayland → Hong Kong -->
+          <path d="M 3065,961 C 3250,990 3450,950 3576,920"/>
+          <!-- SEA-ME-WE-3: Singapur → Perth (Avustralya batı) -->
+          <path d="M 3454,1204 C 3500,1350 3550,1500 3588,1651"/>
+
+          <!-- ═══════ AFRİKA ÇEVRESİ ═══════ -->
+          <!-- 2Africa: Avrupa → Batı Afrika → Cape Town → Doğu Afrika → Mumbai -->
+          <path d="M 2079,703 C 2080,900 2150,1100 2225,1280 C 2280,1500 2350,1650 2408,1700 C 2500,1720 2600,1550 2675,1272 C 2800,1100 2950,1000 3065,961"/>
+          <!-- WACS: Avrupa → Batı Afrika ülkeleri -->
+          <path d="M 2079,703 C 2100,900 2160,1080 2225,1137"/>
+
+          <!-- ═══════ PASİFİK KUZEY (Tokyo/HK ↔ ABD batı) ═══════ -->
+          <!-- JUPITER + FASTER: Tokyo → Oregon -->
+          <path d="M 3892,731 C 3500,650 1500,600 681,622"/>
+          <!-- PLCN: Hong Kong → LA -->
+          <path d="M 3576,920 C 3000,820 1500,760 754,758"/>
+          <!-- Trans-Pacific Express: Tokyo → LA -->
+          <path d="M 3892,731 C 3500,720 1500,740 754,758"/>
+
+          <!-- ═══════ PASİFİK GÜNEY ═══════ -->
+          <!-- Hawaiki: Sydney → Hawaii → ABD batı -->
+          <path d="M 4025,1678 C 3500,1300 1200,1000 754,758"/>
+          <!-- Southern Cross: Sydney → Yeni Zelanda -->
+          <path d="M 4025,1678 C 4150,1700 4250,1715 4317,1719"/>
+          <!-- SEA-US: Manila → Guam → ABD batı -->
+          <path d="M 3661,1015 C 3850,950 4100,800 4378,950"/>
+
+          <!-- ═══════ ÇİN/JAPONYA/KORE içi ═══════ -->
+          <!-- APG: Hong Kong → Şangay → Japonya -->
+          <path d="M 3576,920 C 3700,840 3800,780 3892,731"/>
+          <!-- Singapur → Hong Kong -->
+          <path d="M 3454,1204 C 3500,1100 3550,1000 3576,920"/>
+
           <animate attributeName="stroke-dashoffset" values="0;-72" dur="2.4s" repeatCount="indefinite"/>
         </g>
 
