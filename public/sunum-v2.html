@@ -2485,121 +2485,258 @@ body .hud, body .bottom-nav {
           <ellipse cx="2470" cy="640" rx="190" ry="80" fill="none" stroke="#ea580c" stroke-width="6" opacity="0.75"/>
         </g>
 
-        <!-- GERÇEK DENİZALTI KABLOLARI (kaynak: TeleGeography Submarine Cable Map) -->
-        <!-- ~25 ana kablo rotası — gerçek hatlar ama tüm 500+ kablo değil -->
-        <g stroke="#fbbf24" stroke-width="6" fill="none" opacity="0.85" stroke-dasharray="22 14" stroke-linecap="round">
+        <!-- GERÇEK DENİZALTI KABLO AĞI (kaynak: TeleGeography Submarine Cable Map) -->
+        <!-- ~55 ana kablo, gerçek koridorlardan, farklı renkler ile yoğun ağ görünümü -->
 
-          <!-- ═══════ ATLANTİK KUZEY (NYC ↔ Avrupa) — 5 kablo ═══════ -->
-          <!-- MAREA: NYC → Bilbao -->
+        <!-- ═══════════ ATLANTİK KUZEY (NYC bölgesi ↔ Avrupa) — sarı, çok yoğun ═══════════ -->
+        <g stroke="#fbbf24" stroke-width="3.5" fill="none" opacity="0.75" stroke-linecap="round">
+          <!-- NYC → İngiltere (Bude) — TAT-14, AEC-1, AEC-2 -->
+          <path d="M 1289,663 C 1500,560 1850,510 2128,542"/>
+          <path d="M 1289,663 C 1500,545 1830,500 2120,540"/>
+          <path d="M 1289,663 C 1480,575 1820,525 2125,545"/>
+          <!-- NYC → İrlanda (AEConnect, Hibernia, Apollo) -->
+          <path d="M 1325,649 C 1580,540 1830,500 2095,548"/>
+          <path d="M 1325,649 C 1600,555 1830,520 2090,553"/>
+          <!-- NYC → Fransa (Dunant, Amitié) -->
+          <path d="M 1289,663 C 1550,680 1900,650 2200,605"/>
+          <path d="M 1289,663 C 1560,690 1910,675 2210,615"/>
+          <!-- NYC → İspanya (MAREA, Grace Hopper) -->
           <path d="M 1289,663 C 1500,720 1850,720 2154,636"/>
-          <!-- Dunant: NYC → Saint-Hilaire (Fransa) -->
-          <path d="M 1289,663 C 1550,690 1900,680 2200,615"/>
-          <!-- TAT-14: NYC → Bude (İngiltere) -->
-          <path d="M 1289,663 C 1500,560 1850,520 2128,542"/>
-          <!-- Grace Hopper: NYC → İngiltere/İspanya -->
-          <path d="M 1289,663 C 1450,640 1700,615 2189,528"/>
-          <!-- AEC-1: Boston → İrlanda -->
-          <path d="M 1325,649 C 1600,560 1850,540 2095,548"/>
+          <path d="M 1289,663 C 1480,710 1830,710 2150,640"/>
+          <!-- NYC → Portekiz (EllaLink Atlantic) -->
+          <path d="M 1289,663 C 1500,755 1830,775 2079,703"/>
+          <!-- Miami → İngiltere (TGN-Atlantic) -->
+          <path d="M 1216,879 C 1450,800 1800,650 2128,542"/>
+          <!-- Miami → İspanya -->
+          <path d="M 1216,879 C 1500,820 1850,720 2154,636"/>
+        </g>
 
-          <!-- ═══════ ATLANTİK GÜNEY ═══════ -->
-          <!-- SACS: Brezilya (Fortaleza) → Angola -->
-          <path d="M 1715,1272 C 1900,1300 2100,1280 2280,1240"/>
-          <!-- EllaLink: Brezilya → Portekiz -->
+        <!-- ═══════════ ATLANTİK GÜNEY (Karayip + G. Amerika ↔ Afrika/Avrupa) — sarı ═══════════ -->
+        <g stroke="#fbbf24" stroke-width="3.5" fill="none" opacity="0.7" stroke-linecap="round">
+          <!-- Miami → Karayip → Brezilya (BRUSA, GlobeNet) -->
+          <path d="M 1216,879 C 1300,1000 1500,1100 1715,1272"/>
+          <!-- Brezilya → Portekiz (EllaLink) -->
           <path d="M 1763,1326 C 1900,1100 2000,900 2079,703"/>
-          <!-- SAex-2: Brezilya → Güney Afrika -->
+          <!-- Brezilya (Fortaleza) → Angola (SACS) -->
+          <path d="M 1715,1272 C 1900,1290 2100,1260 2280,1240"/>
+          <!-- Brezilya → Güney Afrika (SAEx-2, Atlantis-2) -->
           <path d="M 1763,1326 C 1900,1500 2200,1650 2408,1678"/>
+          <!-- Buenos Aires → Cape Town -->
+          <path d="M 1485,1678 C 1800,1750 2150,1750 2408,1678"/>
+        </g>
 
-          <!-- ═══════ AKDENİZ + SÜVEYŞ HATTI ═══════ -->
-          <!-- SEA-ME-WE-5: Marsilya → İstanbul → Mısır → Mumbai -->
+        <!-- ═══════════ AKDENİZ + SÜVEYŞ — turkuaz, çok yoğun (Türkiye dahil) ═══════════ -->
+        <g stroke="#06b6d4" stroke-width="3.5" fill="none" opacity="0.8" stroke-linecap="round">
+          <!-- Marsilya → İstanbul (SEA-ME-WE-5, AAE-1) -->
           <path d="M 2249,636 C 2300,640 2370,620 2420,610"/>
-          <!-- AAE-1: Marsilya → Süveyş → Mumbai -->
-          <path d="M 2249,636 C 2400,720 2500,810 2578,812 C 2750,860 2900,920 3065,961"/>
-          <!-- TURCYOS: İstanbul → Kıbrıs → Mısır -->
-          <path d="M 2420,610 C 2480,720 2560,790 2578,812"/>
-          <!-- İtalya → Mısır (MedLoop) -->
+          <path d="M 2249,636 C 2310,650 2370,625 2420,612"/>
+          <!-- Marsilya → Mısır (SEA-ME-WE-3, IMEWE, EIG, AAE-1) -->
+          <path d="M 2249,636 C 2350,720 2480,790 2566,812"/>
+          <path d="M 2249,636 C 2360,725 2490,795 2570,810"/>
+          <path d="M 2249,636 C 2340,710 2475,785 2562,808"/>
+          <!-- İtalya → Mısır (Italia 1, Mediterraneo) -->
           <path d="M 2400,690 C 2480,760 2540,800 2566,812"/>
+          <path d="M 2410,680 C 2490,755 2545,795 2570,810"/>
+          <!-- İspanya → Cezayir/Mısır (Hannibal, Med Cable) -->
+          <path d="M 2154,636 C 2250,720 2400,790 2566,812"/>
+          <!-- TÜRKİYE Akdeniz hattı: İstanbul → Kıbrıs → Mısır (TURCYOS) -->
+          <path d="M 2420,610 C 2480,720 2560,790 2570,810"/>
+          <!-- İstanbul → Mısır (KEDI, ALETAR) -->
+          <path d="M 2420,610 C 2470,720 2540,800 2562,808"/>
+          <!-- Yunanistan → Mısır -->
+          <path d="M 2380,650 C 2440,730 2520,795 2562,810"/>
+        </g>
 
-          <!-- ═══════ KARADENİZ HATTI ═══════ -->
-          <!-- KAFOS: İstanbul → Köstence (Karadeniz altı) -->
-          <path d="M 2420,610 C 2410,580 2400,565 2440,560"/>
+        <!-- ═══════════ KARADENİZ — turuncu (Türkiye'ye özel) ═══════════ -->
+        <g stroke="#fb923c" stroke-width="3.5" fill="none" opacity="0.85" stroke-linecap="round">
+          <!-- KAFOS: İstanbul → Köstence (Romanya) -->
+          <path d="M 2420,610 C 2410,580 2410,560 2440,558"/>
+          <!-- İstanbul → Ukrayna -->
+          <path d="M 2420,610 C 2430,575 2470,555 2510,545"/>
+        </g>
 
-          <!-- ═══════ HİNDİSTAN OKYANUSU ═══════ -->
-          <!-- Mumbai → Singapur (SEA-ME-WE devamı) -->
+        <!-- ═══════════ HİNT OKYANUSU — pembe, yoğun ═══════════ -->
+        <g stroke="#ec4899" stroke-width="3.5" fill="none" opacity="0.75" stroke-linecap="round">
+          <!-- Süveyş → Mumbai (AAE-1, SEA-ME-WE-5, IMEWE, FALCON) -->
+          <path d="M 2566,812 C 2750,860 2900,920 3065,961"/>
+          <path d="M 2570,810 C 2760,870 2910,925 3070,963"/>
+          <path d="M 2562,808 C 2740,850 2890,915 3060,958"/>
+          <!-- Mumbai → Singapur (SEA-ME-WE-3,4,5,6, AAE-1) -->
           <path d="M 3065,961 C 3200,1050 3340,1130 3454,1204"/>
-          <!-- AAE-1 devamı: Hindistan → Tayland → Hong Kong -->
+          <path d="M 3070,963 C 3210,1060 3350,1140 3460,1210"/>
+          <path d="M 3060,958 C 3190,1040 3330,1120 3450,1200"/>
+          <!-- Mumbai → Doğu Afrika (Mombasa) — EASSy, SEACOM -->
+          <path d="M 3065,961 C 2950,1100 2800,1200 2675,1272"/>
+          <!-- Hindistan → Bangladeş → Tayland → Hong Kong -->
           <path d="M 3065,961 C 3250,990 3450,950 3576,920"/>
-          <!-- SEA-ME-WE-3: Singapur → Perth (Avustralya batı) -->
+          <!-- Singapur → Avustralya batı (INDIGO West, ASC) -->
           <path d="M 3454,1204 C 3500,1350 3550,1500 3588,1651"/>
+          <path d="M 3454,1204 C 3490,1360 3540,1510 3588,1651"/>
+          <!-- Singapur → Avustralya doğu (SEA-ME-WE-3 devamı) -->
+          <path d="M 3454,1204 C 3650,1350 3850,1500 4025,1678"/>
+        </g>
 
-          <!-- ═══════ AFRİKA ÇEVRESİ ═══════ -->
-          <!-- 2Africa: Avrupa → Batı Afrika → Cape Town → Doğu Afrika → Mumbai -->
+        <!-- ═══════════ AFRİKA ÇEVRESİ — yeşil ═══════════ -->
+        <g stroke="#10b981" stroke-width="3.5" fill="none" opacity="0.75" stroke-linecap="round">
+          <!-- 2Africa: Avrupa → Batı Afrika → Cape Town → Doğu Afrika → Mumbai (büyük halka) -->
           <path d="M 2079,703 C 2080,900 2150,1100 2225,1280 C 2280,1500 2350,1650 2408,1700 C 2500,1720 2600,1550 2675,1272 C 2800,1100 2950,1000 3065,961"/>
-          <!-- WACS: Avrupa → Batı Afrika ülkeleri -->
+          <!-- WACS: Avrupa → Batı Afrika ülkeleri (Lagos) -->
           <path d="M 2079,703 C 2100,900 2160,1080 2225,1137"/>
+          <!-- ACE: Fransa → Batı Afrika kıyısı boyunca -->
+          <path d="M 2200,615 C 2200,800 2200,1000 2220,1140"/>
+          <!-- METISS: Doğu Afrika → Madagaskar → Mauritius -->
+          <path d="M 2675,1272 C 2720,1370 2740,1430 2761,1475"/>
+          <!-- EASSy / SEACOM: Cape Town → Doğu Afrika kıyısı -->
+          <path d="M 2408,1678 C 2500,1500 2620,1380 2675,1272"/>
+          <!-- Lagos → Cape Town (batı Afrika güney rotası) -->
+          <path d="M 2225,1137 C 2280,1300 2350,1500 2408,1678"/>
+        </g>
 
-          <!-- ═══════ PASİFİK KUZEY (Tokyo/HK ↔ ABD batı) ═══════ -->
-          <!-- JUPITER + FASTER: Tokyo → Oregon -->
-          <path d="M 3892,731 C 3500,650 1500,600 681,622"/>
-          <!-- PLCN: Hong Kong → LA -->
-          <path d="M 3576,920 C 3000,820 1500,760 754,758"/>
-          <!-- Trans-Pacific Express: Tokyo → LA -->
+        <!-- ═══════════ PASİFİK KUZEY (Tokyo/HK/Manila ↔ ABD batı) — mor, çok yoğun ═══════════ -->
+        <g stroke="#a855f7" stroke-width="3.5" fill="none" opacity="0.7" stroke-linecap="round">
+          <!-- Tokyo → Oregon (JUPITER, FASTER, NCP) -->
+          <path d="M 3892,731 C 3500,640 1500,580 693,622"/>
+          <path d="M 3892,731 C 3500,650 1500,600 695,625"/>
+          <path d="M 3892,731 C 3500,635 1480,570 690,620"/>
+          <!-- Tokyo → LA (Trans-Pacific Express, PC-1) -->
           <path d="M 3892,731 C 3500,720 1500,740 754,758"/>
+          <!-- Hong Kong → LA (PLCN, Bay-to-Bay Express) -->
+          <path d="M 3576,920 C 3000,820 1500,770 754,758"/>
+          <path d="M 3576,920 C 3050,830 1530,780 760,762"/>
+          <!-- Hong Kong → Hawaii → ABD (HKA, JGA) -->
+          <path d="M 3576,920 C 3000,950 1200,950 754,758"/>
+          <!-- Manila → Guam → ABD batı (SEA-US, SJC) -->
+          <path d="M 3661,1015 C 3850,950 4100,800 4378,950"/>
+          <!-- Tayvan → ABD batı -->
+          <path d="M 3680,870 C 3000,830 1500,790 754,758"/>
+        </g>
 
-          <!-- ═══════ PASİFİK GÜNEY ═══════ -->
+        <!-- ═══════════ PASİFİK GÜNEY (Sydney/Auckland ↔ ABD/Asya) — mor ═══════════ -->
+        <g stroke="#a855f7" stroke-width="3.5" fill="none" opacity="0.7" stroke-linecap="round">
           <!-- Hawaiki: Sydney → Hawaii → ABD batı -->
           <path d="M 4025,1678 C 3500,1300 1200,1000 754,758"/>
-          <!-- Southern Cross: Sydney → Yeni Zelanda -->
+          <!-- Southern Cross: Sydney → Yeni Zelanda → Hawaii → ABD -->
           <path d="M 4025,1678 C 4150,1700 4250,1715 4317,1719"/>
-          <!-- SEA-US: Manila → Guam → ABD batı -->
-          <path d="M 3661,1015 C 3850,950 4100,800 4378,950"/>
+          <path d="M 4317,1719 C 3800,1500 1200,1100 754,758"/>
+          <!-- Endonezya → Avustralya -->
+          <path d="M 3454,1204 C 3500,1400 3580,1600 4025,1678"/>
+        </g>
 
-          <!-- ═══════ ÇİN/JAPONYA/KORE içi ═══════ -->
-          <!-- APG: Hong Kong → Şangay → Japonya -->
+        <!-- ═══════════ ASYA İÇİ (Çin/Japonya/Kore/SE Asya) — kırmızı ═══════════ -->
+        <g stroke="#ef4444" stroke-width="3.5" fill="none" opacity="0.7" stroke-linecap="round">
+          <!-- APG: Hong Kong → Şanghay → Japonya -->
           <path d="M 3576,920 C 3700,840 3800,780 3892,731"/>
           <!-- Singapur → Hong Kong -->
           <path d="M 3454,1204 C 3500,1100 3550,1000 3576,920"/>
-
-          <animate attributeName="stroke-dashoffset" values="0;-72" dur="2.4s" repeatCount="indefinite"/>
+          <path d="M 3454,1204 C 3505,1095 3555,990 3580,920"/>
+          <!-- Hong Kong → Manila -->
+          <path d="M 3576,920 C 3620,960 3650,990 3661,1015"/>
+          <!-- Singapur → Manila → Tokyo -->
+          <path d="M 3454,1204 C 3580,1100 3700,950 3892,731"/>
+          <!-- Kore → Japonya -->
+          <path d="M 3795,790 C 3830,770 3870,750 3892,731"/>
+          <!-- Tokyo → Vladivostok (Rus uzakdoğusu) -->
+          <path d="M 3892,731 C 3850,690 3820,660 3795,640"/>
+          <!-- Hong Kong → Tayvan -->
+          <path d="M 3576,920 C 3620,895 3660,880 3680,870"/>
         </g>
 
-        <!-- Veri merkezleri / büyük şehirler -->
+        <!-- Tüm kablolarda animasyon (akış efekti) -->
+        <g stroke-dasharray="22 14" fill="none">
+          <!-- Animasyon overlay tüm kablolarda görünür şekilde — global animation -->
+        </g>
+
+        <!-- Tüm dashed kablolar için scroll animasyonu -->
+        <style>
+          @keyframes cableFlow {
+            from { stroke-dashoffset: 0; }
+            to { stroke-dashoffset: -72; }
+          }
+          svg g[stroke="#fbbf24"], svg g[stroke="#06b6d4"], svg g[stroke="#ec4899"],
+          svg g[stroke="#a855f7"], svg g[stroke="#10b981"], svg g[stroke="#ef4444"],
+          svg g[stroke="#fb923c"] {
+            stroke-dasharray: 22 14;
+            animation: cableFlow 2.4s linear infinite;
+          }
+        </style>
+
+        <!-- Veri merkezleri / büyük şehirler + hub'lar -->
         <g>
-          <!-- NYC (-74,41) -->
+          <!-- ═══ ANA ŞEHİRLER (büyük, animasyonlu) ═══ -->
+          <!-- NYC -->
           <circle cx="1289" cy="663" r="16" fill="#ef4444"/>
           <circle cx="1289" cy="663" r="32" fill="none" stroke="#ef4444" stroke-width="5" opacity="0.7">
             <animate attributeName="r" values="16;48;16" dur="2.2s" repeatCount="indefinite"/>
             <animate attributeName="opacity" values="0.8;0;0.8" dur="2.2s" repeatCount="indefinite"/>
           </circle>
-          <!-- Londra (0,51) -->
+          <!-- Londra -->
           <circle cx="2189" cy="528" r="16" fill="#ef4444"/>
           <circle cx="2189" cy="528" r="32" fill="none" stroke="#ef4444" stroke-width="5" opacity="0.6">
             <animate attributeName="r" values="16;42;16" dur="2.4s" repeatCount="indefinite"/>
             <animate attributeName="opacity" values="0.7;0;0.7" dur="2.4s" repeatCount="indefinite"/>
           </circle>
-          <!-- Marsilya (5,43) -->
+          <!-- Marsilya -->
           <circle cx="2249" cy="636" r="14" fill="#ef4444"/>
-          <!-- İSTANBUL — BÜYÜK SARI VURGU (Türkiye'nin kuzey-batısına, Boğaz'a) -->
+          <!-- İSTANBUL — BÜYÜK SARI VURGU -->
           <circle cx="2420" cy="610" r="28" fill="#fbbf24" stroke="#92400e" stroke-width="6"/>
           <circle cx="2420" cy="610" r="50" fill="none" stroke="#fbbf24" stroke-width="8" opacity="0.7">
             <animate attributeName="r" values="28;75;28" dur="2s" repeatCount="indefinite"/>
             <animate attributeName="opacity" values="0.9;0;0.9" dur="2s" repeatCount="indefinite"/>
           </circle>
-          <!-- Mumbai (72,19) -->
+          <!-- Mumbai -->
           <circle cx="3065" cy="961" r="16" fill="#ef4444"/>
           <circle cx="3065" cy="961" r="32" fill="none" stroke="#ef4444" stroke-width="5" opacity="0.6">
             <animate attributeName="r" values="16;42;16" dur="2.4s" repeatCount="indefinite"/>
             <animate attributeName="opacity" values="0.7;0;0.7" dur="2.4s" repeatCount="indefinite"/>
           </circle>
-          <!-- Singapur (104,1) -->
+          <!-- Singapur -->
           <circle cx="3454" cy="1204" r="16" fill="#ef4444"/>
-          <!-- Tokyo (140,36) -->
+          <!-- Tokyo -->
           <circle cx="3892" cy="731" r="16" fill="#ef4444"/>
           <circle cx="3892" cy="731" r="32" fill="none" stroke="#ef4444" stroke-width="5" opacity="0.7">
             <animate attributeName="r" values="16;48;16" dur="2.2s" repeatCount="indefinite"/>
             <animate attributeName="opacity" values="0.8;0;0.8" dur="2.2s" repeatCount="indefinite"/>
           </circle>
-          <!-- Sydney (151,-34) -->
+          <!-- Sydney -->
           <circle cx="4025" cy="1678" r="16" fill="#ef4444"/>
+
+          <!-- ═══ EK HUB ŞEHİRLER (küçük, etiketsiz) ═══ -->
+          <!-- Mısır / Süveyş (kritik geçiş noktası) -->
+          <circle cx="2566" cy="812" r="11" fill="#06b6d4"/>
+          <circle cx="2566" cy="812" r="20" fill="none" stroke="#06b6d4" stroke-width="3" opacity="0.6">
+            <animate attributeName="r" values="11;28;11" dur="2.6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.7;0;0.7" dur="2.6s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Hong Kong (Asya hub) -->
+          <circle cx="3576" cy="920" r="11" fill="#ef4444"/>
+          <!-- Manila (Filipinler) -->
+          <circle cx="3661" cy="1015" r="9" fill="#ef4444"/>
+          <!-- Cape Town (Afrika güney hub) -->
+          <circle cx="2408" cy="1678" r="11" fill="#10b981"/>
+          <!-- Lagos (Batı Afrika hub) -->
+          <circle cx="2225" cy="1137" r="9" fill="#10b981"/>
+          <!-- Hawaii Honolulu (Pasifik hub) -->
+          <circle cx="754" cy="758" r="11" fill="#a855f7"/>
+          <circle cx="754" cy="758" r="20" fill="none" stroke="#a855f7" stroke-width="3" opacity="0.6">
+            <animate attributeName="r" values="11;28;11" dur="2.6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.7;0;0.7" dur="2.6s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Bude İngiltere (Atlantik landing point) -->
+          <circle cx="2128" cy="542" r="9" fill="#fbbf24"/>
+          <!-- Lizbon (Atlantik güney landing) -->
+          <circle cx="2079" cy="703" r="9" fill="#fbbf24"/>
+          <!-- Miami (Karayip hub) -->
+          <circle cx="1216" cy="879" r="9" fill="#fbbf24"/>
+          <!-- Brezilya (Fortaleza/Recife) -->
+          <circle cx="1715" cy="1272" r="9" fill="#fbbf24"/>
+          <!-- Mombasa (Doğu Afrika) -->
+          <circle cx="2675" cy="1272" r="9" fill="#10b981"/>
+          <!-- Oregon ABD batı (Pasifik landing) -->
+          <circle cx="693" cy="622" r="9" fill="#a855f7"/>
+          <!-- LA -->
+          <circle cx="754" cy="758" r="9" fill="#a855f7" opacity="0.8"/>
+          <!-- Auckland Yeni Zelanda -->
+          <circle cx="4317" cy="1719" r="9" fill="#a855f7"/>
         </g>
 
         <!-- Şehir etiketleri (Wikimedia SVG koordinat sisteminde) -->
