@@ -422,9 +422,33 @@ body { height: 100dvh; }
   text-shadow: 0 0 12px rgba(0,245,255,0.4);
 }
 
+.live-counters-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px; width: 100%; max-width: 900px;
+}
 .live-counters {
   display: grid; grid-template-columns: repeat(3, 1fr);
   gap: 14px; max-width: 900px; width: 100%;
+}
+.counter-group-label {
+  font-family: 'Chakra Petch', sans-serif; font-weight: 700;
+  font-size: clamp(11px, 1.15vw, 14px);
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 2.5px;
+  text-align: center;
+  margin-top: 6px;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.counter-group-label.tr-label { margin-top: 18px; }
+.counter-source {
+  font-size: clamp(10px, 0.95vw, 12px);
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  font-style: italic;
+  line-height: 1.5;
+  max-width: 900px;
+  margin-top: 4px;
+  padding: 0 12px;
 }
 .lc-box {
   background: rgba(57,255,20,0.07);
@@ -2126,6 +2150,7 @@ body .tb-text, body .tb-col h3,
 body .level-title, body .level-label, body .level-banner,
 body .keyboard-hint, body .hbar-label,
 body .os-label, body .lc-label, body .lc-num,
+body .counter-group-label, body .counter-source,
 body .orbit-label, body .orbit-num,
 body .timeline-text, body .timeline-year,
 body .profession-title, body .profession-desc,
@@ -2296,19 +2321,39 @@ body .hud, body .bottom-nav {
     <div class="s1-title">TEKNOLOJİ QUEST</div>
     <div class="s1-tagline">İNTERNETTEN YAPAY ZEKAYA — GELECEĞİN ŞİFRESİ</div>
 
-    <div class="live-counters">
-      <div class="lc-box">
-        <div class="lc-num" id="lc1">0</div>
-        <div class="lc-label">🔍 Google araması / gün</div>
+    <div class="live-counters-wrap">
+      <div class="counter-group-label" aria-label="Global istatistikler">🌍 GLOBAL</div>
+      <div class="live-counters" role="group" aria-label="Dünya genelinde günlük istatistikler">
+        <div class="lc-box">
+          <div class="lc-num" id="lc1" aria-live="polite">0</div>
+          <div class="lc-label">🔍 Google araması / gün</div>
+        </div>
+        <div class="lc-box">
+          <div class="lc-num" id="lc2" aria-live="polite">0</div>
+          <div class="lc-label">💬 WhatsApp mesajı / gün</div>
+        </div>
+        <div class="lc-box">
+          <div class="lc-num" id="lc3" aria-live="polite">0</div>
+          <div class="lc-label">📺 YouTube saati / gün</div>
+        </div>
       </div>
-      <div class="lc-box">
-        <div class="lc-num" id="lc2">0</div>
-        <div class="lc-label">💬 WhatsApp mesajı / gün</div>
+
+      <div class="counter-group-label tr-label" aria-label="Türkiye istatistikleri">🇹🇷 TÜRKİYE</div>
+      <div class="live-counters" role="group" aria-label="Türkiye'de günlük istatistikler">
+        <div class="lc-box">
+          <div class="lc-num" id="lc4" aria-live="polite">0</div>
+          <div class="lc-label">🔍 Google araması / gün</div>
+        </div>
+        <div class="lc-box">
+          <div class="lc-num" id="lc5" aria-live="polite">0</div>
+          <div class="lc-label">💬 WhatsApp mesajı / gün</div>
+        </div>
+        <div class="lc-box">
+          <div class="lc-num" id="lc6" aria-live="polite">0</div>
+          <div class="lc-label">📺 YouTube saati / gün</div>
+        </div>
       </div>
-      <div class="lc-box">
-        <div class="lc-num" id="lc3">0</div>
-        <div class="lc-label">📺 YouTube saati / gün</div>
-      </div>
+      <div class="counter-source">* Tahmini değer • Kaynak: DataReportal &amp; TÜİK 2025 • Türkiye'de 77,3 milyon internet kullanıcısı var</div>
     </div>
 
     <div class="health-bars">
@@ -4337,10 +4382,17 @@ body .hud, body .bottom-nav {
   }
 
   // === Canlı sayaçlar (kapak) ===
+  // Global ve Türkiye verileri (DataReportal & TÜİK 2025 referans, tahmini)
+  // rate = saniyede artış miktarı
   const counters = [
-    { el: 'lc1', base: 5_200_000_000, rate: 60_000 },
-    { el: 'lc2', base: 100_000_000_000, rate: 1_157_000 },
-    { el: 'lc3', base: 1_000_000_000, rate: 11_574 }
+    // GLOBAL
+    { el: 'lc1', base: 5_200_000_000,    rate: 60_000     }, // Google araması
+    { el: 'lc2', base: 100_000_000_000,  rate: 1_157_000  }, // WhatsApp mesajı
+    { el: 'lc3', base: 1_000_000_000,    rate: 11_574     }, // YouTube saati
+    // TÜRKİYE — günlük değerler (75M, 2B, 45M)
+    { el: 'lc4', base: 75_000_000,       rate: 868        }, // 75M / 86400
+    { el: 'lc5', base: 2_000_000_000,    rate: 23_148     }, // 2B / 86400
+    { el: 'lc6', base: 45_000_000,       rate: 521        }  // 45M / 86400
   ];
   function fmt(n) {
     if (n >= 1e9) return (n/1e9).toFixed(2) + ' MİLYAR';
@@ -4350,12 +4402,14 @@ body .hud, body .bottom-nav {
   }
   counters.forEach(c => {
     c.val = c.base + Math.random() * c.rate * 30;
-    document.getElementById(c.el).textContent = fmt(c.val);
+    const el = document.getElementById(c.el);
+    if (el) el.textContent = fmt(c.val);
   });
   setInterval(() => {
     counters.forEach(c => {
       c.val += c.rate / 2 + Math.random() * c.rate;
-      document.getElementById(c.el).textContent = fmt(c.val);
+      const el = document.getElementById(c.el);
+      if (el) el.textContent = fmt(c.val);
     });
   }, 500);
 
