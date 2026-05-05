@@ -738,7 +738,7 @@ function TFCard({
   );
 }
 
-// Match — eşleştirme
+// Match — sürükle-bırak eşleştirme (pointer events: hem fare hem dokunmatik)
 function MatchCard({
   pairs, onAnswer, answered,
 }: {
@@ -746,76 +746,148 @@ function MatchCard({
   onAnswer: (correct: boolean) => void;
   answered: boolean | null;
 }) {
+  // Sağ sütunu rastgele sırala
   const shuffledRight = useState(() => [...pairs].sort(() => Math.random() - 0.5))[0];
-  const [selected, setSelected] = useState<string | null>(null);
   const [matched, setMatched] = useState<Record<string, string>>({});
+  const [dragging, setDragging] = useState<{
+    right: string;
+    x: number; y: number;
+    width: number; height: number;
+    offsetX: number; offsetY: number;
+  } | null>(null);
+  const [hoverLeft, setHoverLeft] = useState<string | null>(null);
+  const [shake, setShake] = useState<string | null>(null);
 
-  const handleLeft = (left: string) => { if (answered !== null) return; setSelected(left); };
-  const handleRight = (right: string) => {
-    if (!selected || answered !== null) return;
-    const correct = pairs.find(p => p.left === selected)?.right;
-    if (correct === right) {
-      const next = { ...matched, [selected]: right };
-      setMatched(next);
-      setSelected(null);
-      if (Object.keys(next).length === pairs.length) onAnswer(true);
-    } else {
-      setSelected(null);
-      if (Object.keys(matched).length + 1 >= pairs.length) {
-        onAnswer(false);
+  // Drop hedefi ref'lerini takip et
+  const leftRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+
+  const findHoverLeft = (clientX: number, clientY: number): string | null => {
+    let result: string | null = null;
+    leftRefs.current.forEach((el, left) => {
+      if (result || matched[left]) return;
+      const r = el.getBoundingClientRect();
+      if (clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom) {
+        result = left;
       }
+    });
+    return result;
+  };
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>, right: string) => {
+    if (answered !== null) return;
+    if (Object.values(matched).includes(right)) return;
+    e.preventDefault();
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setDragging({
+      right,
+      x: e.clientX, y: e.clientY,
+      width: rect.width, height: rect.height,
+      offsetX: e.clientX - rect.left,
+      offsetY: e.clientY - rect.top,
+    });
+    try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch {}
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragging) return;
+    e.preventDefault();
+    setDragging(d => d ? { ...d, x: e.clientX, y: e.clientY } : null);
+    setHoverLeft(findHoverLeft(e.clientX, e.clientY));
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragging) return;
+    const right = dragging.right;
+    const targetLeft = findHoverLeft(e.clientX, e.clientY);
+    setDragging(null);
+    setHoverLeft(null);
+    try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
+    if (!targetLeft) return;
+    const correctRight = pairs.find(p => p.left === targetLeft)?.right;
+    if (correctRight === right) {
+      const next = { ...matched, [targetLeft]: right };
+      setMatched(next);
+      if (Object.keys(next).length === pairs.length) {
+        // Tüm eşleşmeler doğru — kazandı
+        setTimeout(() => onAnswer(true), 250);
+      }
+    } else {
+      // Yanlış bırakma — sallama animasyonu, sonsuz deneme hakkı
+      setShake(targetLeft);
+      setTimeout(() => setShake(null), 500);
     }
   };
 
+  const handlePointerCancel = () => {
+    setDragging(null);
+    setHoverLeft(null);
+  };
+
   return (
-    <div className="grid grid-cols-2 gap-3">
-      <div className="space-y-2">
-        <p className="font-game text-xs mb-2" style={{ color: 'var(--muted)' }}>SEÇ</p>
+    <div className="match-grid" style={{ position: 'relative' }}>
+      {/* Sol sütun — drop hedefleri (sabit) */}
+      <div className="match-col">
+        <p className="match-col-label">EŞLEŞTİR</p>
         {pairs.map(p => {
           const isMatched = !!matched[p.left];
-          const isSelected = selected === p.left;
+          const isHover = hoverLeft === p.left;
+          const isShaking = shake === p.left;
           return (
-            <button
+            <div
               key={p.left}
-              className="game-option text-center"
-              style={{
-                borderColor: isMatched ? 'var(--success)' : isSelected ? 'var(--primary)' : '',
-                background: isMatched ? 'rgba(57,255,20,0.15)' : isSelected ? 'rgba(255,230,0,0.1)' : '',
-                color: isMatched ? 'var(--success)' : isSelected ? 'var(--primary)' : '',
-                fontFamily: 'Chakra Petch, sans-serif',
-                fontWeight: 700,
-              }}
-              onClick={() => !isMatched && handleLeft(p.left)}
-              disabled={isMatched}
+              ref={el => { if (el) leftRefs.current.set(p.left, el); else leftRefs.current.delete(p.left); }}
+              className={`match-target${isMatched ? ' matched' : ''}${isHover ? ' hover' : ''}${isShaking ? ' shake' : ''}`}
             >
-              {p.left}
-            </button>
+              <div className="match-left-text">{p.left}</div>
+              {isMatched ? (
+                <div className="match-paired">{matched[p.left]} ✓</div>
+              ) : (
+                <div className="match-slot">{isHover ? 'BURAYA BIRAK' : '↘ buraya sürükle'}</div>
+              )}
+            </div>
           );
         })}
       </div>
-      <div className="space-y-2">
-        <p className="font-game text-xs mb-2" style={{ color: 'var(--muted)' }}>EŞLEŞTİR</p>
+
+      {/* Sağ sütun — sürüklenebilir kartlar */}
+      <div className="match-col">
+        <p className="match-col-label">SÜRÜKLE</p>
         {shuffledRight.map(p => {
           const isMatched = Object.values(matched).includes(p.right);
+          const isDragging = dragging?.right === p.right;
           return (
-            <button
+            <div
               key={p.right}
-              className="game-option text-sm"
-              style={{
-                borderColor: isMatched ? 'var(--success)' : '',
-                background: isMatched ? 'rgba(57,255,20,0.15)' : '',
-                color: isMatched ? 'var(--success)' : '',
-                cursor: isMatched ? 'default' : selected ? 'pointer' : 'not-allowed',
-                opacity: isMatched ? 1 : selected ? 1 : 0.5,
-              }}
-              onClick={() => handleRight(p.right)}
-              disabled={isMatched}
+              className={`match-source${isMatched ? ' matched' : ''}${isDragging ? ' dragging' : ''}`}
+              style={{ visibility: isDragging ? 'hidden' : 'visible' }}
+              onPointerDown={e => handlePointerDown(e, p.right)}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerCancel}
             >
-              {p.right}
-            </button>
+              {!isMatched && <span className="match-grip">⋮⋮</span>}
+              <span>{p.right}</span>
+              {isMatched && <span style={{ color: 'var(--success)', marginLeft: 'auto' }}>✓</span>}
+            </div>
           );
         })}
       </div>
+
+      {/* Sürüklenen kartın "ghost" görüntüsü */}
+      {dragging && (
+        <div
+          className="match-ghost"
+          style={{
+            left: dragging.x - dragging.offsetX,
+            top: dragging.y - dragging.offsetY,
+            width: dragging.width,
+            height: dragging.height,
+          }}
+        >
+          <span className="match-grip">⋮⋮</span>
+          <span>{dragging.right}</span>
+        </div>
+      )}
     </div>
   );
 }

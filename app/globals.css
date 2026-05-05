@@ -2537,3 +2537,205 @@ body.theme-v2 [class*="xp-badge"] {
   color: #ea580c !important;
   border-color: rgba(249,115,22,0.4) !important;
 }
+
+/* ============================================================
+   MATCH (sürükle-bırak eşleştirme)
+   ============================================================ */
+.match-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+  touch-action: none;
+}
+.match-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.match-col-label {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+/* Sol sütun — drop hedefi */
+.match-target {
+  border: 2px dashed rgba(255,230,0,0.35);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: rgba(255,230,0,0.04);
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  text-align: center;
+}
+.match-target.hover {
+  border-style: solid;
+  border-color: var(--primary);
+  background: rgba(255,230,0,0.15);
+  transform: scale(1.03);
+  box-shadow: 0 0 24px rgba(255,230,0,0.25);
+}
+.match-target.matched {
+  border-style: solid;
+  border-color: var(--success);
+  background: rgba(57,255,20,0.12);
+}
+.match-target.shake {
+  animation: matchShake 0.45s;
+  border-color: var(--danger);
+  background: rgba(255,68,68,0.12);
+}
+@keyframes matchShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+.match-left-text {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text);
+  letter-spacing: 1px;
+}
+.match-target.matched .match-left-text { color: var(--success); }
+.match-slot {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  font-style: italic;
+}
+.match-target.hover .match-slot {
+  color: var(--primary);
+  font-style: normal;
+  font-weight: 700;
+}
+.match-paired {
+  font-size: 13px;
+  color: var(--success);
+  font-weight: 600;
+  padding: 4px 10px;
+  background: rgba(57,255,20,0.15);
+  border-radius: 6px;
+}
+
+/* Sağ sütun — sürüklenebilir kart */
+.match-source {
+  border: 2px solid rgba(0,207,255,0.35);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: rgba(0,207,255,0.06);
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  font-size: 14px;
+  font-weight: 500;
+}
+.match-source:hover {
+  border-color: var(--info);
+  background: rgba(0,207,255,0.12);
+}
+.match-source:active { cursor: grabbing; }
+.match-source.dragging { cursor: grabbing; }
+.match-source.matched {
+  border-color: var(--success);
+  background: rgba(57,255,20,0.12);
+  color: var(--success);
+  cursor: default;
+  pointer-events: none;
+}
+.match-grip {
+  font-size: 18px;
+  color: var(--muted);
+  letter-spacing: -2px;
+  flex-shrink: 0;
+}
+
+/* Sürüklenen "ghost" kart */
+.match-ghost {
+  position: fixed;
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: rgba(255,230,0,0.18);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+  z-index: 10000;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.5), 0 0 24px rgba(255,230,0,0.4);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  transform: rotate(-2deg) scale(1.03);
+  transition: none;
+}
+
+/* V2 teması (açık) için renk uyarlaması */
+body.theme-v2 .match-target {
+  border-color: rgba(249,115,22,0.4);
+  background: rgba(249,115,22,0.06);
+}
+body.theme-v2 .match-target.hover {
+  border-color: #f97316;
+  background: rgba(249,115,22,0.18);
+  box-shadow: 0 0 24px rgba(249,115,22,0.3);
+}
+body.theme-v2 .match-target.matched {
+  border-color: #16a34a;
+  background: rgba(22,163,74,0.12);
+}
+body.theme-v2 .match-target.matched .match-left-text { color: #16a34a; }
+body.theme-v2 .match-target.shake {
+  border-color: #dc2626;
+  background: rgba(220,38,38,0.12);
+}
+body.theme-v2 .match-left-text { color: #1e3a8a; }
+body.theme-v2 .match-slot { color: rgba(30,58,138,0.55); }
+body.theme-v2 .match-target.hover .match-slot { color: #f97316; }
+body.theme-v2 .match-paired {
+  color: #16a34a;
+  background: rgba(22,163,74,0.15);
+}
+body.theme-v2 .match-source {
+  border-color: rgba(2,132,199,0.4);
+  background: rgba(2,132,199,0.06);
+  color: #1e3a8a;
+}
+body.theme-v2 .match-source:hover {
+  border-color: #0284c7;
+  background: rgba(2,132,199,0.14);
+}
+body.theme-v2 .match-source.matched {
+  border-color: #16a34a;
+  background: rgba(22,163,74,0.12);
+  color: #16a34a;
+}
+body.theme-v2 .match-ghost {
+  border-color: #f97316;
+  background: rgba(255,255,255,0.95);
+  color: #1e3a8a;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.25), 0 0 24px rgba(249,115,22,0.4);
+}
+
+/* Mobilde dikey istif (alt alta) */
+@media (max-width: 540px) {
+  .match-grid { grid-template-columns: 1fr; gap: 10px; }
+  .match-col-label:not(:first-of-type) { margin-top: 14px; }
+  .match-target { min-height: 70px; padding: 12px 14px; }
+  .match-source { min-height: 54px; padding: 12px 14px; font-size: 13px; }
+}
