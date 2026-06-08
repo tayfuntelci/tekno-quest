@@ -2,7 +2,7 @@
 import Link from 'next/link';
 
 // V2 Cache-busting — V1'den bağımsız versiyon
-const SUNUM_V2_VERSION = '20260423-1';
+const SUNUM_V2_VERSION = '20260608-1';
 
 export default function SunumV2Page() {
   return (
