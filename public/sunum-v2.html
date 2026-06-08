@@ -815,6 +815,7 @@ body { height: 100dvh; }
   width: 100%; border-radius: 8px 8px 0 0;
   transition: height 1s ease;
   position: relative;
+  flex-shrink: 0;   /* yükseklikler ezilmesin — kademeler net görünsün */
 }
 .sc-bar-label {
   position: absolute;
@@ -3038,42 +3039,42 @@ body .hud, body .bottom-nav {
         <div class="sc-speed">~2 kb/s</div>
         <div class="sc-stars">⭐☆☆☆☆</div>
         <div class="sc-can">Telefon araması yapabilirsin 📞</div>
-        <div class="sc-bar" style="height:24px; background:rgba(150,150,150,0.3); border:1px solid rgba(150,150,150,0.5);"><div class="sc-bar-label">Sadece Ses</div></div>
+        <div class="sc-bar" style="height:14px; background:rgba(150,150,150,0.3); border:1px solid rgba(150,150,150,0.5);"><div class="sc-bar-label">Sadece Ses</div></div>
       </div>
       <div class="sc-wrap">
         <div class="sc-gen" style="color:#4aa">2G</div>
         <div class="sc-speed">~64 kb/s</div>
         <div class="sc-stars">⭐⭐☆☆☆</div>
         <div class="sc-can">"İyi geceler" SMS ✉️</div>
-        <div class="sc-bar" style="height:70px; background:rgba(100,200,200,0.22); border:1px solid rgba(100,200,200,0.5);"><div class="sc-bar-label">SMS</div></div>
+        <div class="sc-bar" style="height:36px; background:rgba(100,200,200,0.22); border:1px solid rgba(100,200,200,0.5);"><div class="sc-bar-label">SMS</div></div>
       </div>
       <div class="sc-wrap">
         <div class="sc-gen" style="color:#00b4ff">3G</div>
         <div class="sc-speed">~2 Mb/s</div>
         <div class="sc-stars">⭐⭐⭐☆☆</div>
         <div class="sc-can">Görüntülü arama 🎥</div>
-        <div class="sc-bar" style="height:140px; background:rgba(0,180,255,0.22); border:1px solid rgba(0,180,255,0.5);"><div class="sc-bar-label">Video Arama</div></div>
+        <div class="sc-bar" style="height:68px; background:rgba(0,180,255,0.22); border:1px solid rgba(0,180,255,0.5);"><div class="sc-bar-label">Video Arama</div></div>
       </div>
       <div class="sc-wrap">
         <div class="sc-gen" style="color:var(--info)">4G</div>
         <div class="sc-speed" style="color:var(--info)">~100 Mb/s</div>
         <div class="sc-stars">⭐⭐⭐⭐☆</div>
         <div class="sc-can">Netflix otobüste 🎬</div>
-        <div class="sc-bar" style="height:240px; background:rgba(0,245,255,0.18); border:1px solid rgba(0,245,255,0.55); box-shadow:0 0 22px rgba(0,245,255,0.2);"><div class="sc-bar-label" style="color:var(--info)">Netflix HD</div></div>
+        <div class="sc-bar" style="height:110px; background:rgba(0,245,255,0.18); border:1px solid rgba(0,245,255,0.55); box-shadow:0 0 22px rgba(0,245,255,0.2);"><div class="sc-bar-label" style="color:var(--info)">Netflix HD</div></div>
       </div>
       <div class="sc-wrap">
         <div class="sc-gen" style="color:var(--primary)">5G</div>
         <div class="sc-speed" style="color:var(--primary)">~10 Gb/s</div>
         <div class="sc-stars">⭐⭐⭐⭐⭐</div>
         <div class="sc-can">Uzaktan ameliyat 🏥</div>
-        <div class="sc-bar" style="height:340px; background:rgba(255,230,0,0.18); border:1px solid rgba(255,230,0,0.6); box-shadow:0 0 30px rgba(255,230,0,0.25);"><div class="sc-bar-label" style="color:var(--primary)">Robot & VR</div></div>
+        <div class="sc-bar" style="height:160px; background:rgba(255,230,0,0.18); border:1px solid rgba(255,230,0,0.6); box-shadow:0 0 30px rgba(255,230,0,0.25);"><div class="sc-bar-label" style="color:var(--primary)">Robot & VR</div></div>
       </div>
       <div class="sc-wrap">
         <div class="sc-gen" style="color:#c084fc">6G</div>
         <div class="sc-speed" style="color:#c084fc">~1 Tb/s</div>
         <div class="sc-stars">🌟🌟🌟🌟🌟</div>
         <div class="sc-can">Holografik görüşme 🌐</div>
-        <div class="sc-bar" style="height:360px; background:rgba(192,132,252,0.2); border:1px solid rgba(192,132,252,0.65); box-shadow:0 0 36px rgba(192,132,252,0.35);"><div class="sc-bar-label" style="color:#c084fc">Hologram & XR</div></div>
+        <div class="sc-bar" style="height:215px; background:rgba(192,132,252,0.2); border:1px solid rgba(192,132,252,0.65); box-shadow:0 0 36px rgba(192,132,252,0.35);"><div class="sc-bar-label" style="color:#c084fc">Hologram & XR</div></div>
       </div>
     </div>
   </div>
