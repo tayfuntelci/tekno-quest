@@ -45,49 +45,7 @@ export default function Portal() {
             ▸ SUNUM &amp; QUIZ
           </h2>
 
-          {/* V1 — Uzay Teması (orijinal) */}
-          <div
-            className="game-card p-4 xs:p-6"
-            style={{
-              borderColor: 'rgba(255,230,0,0.35)',
-              boxShadow: '0 0 28px rgba(255,230,0,0.12)',
-            }}
-          >
-            <div className="flex items-start gap-3 xs:gap-4">
-              <div className="text-4xl xs:text-5xl flex-shrink-0 animate-float">🚀</div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2 flex-wrap">
-                  <span
-                    className="font-game font-bold text-base xs:text-xl neon-yellow"
-                    style={{ letterSpacing: '1.5px' }}
-                  >
-                    TEKNO QUEST · V1
-                  </span>
-                  <span className="xp-badge">UZAY TEMASI</span>
-                </div>
-                <p className="text-xs xs:text-sm mb-4 xs:mb-5" style={{ color: 'var(--muted)', lineHeight: 1.6 }}>
-                  Orijinal uzay temalı sürüm — neon renkler, karanlık gökyüzü,
-                  roket animasyonları. 10 level, XP barı, rozetler ve quiz.
-                </p>
-
-                <div className="flex gap-2 xs:gap-3 flex-wrap">
-                  <Link href="/sunum" className="flex-1 xs:flex-none min-w-[140px]">
-                    <button className="btn-primary text-xs xs:text-sm w-full">▶ V1 Sunum</button>
-                  </Link>
-                  <Link href="/quiz" className="flex-1 xs:flex-none min-w-[120px]">
-                    <button
-                      className="btn-outline text-xs xs:text-sm w-full"
-                      style={{ color: 'var(--info)', borderColor: 'var(--info)' }}
-                    >
-                      🎯 V1 Quiz
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* V2 — Gökyüzü Teması (çocuk psikoloğu önerileri) */}
+          {/* TEKNO QUEST — Gökyüzü Teması */}
           <div
             className="game-card p-4 xs:p-6"
             style={{
@@ -105,7 +63,7 @@ export default function Portal() {
                     className="font-game font-bold text-base xs:text-xl"
                     style={{ letterSpacing: '1.5px', color: '#fb923c' }}
                   >
-                    TEKNO QUEST · V2
+                    TEKNO QUEST
                   </span>
                   <span
                     className="xp-badge"
@@ -115,12 +73,12 @@ export default function Portal() {
                       borderColor: 'rgba(249,115,22,0.4)',
                     }}
                   >
-                    GÖKYÜZÜ · YENİ
+                    GÖKYÜZÜ TEMASI
                   </span>
                 </div>
                 <p className="text-xs xs:text-sm mb-4 xs:mb-5" style={{ color: 'var(--muted)', lineHeight: 1.6 }}>
-                  Çocuk psikoloğu önerilerine göre yeniden tasarlandı — açık mavi gökyüzü,
-                  yumuşak renkler, sade animasyonlar. Aynı içerik, daha rahat gözler.
+                  Çocuklar için tasarlanmış sunum ve quiz — açık mavi gökyüzü teması,
+                  yumuşak renkler, sade animasyonlar. 9-10 yaş için uygun içerik.
                 </p>
 
                 <div className="flex gap-2 xs:gap-3 flex-wrap">
@@ -133,7 +91,7 @@ export default function Portal() {
                         borderColor: '#ea580c',
                       }}
                     >
-                      ▶ V2 Sunum
+                      ▶ Sunum
                     </button>
                   </Link>
                   <Link href="/quiz-v2" className="flex-1 xs:flex-none min-w-[120px]">
@@ -141,7 +99,7 @@ export default function Portal() {
                       className="btn-outline text-xs xs:text-sm w-full"
                       style={{ color: '#fb923c', borderColor: '#fb923c' }}
                     >
-                      🎯 V2 Quiz
+                      🎯 Quiz
                     </button>
                   </Link>
                 </div>
@@ -164,9 +122,8 @@ export default function Portal() {
                   NASIL KULLANILIR?
                 </p>
                 <p className="text-xs xs:text-sm" style={{ color: 'var(--muted)', lineHeight: 1.55 }}>
-                  1. <strong style={{ color: '#ffe600' }}>V1 = Uzay teması</strong> (neon / karanlık)
-                  &nbsp;·&nbsp; <strong style={{ color: '#fb923c' }}>V2 = Gökyüzü teması</strong> (açık / sade).
-                  Her iki sürümde de aynı içerik var ve liderboard ortak çalışır.
+                  Önce <strong style={{ color: '#fb923c' }}>Sunum</strong>'u izle ve teknoloji yolculuğunu keşfet.
+                  Sonra <strong style={{ color: '#fb923c' }}>Quiz</strong>'i çöz, XP kazan ve liderboard'da yerini al!
                 </p>
               </div>
             </div>
