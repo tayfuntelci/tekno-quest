@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getLeaderboard, subscribeToLeaderboard, QuizResult } from '@/lib/supabase';
+import { Lang, LANGS, LANG_META, UI } from '@/lib/i18n';
 
 function rankEmoji(i: number) {
   if (i === 0) return '🥇';
@@ -12,6 +13,7 @@ function rankEmoji(i: number) {
 
 export default function Portal() {
   const [leaders, setLeaders] = useState<QuizResult[]>([]);
+  const [lang, setLang] = useState<Lang>('tr');
 
   useEffect(() => {
     getLeaderboard(8).then(setLeaders).catch(() => {});
@@ -19,10 +21,19 @@ export default function Portal() {
     return unsub;
   }, []);
 
+  // Tarayıcı dilini ilk açılışta otomatik öner (kullanıcı yine değiştirebilir)
+  useEffect(() => {
+    const nav = (navigator.language || '').toLowerCase();
+    if (nav.startsWith('zh')) setLang('zh');
+    else if (nav.startsWith('en')) setLang('en');
+  }, []);
+
+  const t = UI[lang];
+
   return (
     <main className="min-h-screen relative z-10 px-3 xs:px-4 py-6 xs:py-8 md:py-12">
       {/* Header */}
-      <div className="text-center mb-8 xs:mb-12">
+      <div className="text-center mb-6 xs:mb-8">
         <div className="text-5xl xs:text-6xl mb-3 xs:mb-4 animate-float inline-block">🌐</div>
         <h1
           className="font-game font-bold neon-yellow mb-2"
@@ -31,8 +42,38 @@ export default function Portal() {
           TEKNOLOJİ QUEST
         </h1>
         <p className="text-sm xs:text-base sm:text-lg px-2" style={{ color: 'var(--muted)' }}>
-          İnternetten Yapay Zekaya — Geleceğin Şifresi
+          {t.homeSubtitle}
         </p>
+      </div>
+
+      {/* Dil seçici */}
+      <div className="flex flex-col items-center gap-2 mb-8 xs:mb-10">
+        <span className="font-game text-[10px] xs:text-xs" style={{ color: 'var(--muted)', letterSpacing: '2px' }}>
+          🌍 {t.langPickTitle}
+        </span>
+        <div className="flex gap-2 xs:gap-3 flex-wrap justify-center">
+          {LANGS.map((l) => {
+            const active = l === lang;
+            return (
+              <button
+                key={l}
+                onClick={() => setLang(l)}
+                className="font-game text-xs xs:text-sm px-3 xs:px-4 py-2 rounded-lg transition-all"
+                style={{
+                  background: active ? 'rgba(249,115,22,0.18)' : 'rgba(255,255,255,0.04)',
+                  color: active ? '#fb923c' : 'var(--muted)',
+                  border: `1px solid ${active ? 'rgba(249,115,22,0.5)' : 'rgba(255,255,255,0.1)'}`,
+                  boxShadow: active ? '0 0 16px rgba(249,115,22,0.18)' : 'none',
+                  letterSpacing: '0.5px',
+                }}
+                aria-pressed={active}
+                aria-label={LANG_META[l].label}
+              >
+                {LANG_META[l].flag}&nbsp;{LANG_META[l].native}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 xs:gap-6">
@@ -42,7 +83,7 @@ export default function Portal() {
             className="font-game text-xs xs:text-sm mb-3 xs:mb-4"
             style={{ color: 'var(--muted)', letterSpacing: '2px' }}
           >
-            ▸ SUNUM &amp; QUIZ
+            {t.sectionLabel}
           </h2>
 
           {/* TEKNO QUEST — Gökyüzü Teması */}
@@ -73,16 +114,15 @@ export default function Portal() {
                       borderColor: 'rgba(249,115,22,0.4)',
                     }}
                   >
-                    GÖKYÜZÜ TEMASI
+                    {t.cardBadge}
                   </span>
                 </div>
                 <p className="text-xs xs:text-sm mb-4 xs:mb-5" style={{ color: 'var(--muted)', lineHeight: 1.6 }}>
-                  Çocuklar için tasarlanmış sunum ve quiz — açık mavi gökyüzü teması,
-                  yumuşak renkler, sade animasyonlar. 9-10 yaş için uygun içerik.
+                  {t.cardDesc}
                 </p>
 
                 <div className="flex gap-2 xs:gap-3 flex-wrap">
-                  <Link href="/sunum-v2" className="flex-1 xs:flex-none min-w-[140px]">
+                  <Link href={`/sunum-v2?lang=${lang}`} className="flex-1 xs:flex-none min-w-[140px]">
                     <button
                       className="btn-primary text-xs xs:text-sm w-full"
                       style={{
@@ -91,15 +131,15 @@ export default function Portal() {
                         borderColor: '#ea580c',
                       }}
                     >
-                      ▶ Sunum
+                      {t.btnPresentation}
                     </button>
                   </Link>
-                  <Link href="/quiz-v2" className="flex-1 xs:flex-none min-w-[120px]">
+                  <Link href={`/quiz-v2?lang=${lang}`} className="flex-1 xs:flex-none min-w-[120px]">
                     <button
                       className="btn-outline text-xs xs:text-sm w-full"
                       style={{ color: '#fb923c', borderColor: '#fb923c' }}
                     >
-                      🎯 Quiz
+                      {t.btnQuiz}
                     </button>
                   </Link>
                 </div>
@@ -119,11 +159,10 @@ export default function Portal() {
               <span className="text-xl xs:text-2xl flex-shrink-0">💡</span>
               <div className="min-w-0">
                 <p className="font-game text-[10px] xs:text-xs mb-1" style={{ color: '#c084fc', letterSpacing: '1px' }}>
-                  NASIL KULLANILIR?
+                  {t.howToTitle}
                 </p>
                 <p className="text-xs xs:text-sm" style={{ color: 'var(--muted)', lineHeight: 1.55 }}>
-                  Önce <strong style={{ color: '#fb923c' }}>Sunum</strong>'u izle ve teknoloji yolculuğunu keşfet.
-                  Sonra <strong style={{ color: '#fb923c' }}>Quiz</strong>'i çöz, XP kazan ve liderboard'da yerini al!
+                  {t.howToDesc}
                 </p>
               </div>
             </div>
@@ -137,10 +176,10 @@ export default function Portal() {
             style={{ borderColor: 'rgba(255,159,28,0.3)' }}
           >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-game font-bold text-sm neon-yellow">🏆 LİDERBOARD</h2>
+              <h2 className="font-game font-bold text-sm neon-yellow">{t.leaderboard}</h2>
               <Link href="/liderboard">
                 <span className="text-xs cursor-pointer" style={{ color: 'var(--info)' }}>
-                  Tümü →
+                  {t.leaderboardAll}
                 </span>
               </Link>
             </div>
@@ -148,8 +187,8 @@ export default function Portal() {
             {leaders.length === 0 ? (
               <div className="text-center py-8" style={{ color: 'var(--muted)' }}>
                 <div className="text-4xl mb-3">🎮</div>
-                <p className="text-sm font-game">Henüz kimse quiz çözmedi!</p>
-                <p className="text-xs mt-1">İlk sen ol 🚀</p>
+                <p className="text-sm font-game">{t.leaderEmpty1}</p>
+                <p className="text-xs mt-1">{t.leaderEmpty2}</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -168,7 +207,7 @@ export default function Portal() {
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-sm truncate">{r.player_name}</p>
                       <p className="text-xs" style={{ color: 'var(--muted)' }}>
-                        {r.correct_count}/{r.total_questions} doğru
+                        {r.correct_count}/{r.total_questions} {t.correctWord}
                       </p>
                     </div>
                     <div className="text-right flex-shrink-0">
@@ -189,7 +228,7 @@ export default function Portal() {
                   style={{ background: 'var(--success)' }}
                 />
                 <span className="text-xs" style={{ color: 'var(--success)' }}>
-                  Canlı güncelleniyor
+                  {t.liveUpdating}
                 </span>
               </div>
             </div>

@@ -1,0 +1,4355 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  TEKNO QUEST — Teknoloji Sunumu + Quiz Platformu
+  Copyright © 2026 Tayfun Telci. Tüm hakları saklıdır.
+  All Rights Reserved.
+
+  Bu dosyanın, içeriğinin, tasarımının veya kodunun izinsiz
+  kopyalanması, dağıtılması veya türev çalışma oluşturulması
+  5846 sayılı Fikir ve Sanat Eserleri Kanunu gereği YASAKTIR.
+
+  İmza: TK-TQ-2026-TAYFUN-TELCII-MKETUN9M
+  İletişim: t.telcii@gmail.com
+  Kaynak: https://github.com/tayfuntelci/tekno-quest
+  ============================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Tayfun Telci">
+<meta name="copyright" content="© 2026 Tayfun Telci — Tüm hakları saklıdır">
+<title>Technology Quest — Classroom</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Exo+2:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TEKNO QUEST — CLASSROOM EDITION
+   Her level birden fazla sayfadan oluşur (projeksiyon için büyük puntolar)
+   ============================================================ */
+
+:root {
+  --bg:        #0d0d1a;
+  --bg-soft:   #12122b;
+  --text:      #f0f0ff;
+  --dim:       rgba(255,255,255,0.06);
+  --primary:   #ffe600;
+  --success:   #39ff14;
+  --info:      #00cfff;
+  --purple:    #A855F7;
+  --warm:      #FF6B35;
+  --pink:      #FF6B9D;
+  --mint:      #4ecdc4;
+  --red:       #ff3131;
+  --holo-bg:     rgba(0,30,60,0.55);
+  --holo-border: rgba(0,245,255,0.3);
+  --grid:        rgba(0,245,255,0.05);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  font-family: 'Exo 2', sans-serif;
+  background: var(--bg);
+  width: 100%;
+  height: 100%;
+  color: var(--text);
+  user-select: none;
+  overflow: hidden;
+}
+html { height: 100%; }
+body { height: 100dvh; }
+
+/* ======================== ARKA PLAN KATMANLARI ========================= */
+.grid-bg {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none; z-index: 0;
+}
+.scanline {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--info), transparent);
+  animation: scan 5s linear infinite;
+  z-index: 1; opacity: 0.35; pointer-events: none;
+}
+@keyframes scan { 0%{top:-3px} 100%{top:100vh} }
+.stars-bg { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 0; }
+.star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2.5s ease-in-out infinite; }
+@keyframes twinkle { 0%,100%{opacity:0.15} 50%{opacity:0.9} }
+.particles-container { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 0; }
+.particle { position: absolute; border-radius: 50%; animation: particleDrift linear infinite; }
+@keyframes particleDrift {
+  0%   { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.4; }
+  100% { transform: translateY(-20px) translateX(var(--drift)) scale(1); opacity: 0; }
+}
+.pixel-corner { position: fixed; width: 14px; height: 14px; z-index: 300; pointer-events: none; }
+.pc-tl { top:56px;    left:0;  border-top:2px solid var(--primary); border-left:2px solid var(--primary); }
+.pc-tr { top:56px;    right:0; border-top:2px solid var(--primary); border-right:2px solid var(--primary); }
+.pc-bl { bottom:48px; left:0;  border-bottom:2px solid var(--primary); border-left:2px solid var(--primary); }
+.pc-br { bottom:48px; right:0; border-bottom:2px solid var(--primary); border-right:2px solid var(--primary); }
+
+/* ============================= ÜST HUD ================================= */
+.hud {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 56px;
+  background: #0a0a19;
+  border-bottom: 2px solid var(--primary);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; z-index: 200;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.85), 0 4px 30px rgba(255,230,0,0.1);
+}
+.bottom-nav { background: #0a0a19 !important; box-shadow: 0 -6px 24px rgba(0,0,0,0.85); }
+.hud-left  { display:flex; align-items:center; gap:10px; }
+.hud-logo {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 12px;
+  color: var(--primary);
+  text-shadow: 0 0 10px rgba(255,230,0,0.6);
+  letter-spacing: 1.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 100%;
+}
+.hud-left, .hud-right { min-width: 0; flex-shrink: 1; }
+.hud-right { overflow: hidden; }
+.hud { gap: 6px; overflow: hidden; }
+.hud-level {
+  background: var(--primary); color: #000;
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 11px;
+  padding: 4px 10px; border-radius: 4px; letter-spacing: 1px;
+}
+.hud-page {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 10px;
+  color: var(--info);
+  padding: 3px 8px; border-radius: 4px;
+  border: 1px solid rgba(0,207,255,0.4);
+  background: rgba(0,207,255,0.1);
+  letter-spacing: 0.5px;
+  min-width: 40px; text-align: center;
+}
+.hud-center { display:flex; align-items:center; gap:10px; }
+.xp-label { font-family: 'Chakra Petch'; font-size: 9px; color: var(--success); letter-spacing: 1px; }
+.xp-bar-wrap {
+  width: 200px; height: 14px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(57,255,20,0.3);
+  border-radius: 3px; overflow: hidden; position: relative;
+}
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--success), #a8ff3e);
+  border-radius: 3px; transition: width 0.8s ease; position: relative;
+}
+.xp-bar-fill::after {
+  content:''; position: absolute; top:0; left:0; right:0; bottom:0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
+  animation: shimmer 2s linear infinite;
+}
+@keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+.xp-count { font-family: 'Chakra Petch'; font-size: 10px; color: var(--success); min-width: 90px; letter-spacing: 0.5px; }
+.hud-right { display:flex; gap:8px; align-items:center; }
+.badge-item { font-size: 20px; filter: grayscale(1) opacity(0.3); transition: all 0.4s; cursor: default; }
+.badge-item.earned { filter: drop-shadow(0 0 8px rgba(255,230,0,0.8)); animation: badgePop 0.5s ease; }
+@keyframes badgePop { 0% { transform: scale(0.5); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
+
+/* ============================ ALT NAV ================================== */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 48px;
+  background: rgba(10,10,25,0.95);
+  border-top: 2px solid var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; z-index: 200; backdrop-filter: blur(8px);
+  padding: 0 8px;
+}
+.level-pip {
+  width: 42px; height: 32px;
+  border: 2px solid rgba(255,230,0,0.2); border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 9px;
+  color: rgba(255,255,255,0.35); cursor: pointer;
+  transition: all 0.3s;
+  background: rgba(255,255,255,0.03); letter-spacing: 0.5px;
+  position: relative;
+}
+.level-pip .pip-dots {
+  position: absolute; bottom: -2px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 2px;
+}
+.level-pip .pip-dot {
+  width: 3px; height: 3px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+}
+.level-pip.done .pip-dot { background: var(--success); }
+.level-pip.active .pip-dot.cur { background: var(--primary); box-shadow: 0 0 4px var(--primary); }
+.level-pip.done {
+  border-color: var(--success); color: var(--success);
+  background: rgba(57,255,20,0.08); box-shadow: 0 0 10px rgba(57,255,20,0.2);
+}
+.level-pip.active {
+  border-color: var(--primary); color: var(--primary);
+  background: rgba(255,230,0,0.12); box-shadow: 0 0 14px rgba(255,230,0,0.4);
+  transform: scale(1.12);
+}
+
+/* ============================ OKLAR =================================== */
+.arrow-btn {
+  position: fixed; top: 50%; transform: translateY(-50%);
+  background: rgba(255,230,0,0.08);
+  border: 2px solid rgba(255,230,0,0.3);
+  color: var(--primary);
+  width: 48px; height: 48px; border-radius: 8px;
+  font-family: 'Chakra Petch'; font-size: 18px;
+  cursor: pointer; z-index: 200; transition: all 0.2s;
+}
+.arrow-btn:hover {
+  background: rgba(255,230,0,0.22);
+  box-shadow: 0 0 22px rgba(255,230,0,0.35);
+  transform: translateY(-50%) scale(1.08);
+}
+.arrow-left  { left: 14px; }
+.arrow-right { right: 14px; }
+
+/* ============================ SLAYT ZEMİNİ ============================= */
+.presentation {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+.slide {
+  position: absolute; top:0; left:0; width:100%;
+  height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.45s ease;
+  padding: 72px 60px 62px;
+  gap: 18px;
+  overflow-y: scroll;            /* scroll her zaman var */
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+.slide > * { flex-shrink: 0; }   /* hiçbir öğe sıkışmasın, scroll devreye girsin */
+.slide.active { opacity: 1; pointer-events: all; }
+/* İnce scrollbar — kullanıcı scroll edebileceğini görsün */
+.slide::-webkit-scrollbar { width: 8px; }
+.slide::-webkit-scrollbar-track { background: rgba(30,58,138,0.06); }
+.slide::-webkit-scrollbar-thumb {
+  background: rgba(249,115,22,0.45);
+  border-radius: 4px;
+}
+.slide::-webkit-scrollbar-thumb:hover { background: rgba(249,115,22,0.7); }
+.slide { scrollbar-width: thin; scrollbar-color: rgba(249,115,22,0.5) transparent; }
+
+/* ======================== ORTAK BİLEŞENLER ============================= */
+.level-banner {
+  display: flex; align-items: center; justify-content: center;
+  column-gap: 14px; row-gap: 6px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+.level-title {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  flex-basis: 100%;        /* uzun title'lar tam satır kaplasın */
+  flex-grow: 0;
+}
+@media (min-width: 821px) {
+  /* Geniş ekranda title yan yana kalabilir ama overflow olursa wrap eder */
+  .level-title { flex-basis: auto; }
+}
+.level-badge {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 12px;
+  background: var(--primary); color: #000;
+  padding: 6px 16px; border-radius: 4px; letter-spacing: 1px;
+}
+.level-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(26px, 3.5vw, 42px);
+  color: var(--primary);
+  text-shadow: 0 0 24px rgba(255,230,0,0.5);
+  text-align: center; letter-spacing: 2px;
+  line-height: 1.15;
+}
+.slide-sub {
+  font-size: clamp(16px, 1.8vw, 22px);
+  color: rgba(240,240,255,0.75);
+  text-align: center; margin-bottom: 12px;
+  font-weight: 400; letter-spacing: 0.5px;
+  max-width: 1100px;
+  line-height: 1.45;
+}
+.page-tag {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 11px;
+  color: var(--info); background: rgba(0,207,255,0.12);
+  border: 1px solid rgba(0,207,255,0.35);
+  padding: 4px 12px; border-radius: 4px; letter-spacing: 1px;
+}
+
+.holo-card {
+  background: var(--holo-bg);
+  border: 1px solid var(--holo-border);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  position: relative; overflow: visible;
+  transition: all 0.3s;
+  padding: 22px 28px;
+}
+/* Default (game-card OLMAYAN) holo-card içeriği için stiller */
+.holo-card > .gc-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(16px, 1.9vw, 22px);
+  color: var(--primary);
+  margin-bottom: 10px; letter-spacing: 1px; line-height: 1.3;
+}
+.holo-card > .gc-text {
+  font-size: clamp(14px, 1.6vw, 17px);
+  color: rgba(240,240,255,0.9);
+  line-height: 1.6; font-weight: 400;
+}
+.holo-card::before {
+  content:''; position:absolute; top:0; left:0;
+  width:100%; height:2px;
+  background: linear-gradient(90deg, transparent, var(--info), transparent);
+}
+.holo-card::after {
+  content:''; position:absolute; top:0; left:0;
+  width:5px; height:100%;
+  background: var(--info); opacity: 0.85;
+}
+.holo-card:hover {
+  border-color: var(--info);
+  box-shadow: 0 0 28px rgba(0,245,255,0.2), inset 0 0 28px rgba(0,245,255,0.04);
+  transform: translateY(-3px);
+}
+.accent-warm::after   { background: var(--warm);    }
+.accent-pink::after   { background: var(--pink);    }
+.accent-purple::after { background: var(--purple);  }
+.accent-green::after  { background: var(--success); }
+.accent-yellow::after { background: var(--primary); }
+.accent-cyan::after   { background: var(--info);    }
+.accent-mint::after   { background: var(--mint);    }
+.accent-red::after    { background: var(--red);     }
+
+.fact-box {
+  background: rgba(255,230,0,0.1);
+  border: 1px solid rgba(255,230,0,0.35);
+  border-radius: 10px;
+  padding: 16px 26px;
+  max-width: 1000px;
+  text-align: center;
+  font-size: clamp(15px, 1.7vw, 20px);
+  color: rgba(240,240,255,0.95);
+  line-height: 1.5;
+}
+
+/* ====================== SLAYT 1 — KAPAK ================================= */
+.orbit-container { position: relative; width: 180px; height: 180px; margin-bottom: 24px; flex-shrink: 0; }
+.planet {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); font-size: 78px;
+  animation: planetPulse 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(0,245,255,0.8));
+}
+@media (max-width: 640px) {
+  .orbit-container { width: 120px; height: 120px; margin-bottom: 28px; }
+  .planet { font-size: 56px; }
+  .orbit-ring-1 { width: 96px !important; height: 96px !important; }
+  .orbit-ring-2 { width: 130px !important; height: 130px !important; }
+  @keyframes moonOrbit { to { transform: rotate(360deg) translateX(55px) rotate(-360deg); } }
+  .orbit-moon { font-size: 18px !important; }
+}
+@media (max-width: 360px) {
+  .orbit-container { width: 96px; height: 96px; margin-bottom: 22px; }
+  .planet { font-size: 44px; }
+  .orbit-ring-1 { width: 76px !important; height: 76px !important; }
+  .orbit-ring-2 { width: 106px !important; height: 106px !important; }
+}
+@keyframes planetPulse {
+  0%,100% { transform: translate(-50%,-50%) scale(1); }
+  50%     { transform: translate(-50%,-50%) scale(1.08); }
+}
+.orbit-ring {
+  position: absolute; top:50%; left:50%;
+  border-radius: 50%;
+  border: 1px solid rgba(0,245,255,0.3);
+  transform: translate(-50%,-50%) rotateX(70deg);
+}
+.orbit-ring-1 { width: 140px; height: 140px; animation: ringRotate 6s linear infinite; }
+.orbit-ring-2 { width: 200px; height: 200px; animation: ringRotate 10s linear infinite reverse; border-color: rgba(191,95,255,0.35); }
+@keyframes ringRotate { to { transform: translate(-50%,-50%) rotateX(70deg) rotateZ(360deg); } }
+.orbit-moon {
+  position: absolute; font-size: 22px;
+  top: 50%; left: 50%;
+  transform-origin: 0 0;
+  animation: moonOrbit 6s linear infinite;
+}
+@keyframes moonOrbit { to { transform: rotate(360deg) translateX(80px) rotate(-360deg); } }
+
+.s1-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(44px, 7vw, 82px);
+  color: var(--primary);
+  text-align: center; line-height: 1;
+  text-shadow:
+    5px 5px 0 rgba(0,0,0,0.5),
+    0 0 45px rgba(255,230,0,0.65),
+    0 0 85px rgba(255,230,0,0.3);
+  letter-spacing: 4px;
+}
+.s1-tagline {
+  font-size: clamp(15px, 1.8vw, 20px);
+  color: var(--info); text-align: center;
+  margin-top: 12px; letter-spacing: 3px;
+  font-weight: 400;
+  text-shadow: 0 0 12px rgba(0,245,255,0.4);
+}
+
+.live-counters-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px; width: 100%; max-width: 900px;
+}
+.live-counters {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 14px; max-width: 900px; width: 100%;
+}
+.counter-group-label {
+  font-family: 'Chakra Petch', sans-serif; font-weight: 700;
+  font-size: clamp(11px, 1.15vw, 14px);
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 2.5px;
+  text-align: center;
+  margin-top: 6px;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.counter-group-label.tr-label { margin-top: 18px; }
+.tr-flag {
+  width: 22px; height: 14px;
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+.counter-source {
+  font-size: clamp(10px, 0.95vw, 12px);
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  font-style: italic;
+  line-height: 1.5;
+  max-width: 900px;
+  margin-top: 4px;
+  padding: 0 12px;
+}
+.lc-box {
+  background: rgba(57,255,20,0.07);
+  border: 1px solid rgba(57,255,20,0.3);
+  border-radius: 10px; padding: 14px 18px; text-align: center;
+}
+.lc-num {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(20px, 2.6vw, 30px);
+  color: var(--success);
+  text-shadow: 0 0 14px rgba(57,255,20,0.5);
+  line-height: 1;
+}
+.lc-label { font-size: clamp(13px, 1.4vw, 16px); color: rgba(255,255,255,0.7); margin-top: 6px; letter-spacing: 0.5px; }
+
+.health-bars { display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; }
+.hbar { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.hbar-label { font-family: 'Chakra Petch'; font-weight: 700; font-size: 10px; color: rgba(255,255,255,0.65); letter-spacing: 1.5px; }
+.hbar-track {
+  width: 140px; height: 11px;
+  background: rgba(255,255,255,0.08); border-radius: 3px;
+  overflow: hidden; border: 1px solid rgba(255,255,255,0.18);
+}
+.hbar-fill { height:100%; border-radius:3px; }
+.intro-start {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(14px, 1.8vw, 18px);
+  color: var(--success); border: 2px solid var(--success);
+  padding: 12px 32px; border-radius: 6px;
+  background: rgba(57,255,20,0.08);
+  animation: glowGreen 2s ease-in-out infinite;
+  letter-spacing: 2.5px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.intro-start:hover { background: rgba(57,255,20,0.18); transform: translateY(-2px) scale(1.03); }
+.intro-start:active { transform: translateY(0) scale(0.98); }
+@keyframes glowGreen {
+  0%,100% { box-shadow: 0 0 12px rgba(57,255,20,0.35); }
+  50%     { box-shadow: 0 0 28px rgba(57,255,20,0.7); }
+}
+.keyboard-hint { font-family: 'Chakra Petch'; font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1.5px; }
+
+/* ====================== GAME GRID (BÜYÜK) ============================= */
+.game-grid { display: grid; gap: 18px; width: 100%; max-width: 1200px; }
+.g2 { grid-template-columns: repeat(2, 1fr); }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g4 { grid-template-columns: repeat(4, 1fr); }
+
+.game-card { padding: 26px 22px; text-align: center; }
+.game-card .gc-icon {
+  font-size: clamp(52px, 5.5vw, 72px);
+  margin-bottom: 12px; display: block;
+  filter: drop-shadow(0 0 14px rgba(0,245,255,0.5));
+}
+.game-card .gc-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(16px, 1.9vw, 22px);
+  color: var(--primary);
+  margin-bottom: 10px; letter-spacing: 1.5px; line-height: 1.25;
+}
+.game-card .gc-text {
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: rgba(240,240,255,0.85);
+  line-height: 1.55; font-weight: 400;
+}
+
+/* XP tag — bigger */
+.xp-tag {
+  position: absolute; top: 12px; right: 14px;
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 10px;
+  color: var(--success);
+  background: rgba(57,255,20,0.12);
+  border: 1px solid rgba(57,255,20,0.4);
+  padding: 4px 9px; border-radius: 4px;
+  letter-spacing: 0.5px; z-index: 3;
+}
+
+/* =================== MESAJ HARİTASI (LV1 S2) ========================== */
+.msg-map {
+  position: relative;
+  background: rgba(0,30,60,0.6);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 14px;
+  padding: 24px 30px 18px;
+  width: 100%; max-width: 1100px;
+  overflow: hidden;
+  flex-shrink: 0;        /* flex container içinde içerik çökmesin */
+}
+.msg-map-svg { flex-shrink: 0; }
+.msg-map-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(13px, 1.9vw, 22px);
+  color: var(--info); letter-spacing: 1px; margin-bottom: 14px;
+  text-align: center;
+  text-shadow: 0 0 12px rgba(0,245,255,0.35);
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+.msg-map-svg {
+  width: 100%;
+  height: auto;
+  max-height: 280px;
+  aspect-ratio: 950 / 280;
+  display: block;
+}
+@media (max-width: 640px) {
+  .msg-map-svg { aspect-ratio: 600 / 280; }
+  .msg-map { padding: 14px 14px 12px; }
+  .city-label { font-size: 28px !important; }
+}
+@media (max-width: 360px) {
+  .msg-map-svg { aspect-ratio: 480 / 280; }
+  .city-label { font-size: 34px !important; }
+}
+.msg-packet {
+  fill: var(--primary);
+  filter: drop-shadow(0 0 8px var(--primary));
+  offset-path: path('M 80 180 Q 450 30 870 150');
+  offset-distance: 0;
+  animation: packetMove 3s linear infinite;
+}
+.msg-packet.p2 { animation-delay: 0.6s; fill: var(--warm); filter: drop-shadow(0 0 8px var(--warm)); }
+.msg-packet.p3 { animation-delay: 1.2s; fill: var(--success); filter: drop-shadow(0 0 8px var(--success)); }
+.msg-packet.p4 { animation-delay: 1.8s; fill: var(--pink); filter: drop-shadow(0 0 8px var(--pink)); }
+@keyframes packetMove { to { offset-distance: 100%; } }
+.city-label {
+  fill: var(--info); font-family: 'Chakra Petch';
+  font-size: 18px; font-weight: 700; letter-spacing: 1.5px;
+}
+.msg-legend {
+  font-size: clamp(14px, 1.6vw, 17px);
+  color: rgba(255,255,255,0.75);
+  margin-top: 10px; text-align: center;
+}
+
+/* 1 saniye paneli (LV1 S2) */
+.one-second-panel {
+  background: rgba(0,30,60,0.6);
+  border: 1px solid rgba(255,107,53,0.35);
+  border-radius: 14px; padding: 20px 26px;
+  width: 100%; max-width: 900px;
+}
+.one-second-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(16px, 1.9vw, 22px);
+  color: var(--warm); letter-spacing: 1.5px;
+  margin-bottom: 12px; text-align: center;
+  text-shadow: 0 0 12px rgba(255,107,53,0.35);
+}
+.os-row {
+  display: grid; grid-template-columns: 44px 1fr auto;
+  align-items: center; gap: 14px;
+  padding: 10px 12px; border-bottom: 1px dashed rgba(255,255,255,0.1);
+}
+.os-row:last-child { border-bottom: 0; }
+.os-icon { font-size: 30px; }
+.os-label { font-size: clamp(14px, 1.6vw, 18px); color: rgba(255,255,255,0.85); }
+.os-num {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(18px, 2vw, 24px);
+  color: var(--primary);
+}
+
+/* Sayfa yolculuğu (LV1 S3) */
+.page-journey {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px; width: 100%; max-width: 1200px;
+}
+.pj-step {
+  background: rgba(0,30,60,0.6);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 12px; padding: 22px 16px; text-align: center;
+  position: relative;
+}
+.pj-arrow {
+  position: absolute; top: 50%; right: -12px;
+  transform: translateY(-50%);
+  color: var(--info); font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: 24px;
+  filter: drop-shadow(0 0 8px var(--info));
+  z-index: 1;
+}
+.pj-step:last-child .pj-arrow { display: none; }
+.pj-icon { font-size: 54px; margin-bottom: 8px; }
+.pj-num {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 11px;
+  color: var(--warm); letter-spacing: 1.5px;
+}
+.pj-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(15px, 1.7vw, 19px);
+  color: var(--primary); margin: 8px 0 6px;
+  letter-spacing: 1px;
+}
+.pj-desc { font-size: clamp(13px, 1.5vw, 16px); color: rgba(255,255,255,0.8); line-height: 1.5; }
+
+.mini-cards {
+  display: grid; gap: 14px; width: 100%; max-width: 1200px;
+}
+.mini-cards.mc4 { grid-template-columns: repeat(4, 1fr); }
+.mini-cards.mc2 { grid-template-columns: repeat(2, 1fr); }
+.mini-card {
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.28);
+  border-radius: 10px; padding: 18px 20px;
+  border-left: 4px solid var(--info);
+}
+.mini-card.purple { border-left-color: var(--purple); }
+.mini-card.warm   { border-left-color: var(--warm); }
+.mini-card.mint   { border-left-color: var(--mint); }
+.mini-card.pink   { border-left-color: var(--pink); }
+.mc-label {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: var(--info);
+  letter-spacing: 1px; margin-bottom: 6px;
+}
+.mini-card.purple .mc-label { color: var(--purple); }
+.mini-card.warm .mc-label   { color: var(--warm); }
+.mini-card.mint .mc-label   { color: var(--mint); }
+.mini-card.pink .mc-label   { color: var(--pink); }
+.mc-text { font-size: clamp(13px, 1.5vw, 17px); color: rgba(255,255,255,0.85); line-height: 1.55; }
+
+/* =================== TÜRKİYE QUEST TIMELINE (LV2) ====================== */
+.quest-list { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 1100px; position: relative; }
+.quest-list::before {
+  content:''; position: absolute;
+  left: 160px; top: 20px; bottom: 20px; width: 3px;
+  background: linear-gradient(to bottom, transparent, var(--info), var(--purple), transparent);
+}
+.quest-item { display: flex; align-items: center; gap: 18px; padding: 18px 26px; position: relative; }
+.quest-item:hover { transform: translateX(6px); }
+.quest-item .q-dot {
+  position: absolute; left: 156px; top: 50%;
+  transform: translateY(-50%);
+  width: 12px; height: 12px; background: var(--info);
+  border-radius: 50%; box-shadow: 0 0 14px var(--info);
+  z-index: 2;
+}
+.quest-item.active .q-dot {
+  background: var(--primary); box-shadow: 0 0 16px var(--primary);
+  animation: dotBlink 1.2s step-end infinite;
+}
+@keyframes dotBlink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.quest-year {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(22px, 2.6vw, 32px);
+  color: var(--primary); min-width: 110px;
+  text-shadow: 0 0 12px rgba(255,230,0,0.4);
+  position: relative; z-index: 3;
+}
+.q-spacer { width: 30px; flex-shrink: 0; }
+.quest-icon { font-size: 44px; flex-shrink: 0; }
+.quest-text { flex: 1; }
+.quest-text > strong {
+  display: block;
+  font-size: clamp(17px, 2vw, 22px);
+  color: var(--text); font-weight: 700; margin-bottom: 4px;
+}
+.q-know strong {
+  display: inline;
+  font-size: inherit;
+  color: inherit;
+  font-weight: 700;
+  margin: 0;
+}
+.quest-text span {
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: rgba(240,240,255,0.75); font-weight: 300;
+  line-height: 1.5;
+}
+.q-know {
+  display: block; margin-top: 8px; padding: 8px 14px;
+  background: rgba(255,230,0,0.1);
+  border-left: 3px solid var(--primary);
+  border-radius: 4px;
+  font-size: clamp(13px, 1.5vw, 16px);
+  color: var(--primary);
+  font-style: italic;
+  line-height: 1.5;
+}
+.quest-badge {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 10px;
+  padding: 6px 10px; border-radius: 4px; white-space: nowrap; letter-spacing: 1px;
+}
+.qb-done   { background: rgba(57,255,20,0.15); color: var(--success);  border: 1px solid var(--success); }
+.qb-active { background: rgba(255,230,0,0.15); color: var(--primary);  border: 1px solid var(--primary); animation: badgeBlink 1.2s step-end infinite; }
+@keyframes badgeBlink { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+/* Büyüme grafiği (LV2 S3) */
+.growth-chart {
+  width: 100%; max-width: 1100px;
+  background: rgba(0,30,60,0.6);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 14px; padding: 22px 28px;
+}
+.growth-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(16px, 1.9vw, 22px);
+  color: var(--info); letter-spacing: 1.5px; margin-bottom: 14px;
+  text-align: center;
+}
+.growth-row {
+  display: grid; grid-template-columns: 100px 1fr 160px;
+  gap: 14px; align-items: center; padding: 10px 0;
+}
+.growth-year {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(18px, 2vw, 24px);
+  color: var(--primary);
+}
+.growth-bar { height: 22px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; }
+.growth-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--info), var(--primary));
+  border-radius: 4px; transition: width 1s ease;
+}
+.growth-val {
+  font-size: clamp(14px, 1.7vw, 18px);
+  color: var(--success);
+  font-family: 'Chakra Petch'; font-weight: 700;
+  text-align: right;
+}
+
+/* =================== HIZ GRAFİĞİ (LV3 S1) ============================== */
+.speed-chart {
+  display: flex; gap: 22px;
+  width: 100%; max-width: 1100px;
+  align-items: flex-end; height: 420px;
+  padding-bottom: 6px;
+}
+.sc-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; gap: 6px; }
+.sc-gen {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(30px, 4vw, 48px);
+}
+.sc-speed {
+  font-family: 'Chakra Petch';
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: var(--info);
+  margin-bottom: 4px; letter-spacing: 0.5px;
+}
+.sc-stars { font-size: clamp(16px, 1.9vw, 22px); margin-bottom: 4px; letter-spacing: 1px; }
+.sc-can {
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.05); border-radius: 5px;
+  padding: 6px 10px; margin-bottom: 6px; text-align: center;
+  max-width: 100%; line-height: 1.4;
+}
+.sc-bar {
+  width: 100%; border-radius: 8px 8px 0 0;
+  transition: height 1s ease;
+  position: relative;
+  flex-shrink: 0;   /* yükseklikler ezilmesin — kademeler net görünsün */
+}
+.sc-bar-label {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: -4px; right: -4px;
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(11px, 1.3vw, 15px);
+  color: rgba(255,255,255,0.95);
+  letter-spacing: 0.3px;
+  text-align: center;
+  padding: 6px 4px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+/* ===== Responsive — dar ekranlarda hız grafiği ===== */
+@media (max-width: 960px) {
+  .speed-chart {
+    height: auto;
+    min-height: 340px;
+    gap: 10px;
+    padding: 0 4px 36px;
+  }
+  .sc-gen    { font-size: clamp(20px, 3.8vw, 30px); }
+  .sc-speed  { font-size: clamp(10px, 1.4vw, 12px); }
+  .sc-stars  { font-size: clamp(12px, 1.8vw, 16px); }
+  .sc-can    { font-size: clamp(10px, 1.5vw, 13px); padding: 4px 5px; }
+  .sc-bar-label {
+    font-size: clamp(9px, 1.4vw, 12px);
+    padding: 4px 2px;
+    letter-spacing: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .speed-chart {
+    gap: 5px; min-height: 300px;
+    padding-bottom: 40px;
+  }
+  .sc-wrap { gap: 3px; }
+  .sc-gen    { font-size: clamp(16px, 4vw, 22px); }
+  .sc-speed  { font-size: 9px; }
+  .sc-stars  { font-size: 10px; letter-spacing: 0; }
+  .sc-can    { font-size: 9px; padding: 3px 2px; line-height: 1.2; }
+  .sc-bar-label {
+    font-size: 9px;
+    padding: 3px 1px;
+    white-space: normal;
+    letter-spacing: 0;
+    top: calc(100% + 3px);
+  }
+}
+
+/* İndirme yarışı (LV3 S2) */
+.dl-race {
+  width: 100%; max-width: 1100px;
+  background: rgba(0,30,60,0.6);
+  border: 1px solid rgba(255,107,53,0.35);
+  border-radius: 14px; padding: 24px 30px;
+}
+.dl-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(18px, 2.2vw, 26px);
+  color: var(--warm); letter-spacing: 1.5px;
+  margin-bottom: 16px; text-align: center;
+}
+.dl-row {
+  display: grid; grid-template-columns: 60px 1fr 150px;
+  gap: 16px; align-items: center; padding: 10px 0;
+}
+.dl-gen {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(18px, 2vw, 24px);
+  color: var(--primary);
+}
+.dl-track { height: 22px; background: rgba(255,255,255,0.06); border-radius: 4px; position: relative; overflow: hidden; }
+.dl-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--warm), var(--primary));
+  border-radius: 4px;
+  width: 0;
+  animation-name: none;               /* varsayılan: animasyon durgun, bar boş */
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+  /* animation-duration inline style ile gelir (1G = 90s, 5G = 1s vb.) */
+}
+.dl-race.running .dl-fill {
+  animation-name: dlMove;             /* sadece sayfa aktif olduğunda oynat */
+}
+@keyframes dlMove { 0%{width:0%} 100%{width:100%} }
+.dl-time {
+  font-size: clamp(14px, 1.7vw, 18px);
+  color: var(--success);
+  font-family: 'Chakra Petch'; font-weight: 700;
+  text-align: right;
+}
+
+/* ====================== YZ BOSS FIGHT (LV4 S1) ======================== */
+.boss-fight { display: flex; gap: 32px; width: 100%; max-width: 1100px; align-items: center; }
+.boss-icon-wrap { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.boss-icon {
+  font-size: clamp(110px, 12vw, 150px);
+  animation: bossPulse 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 32px rgba(191,95,255,0.8));
+}
+@keyframes bossPulse {
+  0%,100% { transform: scale(1) rotate(-2deg); }
+  50%     { transform: scale(1.08) rotate(2deg); }
+}
+.boss-name {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(13px, 1.5vw, 16px);
+  color: var(--purple); text-align: center;
+  letter-spacing: 2px; line-height: 1.4;
+}
+.boss-cards { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+.bc { display: flex; gap: 16px; align-items: flex-start; padding: 16px 22px; }
+.bc:hover { transform: translateX(6px); }
+.bc .bc-icon {
+  font-size: 44px; flex-shrink: 0;
+  filter: drop-shadow(0 0 10px var(--purple));
+}
+.bc strong {
+  display: block;
+  font-size: clamp(16px, 1.9vw, 22px);
+  color: var(--purple); font-weight: 700;
+  margin-bottom: 4px; letter-spacing: 1px;
+}
+.bc span {
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: rgba(240,240,255,0.82);
+  line-height: 1.5;
+}
+
+/* YZ tarih şeridi (LV4 S2) */
+.ai-timeline {
+  width: 100%; max-width: 1200px;
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+.ai-tl-cell {
+  background: rgba(168,85,247,0.1);
+  border: 1px solid rgba(168,85,247,0.4);
+  border-radius: 12px; padding: 22px 14px;
+  text-align: center;
+  position: relative;
+}
+.ai-tl-year {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(26px, 3vw, 36px);
+  color: var(--purple);
+  text-shadow: 0 0 12px rgba(168,85,247,0.5);
+}
+.ai-tl-ev {
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: rgba(255,255,255,0.85);
+  margin-top: 8px; line-height: 1.45;
+}
+
+/* YZ türler/günlük (LV4 S3) */
+.ai-split {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 18px; width: 100%; max-width: 1200px;
+}
+@media (max-width: 1100px) { .ai-split { grid-template-columns: 1fr; } }
+.ai-types, .ai-life {
+  background: rgba(0,30,60,0.55);
+  border-radius: 12px; padding: 22px 26px;
+}
+.ai-types { border: 1px solid rgba(168,85,247,0.4); }
+.ai-life  { border: 1px solid rgba(255,107,53,0.4); }
+.ai-h {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(16px, 1.9vw, 22px);
+  letter-spacing: 1.5px; margin-bottom: 12px;
+}
+.ai-types .ai-h { color: var(--purple); }
+.ai-life  .ai-h { color: var(--warm); }
+.ai-types ul, .ai-life ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.ai-types li, .ai-life li {
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: rgba(255,255,255,0.85);
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px; line-height: 1.5;
+}
+.ai-types li strong { color: var(--purple); }
+.ai-life li strong  { color: var(--warm); }
+
+/* ====================== 2030 GÜN (LV5 S2) ============================== */
+.day-2030 {
+  background: rgba(0,30,60,0.6);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 14px; padding: 24px 28px;
+  width: 100%; max-width: 1200px;
+}
+.d30-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(18px, 2.1vw, 24px);
+  color: var(--info); letter-spacing: 1.5px;
+  margin-bottom: 16px; text-align: center;
+}
+.d30-steps {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+}
+.d30-step {
+  background: rgba(0,245,255,0.07);
+  border: 1px solid rgba(0,245,255,0.28);
+  border-radius: 10px; padding: 14px 8px; text-align: center;
+}
+.d30-time {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: var(--primary); letter-spacing: 0.5px;
+}
+.d30-icon {
+  font-size: clamp(40px, 4.5vw, 56px);
+  display: block; margin: 6px 0;
+}
+.d30-desc {
+  font-size: clamp(11px, 1.3vw, 14px);
+  color: rgba(255,255,255,0.8);
+  line-height: 1.45;
+}
+
+/* YZ araçları (LV5 S3) */
+.ai-tools {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 14px; width: 100%; max-width: 1100px;
+}
+.ai-tool {
+  background: rgba(168,85,247,0.1);
+  border: 1px solid rgba(168,85,247,0.4);
+  border-radius: 10px; padding: 18px 10px; text-align: center;
+}
+.ai-tool .at-emoji { font-size: 42px; }
+.at-name {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: var(--purple); letter-spacing: 1px;
+  margin-top: 6px;
+}
+.at-do {
+  font-size: clamp(11px, 1.3vw, 14px);
+  color: rgba(255,255,255,0.78);
+  margin-top: 5px; line-height: 1.45;
+}
+
+/* ====================== SCIFI KARŞILAŞTIRMA (LV6 S3) ==================== */
+.scifi-flow {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 18px; width: 100%; max-width: 1200px;
+}
+.sf-col {
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 12px; padding: 22px 26px;
+}
+.sf-col.real { border-color: rgba(57,255,20,0.4); }
+.sf-col.fic  { border-color: rgba(255,107,157,0.4); }
+.sf-col h4 {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(17px, 2vw, 22px);
+  letter-spacing: 1.5px; margin-bottom: 12px;
+}
+.sf-col.real h4 { color: var(--success); }
+.sf-col.fic  h4 { color: var(--pink); }
+.sf-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.sf-col li {
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: rgba(255,255,255,0.85);
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px; line-height: 1.5;
+}
+
+/* TR teknoloji (LV6 S3) */
+.tr-tech {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 14px; width: 100%; max-width: 1200px;
+}
+.tr-tech-card {
+  background: rgba(255,107,53,0.1);
+  border: 1px solid rgba(255,107,53,0.4);
+  border-radius: 12px; padding: 20px 12px; text-align: center;
+}
+.trt-emoji { font-size: clamp(42px, 5vw, 56px); }
+.trt-name {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: var(--warm); letter-spacing: 1px;
+  margin-top: 8px;
+}
+.trt-sub {
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: rgba(255,255,255,0.78);
+  margin-top: 5px; line-height: 1.4;
+}
+
+/* ====================== TİCARET (LV7) ================================== */
+.trade-board {
+  display: grid; grid-template-columns: 1fr 70px 1fr;
+  gap: 16px; width: 100%; max-width: 1100px; align-items: stretch;
+}
+.tb-col { padding: 24px 26px; }
+.tb-col h3 {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(18px, 2.2vw, 26px);
+  margin-bottom: 14px; text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  letter-spacing: 1.5px;
+}
+.tb-col.old h3 { color: var(--info); }
+.tb-col.new h3 { color: var(--success); }
+.tb-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.tb-col li {
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: rgba(240,240,255,0.9);
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 7px;
+  border-left: 3px solid rgba(0,245,255,0.4);
+}
+.tb-arrow {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 44px; color: var(--primary);
+  filter: drop-shadow(0 0 12px var(--primary));
+  animation: arrowBlink 1.5s ease-in-out infinite;
+}
+@keyframes arrowBlink {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%     { opacity: 0.55; transform: scale(1.18); }
+}
+
+/* Ürün yolculuğu (LV7 S2) */
+.journey {
+  width: 100%; max-width: 1200px;
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+}
+.jrn-step {
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 10px; padding: 16px 8px; text-align: center;
+  position: relative;
+}
+.jrn-step::after {
+  content: '→';
+  position: absolute; right: -10px; top: 50%; transform: translateY(-50%);
+  color: var(--primary); font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: 22px;
+  filter: drop-shadow(0 0 8px var(--primary)); z-index: 2;
+}
+.jrn-step:last-child::after { display: none; }
+.jrn-icon { font-size: clamp(44px, 4.8vw, 58px); }
+.jrn-label {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(11px, 1.3vw, 14px);
+  color: var(--info); letter-spacing: 1px;
+  margin-top: 6px;
+}
+
+.ecom-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 14px; width: 100%; max-width: 1100px;
+}
+.ecom-card {
+  background: rgba(57,255,20,0.08);
+  border: 1px solid rgba(57,255,20,0.35);
+  border-radius: 10px; padding: 16px 18px;
+  text-align: center;
+}
+.ecom-card .e-emoji { font-size: 40px; }
+.ec-name {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: var(--success); letter-spacing: 1px;
+  margin-top: 6px;
+}
+.ec-meta {
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: rgba(255,255,255,0.78);
+  margin-top: 4px; line-height: 1.4;
+}
+
+.crypto-money {
+  display: grid; grid-template-columns: 1.15fr 1fr;
+  gap: 18px; width: 100%; max-width: 1200px;
+}
+.crypto-box, .money-box {
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(255,230,0,0.35);
+  border-radius: 12px; padding: 20px 24px;
+}
+.cm-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(16px, 1.9vw, 22px);
+  color: var(--primary); letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.cm-text {
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: rgba(255,255,255,0.85); line-height: 1.55;
+}
+.money-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.money-chip {
+  font-size: clamp(12px, 1.4vw, 15px);
+  padding: 7px 14px; border-radius: 20px;
+  background: rgba(255,230,0,0.1);
+  border: 1px solid rgba(255,230,0,0.4);
+  color: var(--primary);
+}
+
+/* ==================== KARİYER (LV8) ===================================== */
+.career-rpg {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; width: 100%; max-width: 1200px;
+}
+.crpg { padding: 22px 16px; text-align: center; position: relative; }
+.crpg .c-level {
+  position: absolute; top: 12px; right: 14px;
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 9px;
+  color: rgba(255,230,0,0.75); letter-spacing: 0.5px;
+}
+.crpg .c-icon {
+  font-size: clamp(56px, 6vw, 72px);
+  margin-bottom: 8px; display: block;
+  filter: drop-shadow(0 0 14px rgba(57,255,20,0.5));
+}
+.crpg .c-class {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(15px, 1.7vw, 19px);
+  color: var(--success); margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+.crpg .c-routine {
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: rgba(255,255,255,0.8); line-height: 1.55;
+  margin-bottom: 6px;
+}
+.crpg .c-role-model {
+  font-size: clamp(11px, 1.3vw, 14px);
+  color: var(--primary); font-style: italic;
+  letter-spacing: 0.5px;
+}
+
+.people-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; width: 100%; max-width: 1200px;
+}
+.person-card {
+  background: rgba(255,230,0,0.08);
+  border: 1px solid rgba(255,230,0,0.35);
+  border-radius: 12px; padding: 18px 22px;
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.person-icon { font-size: 52px; flex-shrink: 0; }
+.person-name {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(15px, 1.7vw, 19px);
+  color: var(--primary);
+}
+.person-role {
+  font-size: clamp(11px, 1.3vw, 14px);
+  color: var(--info); margin: 4px 0;
+  letter-spacing: 0.5px;
+}
+.person-do {
+  font-size: clamp(12px, 1.4vw, 16px);
+  color: rgba(255,255,255,0.85);
+  line-height: 1.5;
+}
+
+.extras-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 18px; width: 100%; max-width: 1200px;
+}
+.extras-col {
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 12px; padding: 22px 26px;
+}
+.ext-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(16px, 1.9vw, 22px);
+  letter-spacing: 1.5px; margin-bottom: 12px;
+}
+.extras-col.new-jobs .ext-title  { color: var(--pink); }
+.extras-col.study    .ext-title  { color: var(--mint); }
+.extras-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.extras-col li {
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: rgba(255,255,255,0.85);
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px; line-height: 1.5;
+}
+
+.career-quiz {
+  width: 100%; max-width: 1100px;
+  background: rgba(168,85,247,0.1);
+  border: 1px solid rgba(168,85,247,0.4);
+  border-radius: 12px; padding: 22px 28px;
+}
+.cq-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(17px, 2vw, 22px);
+  color: var(--purple); letter-spacing: 1.5px;
+  margin-bottom: 10px; text-align: center;
+}
+.cq-question {
+  font-size: clamp(15px, 1.7vw, 20px);
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 12px; text-align: center;
+}
+.cq-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.cq-opt {
+  font-size: clamp(13px, 1.5vw, 17px);
+  padding: 12px 18px; border-radius: 8px;
+  background: rgba(168,85,247,0.12);
+  border: 2px solid rgba(168,85,247,0.4);
+  color: rgba(255,255,255,0.9);
+  cursor: pointer; transition: all 0.2s;
+  text-align: left; font-family: 'Exo 2';
+}
+.cq-opt:hover { background: rgba(168,85,247,0.3); border-color: var(--purple); transform: translateY(-2px); }
+.cq-result {
+  margin-top: 12px; padding: 12px 18px; border-radius: 8px;
+  background: rgba(57,255,20,0.1);
+  border: 1px solid rgba(57,255,20,0.4);
+  color: var(--success);
+  font-size: clamp(14px, 1.6vw, 17px);
+  display: none;
+  text-align: center;
+}
+.cq-result.show { display: block; animation: pop 0.4s ease; }
+@keyframes pop { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+/* ===================== AKILLI KULLANIM (LV9) ============================ */
+.mint-badge { background: var(--mint) !important; color: #002a28 !important; }
+.mint-title { color: var(--mint) !important; text-shadow: 0 0 24px rgba(78,205,196,0.5) !important; }
+
+.smart-full {
+  background: rgba(78,205,196,0.08);
+  border: 1px solid rgba(78,205,196,0.4);
+  border-radius: 14px;
+  padding: 26px 32px;
+  width: 100%; max-width: 1100px;
+  position: relative; overflow: hidden;
+}
+@media (max-width: 640px) { .smart-full { padding: 18px 16px; } }
+@media (max-width: 360px) { .smart-full { padding: 14px 12px; } }
+.smart-full::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--mint), transparent);
+}
+.sf-head { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+.sf-emo { font-size: clamp(40px, 5vw, 56px); }
+.sf-head h3 {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(20px, 2.4vw, 28px);
+  color: var(--mint); letter-spacing: 1.5px;
+}
+.sf-text {
+  font-size: clamp(15px, 1.8vw, 20px);
+  color: rgba(255,255,255,0.9);
+  line-height: 1.55; margin-bottom: 10px;
+}
+.sf-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.sf-list li {
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: rgba(255,255,255,0.85);
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px;
+  border-left: 3px solid var(--mint);
+  line-height: 1.55;
+}
+
+/* Ekran süresi slider */
+.screen-slider-wrap {
+  margin-top: 14px;
+  padding: 16px 18px;
+  background: rgba(78,205,196,0.1);
+  border: 1px solid rgba(78,205,196,0.4);
+  border-radius: 10px;
+}
+.sslider-label {
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: var(--mint);
+  font-family: 'Chakra Petch'; font-weight: 700;
+  letter-spacing: 1px;
+}
+.sslider-row { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
+input[type=range].sslider {
+  flex: 1; -webkit-appearance: none; appearance: none;
+  height: 10px; border-radius: 5px;
+  background: linear-gradient(to right, var(--success) 0%, var(--success) 25%, var(--primary) 25%, var(--primary) 50%, var(--warm) 50%, var(--warm) 75%, var(--red) 75%);
+  outline: none;
+}
+input[type=range].sslider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--primary); cursor: pointer;
+  border: 3px solid #000;
+  box-shadow: 0 0 10px var(--primary);
+}
+.sslider-val {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(15px, 1.8vw, 20px);
+  color: var(--primary); min-width: 100px; text-align: right;
+}
+.sslider-msg {
+  font-size: clamp(13px, 1.5vw, 17px);
+  margin-top: 8px; line-height: 1.5;
+  text-align: center;
+}
+
+/* Şifre oluşturucu */
+.pw-creator {
+  margin-top: 14px;
+  padding: 16px 18px;
+  background: rgba(78,205,196,0.1);
+  border: 1px solid rgba(78,205,196,0.4);
+  border-radius: 10px;
+}
+.pw-lbl {
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: var(--mint);
+  font-family: 'Chakra Petch'; font-weight: 700;
+  letter-spacing: 1px;
+}
+.pw-input {
+  width: 100%; margin-top: 10px;
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.35);
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 6px;
+  font-family: 'Exo 2';
+  font-size: clamp(16px, 1.9vw, 20px);
+  color: var(--text);
+}
+.pw-input:focus { border-color: var(--mint); outline: none; box-shadow: 0 0 14px rgba(78,205,196,0.4); }
+.pw-checks {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px; margin-top: 10px;
+}
+.pw-check {
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: rgba(255,255,255,0.5);
+  padding: 8px 12px; border-radius: 5px;
+  background: rgba(255,255,255,0.04);
+  text-align: center;
+}
+.pw-check.ok {
+  color: var(--success);
+  background: rgba(57,255,20,0.1);
+  border: 1px solid rgba(57,255,20,0.4);
+}
+
+/* 5 altın kural */
+.golden-rules {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 14px; width: 100%; max-width: 1200px;
+}
+.gr-card {
+  background: linear-gradient(180deg, rgba(255,230,0,0.15), rgba(78,205,196,0.08));
+  border: 2px solid rgba(255,230,0,0.45);
+  border-radius: 12px; padding: 20px 14px; text-align: center;
+  position: relative; cursor: pointer;
+  transition: all 0.3s;
+}
+.gr-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(255,230,0,0.3);
+  border-color: var(--primary);
+}
+.gr-num {
+  position: absolute; top: 6px; left: 10px;
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: 12px; color: var(--primary);
+}
+.gr-icon {
+  font-size: clamp(48px, 5vw, 60px);
+  margin-bottom: 6px; display: block;
+}
+.gr-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: var(--primary); letter-spacing: 0.5px;
+  line-height: 1.3; margin-bottom: 6px;
+}
+.gr-desc {
+  font-size: clamp(11px, 1.3vw, 14px);
+  color: rgba(255,255,255,0.85);
+  line-height: 1.5;
+}
+
+.oath-btn {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(14px, 1.8vw, 18px);
+  letter-spacing: 2px;
+  color: var(--mint); border: 3px solid var(--mint);
+  padding: 14px 32px; border-radius: 8px;
+  background: rgba(78,205,196,0.1);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.oath-btn:hover {
+  background: var(--mint); color: #002a28;
+  box-shadow: 0 0 26px rgba(78,205,196,0.7);
+  transform: scale(1.03);
+}
+.oath-stars {
+  position: fixed; pointer-events: none;
+  top: 50%; left: 50%; z-index: 150;
+}
+.oath-star {
+  position: absolute; font-size: 28px;
+  animation: oathBurst 1.5s ease-out forwards;
+}
+@keyframes oathBurst {
+  0%   { transform: translate(0,0) scale(0); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(1.5); opacity: 0; }
+}
+
+/* ===================== VICTORY (S30) =================================== */
+.victory-screen { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.victory-trophy {
+  font-size: clamp(90px, 10vw, 120px);
+  filter: drop-shadow(0 0 30px rgba(255,230,0,0.85));
+  animation: trophyFloat 2.4s ease-in-out infinite;
+}
+@keyframes trophyFloat {
+  0%,100% { transform: translateY(0) rotate(-3deg); }
+  50%     { transform: translateY(-12px) rotate(3deg); }
+}
+.victory-title {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(32px, 5vw, 56px);
+  color: var(--primary);
+  text-shadow:
+    5px 5px 0 rgba(0,0,0,0.5),
+    0 0 45px rgba(255,230,0,0.85);
+  animation: victoryFlicker 3s ease-in-out infinite;
+  line-height: 1.15; letter-spacing: 3px;
+}
+@keyframes victoryFlicker {
+  0%,100% { text-shadow: 5px 5px 0 rgba(0,0,0,0.5), 0 0 45px rgba(255,230,0,0.85); }
+  50%     { text-shadow: 5px 5px 0 rgba(0,0,0,0.5), 0 0 75px rgba(255,230,0,1), 0 0 140px rgba(255,230,0,0.5); }
+}
+.final-xp {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(16px, 2vw, 22px);
+  color: var(--success);
+  background: rgba(57,255,20,0.12);
+  border: 2px solid var(--success);
+  padding: 12px 28px; border-radius: 8px;
+  box-shadow: 0 0 22px rgba(57,255,20,0.35); letter-spacing: 1px;
+}
+
+.achievement-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.achievement {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 12px 16px;
+  background: var(--dim);
+  border: 1px solid rgba(255,230,0,0.35);
+  border-radius: 10px; min-width: 96px;
+  animation: achieveFloat 3s ease-in-out infinite;
+}
+.achievement:nth-child(2) { animation-delay: 0.2s; }
+.achievement:nth-child(3) { animation-delay: 0.4s; }
+.achievement:nth-child(4) { animation-delay: 0.6s; }
+.achievement:nth-child(5) { animation-delay: 0.8s; }
+@keyframes achieveFloat {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-7px); }
+}
+.ach-icon { font-size: 36px; filter: drop-shadow(0 0 12px rgba(255,230,0,0.7)); }
+.ach-label {
+  font-family: 'Chakra Petch'; font-weight: 700; font-size: 9px;
+  color: var(--primary); text-align: center;
+  line-height: 1.4; letter-spacing: 0.5px;
+}
+
+.quote-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 12px; width: 100%; max-width: 900px;
+  margin: 0 auto;
+}
+.quote-card {
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.35);
+  border-radius: 8px; padding: 14px 16px;
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: rgba(255,255,255,0.85);
+  line-height: 1.5; font-style: italic;
+}
+.quote-author {
+  display: block; margin-top: 6px;
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(10px, 1.2vw, 13px);
+  color: var(--info); font-style: normal;
+  letter-spacing: 0.5px;
+}
+
+.final-cta {
+  font-family: 'Chakra Petch'; font-weight: 700;
+  font-size: clamp(14px, 1.8vw, 18px);
+  color: var(--mint); letter-spacing: 1.5px;
+  padding: 12px 22px;
+  border: 2px solid var(--mint);
+  border-radius: 8px;
+  background: rgba(78,205,196,0.08);
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.final-cta:hover {
+  background: rgba(78,205,196,0.18);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 24px rgba(78,205,196,0.45);
+}
+.final-cta:active { transform: translateY(0) scale(0.98); }
+.press-start {
+  font-family: 'Chakra Petch'; font-size: 11px;
+  color: rgba(240,240,255,0.45);
+  animation: pressBlink 1.2s step-end infinite;
+  letter-spacing: 1.5px;
+}
+@keyframes pressBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* Konfetti */
+.confetti-piece {
+  position: absolute; width: 10px; height: 10px;
+  border-radius: 2px; animation: confettiFall linear infinite;
+  z-index: 150;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0.3; }
+}
+
+/* ============================================================
+   GENEL RESPONSIVE DÜZENLEMELER (tablet / telefon)
+   ============================================================ */
+@media (max-width: 1100px) {
+  .slide { padding: 72px 28px 58px; gap: 14px; }
+  .preview-9 { grid-template-columns: repeat(5, 1fr); }
+  .preview-chip .pl { font-size: 9px; }
+  .live-counters { gap: 10px; }
+  .g4 { grid-template-columns: repeat(2, 1fr); }
+  .page-journey { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .pj-step:nth-child(2) .pj-arrow { display: none; }
+  .journey { grid-template-columns: repeat(3, 1fr); }
+  .jrn-step:nth-child(3n)::after { display: none; }
+  .mini-cards.mc4 { grid-template-columns: repeat(2, 1fr); }
+  .tr-tech { grid-template-columns: repeat(3, 1fr); }
+  .ai-tools { grid-template-columns: repeat(3, 1fr); }
+  .golden-rules { grid-template-columns: repeat(3, 1fr); }
+  .ecom-row { grid-template-columns: repeat(2, 1fr); }
+  .d30-steps { grid-template-columns: repeat(3, 1fr); }
+  .ai-timeline { grid-template-columns: repeat(3, 1fr); }
+  .career-rpg { grid-template-columns: repeat(2, 1fr); }
+  .hud-center { width: 280px; }
+  .xp-bar-wrap { width: 160px; }
+}
+
+@media (max-width: 780px) {
+  .slide { padding: 64px 20px 54px; gap: 10px; }
+  .level-title { font-size: clamp(20px, 4vw, 28px); letter-spacing: 1px; }
+  .slide-sub { font-size: clamp(13px, 2.2vw, 16px); margin-bottom: 6px; }
+  .level-banner { flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .preview-9 { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  .live-counters { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .lc-box { padding: 8px 10px; }
+  .lc-num { font-size: clamp(14px, 3.2vw, 20px); }
+  .lc-label { font-size: 10px; }
+  .g3, .g4 { grid-template-columns: repeat(2, 1fr); }
+  .game-card { padding: 16px 12px; }
+  .internet-split { grid-template-columns: 1fr; gap: 10px; }
+  .one-second-panel { max-width: 100%; }
+  .page-journey { grid-template-columns: repeat(2, 1fr); }
+  .mini-cards.mc4, .mini-cards.mc2 { grid-template-columns: repeat(2, 1fr); }
+  .quest-list::before { left: 120px; }
+  .q-dot { left: 116px; }
+  .quest-year { min-width: 80px; font-size: clamp(18px, 3.5vw, 24px); }
+  .q-spacer { width: 16px; }
+  .quest-icon { font-size: 30px; }
+  .quest-item { padding: 14px 16px; gap: 10px; }
+  .quest-badge { display: none; }
+  .trade-board { grid-template-columns: 1fr; }
+  .tb-arrow { transform: rotate(90deg); padding: 0; min-height: auto; font-size: 32px; }
+  .journey { grid-template-columns: repeat(2, 1fr); }
+  .jrn-step::after { display: none; }
+  .crypto-money { grid-template-columns: 1fr; }
+  .ai-split { grid-template-columns: 1fr; }
+  .ai-timeline { grid-template-columns: repeat(2, 1fr); }
+  .ai-tools { grid-template-columns: repeat(2, 1fr); }
+  .d30-steps { grid-template-columns: repeat(2, 1fr); }
+  .scifi-flow { grid-template-columns: 1fr; }
+  .tr-tech { grid-template-columns: repeat(2, 1fr); }
+  .boss-fight { flex-direction: column; gap: 14px; }
+  .career-rpg { grid-template-columns: repeat(2, 1fr); }
+  .people-row { grid-template-columns: 1fr; }
+  .extras-grid { grid-template-columns: 1fr; }
+  .golden-rules { grid-template-columns: repeat(2, 1fr); }
+  .gr-card { padding: 14px 10px; }
+  .quote-row { grid-template-columns: 1fr; }
+  .achievement-row { gap: 6px; }
+  .achievement { min-width: 78px; padding: 8px 10px; }
+  /* HUD sıkıştır */
+  .hud { padding: 0 12px; }
+  .hud-logo { font-size: 10px; }
+  .hud-center { display: none; }
+  .hud-right .badge-item { font-size: 16px; }
+  .hud-right .badge-item:nth-child(n+7) { display: none; }
+  .level-pip { width: 34px; height: 28px; font-size: 8px; }
+}
+
+@media (max-width: 500px) {
+  .slide { padding: 58px 12px 52px; gap: 8px; }
+  .level-title { font-size: 18px; letter-spacing: 0.5px; }
+  .level-badge, .page-tag { font-size: 9px; padding: 3px 8px; }
+  .s1-title { font-size: clamp(32px, 9vw, 48px); letter-spacing: 2px; }
+  .s1-tagline { font-size: 11px; letter-spacing: 1.5px; }
+  .preview-9 { grid-template-columns: repeat(3, 1fr); }
+  .live-counters { grid-template-columns: 1fr; }
+  .g3, .g4 { grid-template-columns: 1fr; }
+  .gc-icon { font-size: clamp(40px, 9vw, 54px); }
+  .page-journey, .mini-cards.mc4, .mini-cards.mc2 { grid-template-columns: 1fr; }
+  .journey { grid-template-columns: repeat(2, 1fr); }
+  /* Dar ekranda timeline çizgisi ve dot'ları gizle — sadece sade kart görünümü */
+  .quest-list::before { display: none; }
+  .q-dot { display: none; }
+  .q-spacer { display: none; }
+  .quest-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 12px 14px;
+  }
+  .quest-year {
+    min-width: auto;
+    font-size: 18px;
+    margin-bottom: 2px;
+  }
+  .quest-icon { font-size: 26px; position: absolute; top: 12px; right: 14px; }
+  .quest-text { width: 100%; }
+  .q-know { font-size: 11px; padding: 6px 8px; }
+  .speed-chart { min-height: 260px; }
+  .growth-row { grid-template-columns: 60px 1fr 80px; gap: 8px; }
+  .growth-year { font-size: 14px; }
+  .growth-val { font-size: 11px; }
+  .dl-row { grid-template-columns: 36px 1fr 80px; gap: 8px; }
+  .dl-gen { font-size: 14px; }
+  .dl-time { font-size: 11px; }
+  .ai-timeline, .ai-tools, .tr-tech, .golden-rules, .career-rpg, .d30-steps { grid-template-columns: 1fr 1fr; }
+  .quote-row { grid-template-columns: 1fr; }
+  .bottom-nav { gap: 3px; padding: 0 4px; height: 42px; }
+  .level-pip { width: 28px; height: 24px; font-size: 7px; }
+  .level-pip .pip-dots { bottom: -1px; }
+  .level-pip .pip-dot { width: 2px; height: 2px; }
+  /* ≤500px — okları ALTA taşı + HUD'u sıkıştır */
+  .arrow-btn {
+    top: auto;
+    bottom: 50px; /* 42px bottom-nav + 8px gap */
+    transform: none;
+    width: 38px;
+    height: 34px;
+    font-size: 12px;
+    background: rgba(10,10,25,0.92);
+    border-width: 1.5px;
+    box-shadow: 0 0 0 8px rgba(10,10,25,0.55), 0 4px 14px rgba(0,0,0,0.6);
+    backdrop-filter: blur(6px);
+  }
+  .arrow-btn:hover { transform: scale(1.08); background: rgba(255,230,0,0.25); }
+  .arrow-left  { left: 6px; }
+  .arrow-right { right: 6px; }
+  .hud { height: 48px; padding: 0 10px; gap: 4px; }
+  .hud-logo { font-size: 9px; letter-spacing: 0.5px; max-width: 90px; }
+  .hud-level { font-size: 10px; padding: 3px 6px; }
+  .hud-page { font-size: 9px; padding: 2px 5px; min-width: 30px; }
+  .pc-tl, .pc-tr { top: 48px; }
+  .pc-bl, .pc-br { bottom: 42px; }
+  .slide { justify-content: flex-start; padding-top: 60px; padding-bottom: 100px; }
+}
+
+/* ===== Ultra-dar ekranlar: iPhone SE 1st gen, küçük Android (≤360px) ===== */
+@media (max-width: 360px) {
+  .slide { padding: 48px 10px 92px; gap: 6px; }
+  .arrow-btn { width: 34px; height: 30px; font-size: 10px; bottom: 46px; }
+  .arrow-left { left: 4px; }
+  .arrow-right { right: 4px; }
+  .hud { padding: 0 6px; height: 42px; gap: 3px; }
+  .hud-logo { display: none; }  /* TEKNO QUEST yazısı tamamen gizlensin */
+  .hud-level { font-size: 9px; padding: 2px 5px; }
+  .hud-page { font-size: 8px; padding: 2px 4px; min-width: 26px; }
+  .pc-tl, .pc-tr { top: 42px; }
+  .pc-bl, .pc-br { bottom: 42px; }
+  .s1-title { font-size: clamp(26px, 8vw, 36px); letter-spacing: 1px; }
+  .s1-tagline { font-size: 10px; letter-spacing: 1px; }
+  .level-title { font-size: 15px; }
+  .level-badge, .page-tag { font-size: 8px; padding: 2px 6px; }
+  .live-counters { grid-template-columns: 1fr; gap: 4px; }
+  .g3, .g4, .mini-cards, .mini-cards.mc2, .mini-cards.mc4,
+  .page-journey, .journey, .ai-timeline, .ai-tools,
+  .tr-tech, .golden-rules, .career-rpg, .d30-steps,
+  .ecom-row, .preview-9, .quote-row { grid-template-columns: 1fr !important; }
+  .game-card, .gr-card, .lc-box { padding: 10px 8px; }
+  .quest-icon { font-size: 20px; top: 10px; right: 10px; }
+  .quest-item { padding: 10px 10px; gap: 4px; }
+  .quest-year { min-width: auto; font-size: 14px; }
+  .growth-row { grid-template-columns: 44px 1fr 56px; gap: 5px; }
+  .growth-val { font-size: 10px; }
+  .dl-row { grid-template-columns: 28px 1fr 56px; gap: 5px; }
+  .dl-time { font-size: 10px; }
+  .bottom-nav { height: 38px; gap: 2px; padding: 0 3px; }
+  .level-pip { width: 24px; height: 22px; font-size: 6px; }
+  .hud-right .badge-item:nth-child(n+5) { display: none; }
+  .hud-right .badge-item { font-size: 14px; }
+  .achievement-row { gap: 4px; }
+  .achievement { min-width: 64px; padding: 6px 8px; font-size: 10px; }
+}
+
+/* ===== Samsung Fold (katlanmış ≤320px) ===== */
+@media (max-width: 320px) {
+  .slide { padding: 46px 6px 88px; }
+  .arrow-btn { width: 30px; height: 28px; font-size: 9px; bottom: 42px; }
+  .s1-title { font-size: clamp(22px, 7vw, 28px); letter-spacing: 0.5px; }
+  .hud-right .badge-item:nth-child(n+4) { display: none; }
+  .bottom-nav { height: 34px; }
+  .level-pip { width: 20px; height: 20px; font-size: 5px; }
+  .level-title { font-size: 13px; }
+}
+
+/* ===== Fold açık / Küçük tablet (501-820px) — arada kalmış aralık ===== */
+@media (min-width: 501px) and (max-width: 820px) {
+  /* Oklar yanlarda kalsın ama yumuşak halo'lu */
+  .arrow-btn {
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 42px;
+    background: rgba(10,10,25,0.92);
+    box-shadow: 0 0 0 10px rgba(10,10,25,0.4), 0 4px 16px rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+  }
+  .arrow-btn:hover { transform: translateY(-50%) scale(1.08); }
+  .arrow-left  { left: 8px; }
+  .arrow-right { right: 8px; }
+  /* Slide padding'i arrow genişliği için güvenli */
+  .slide { padding-left: 62px; padding-right: 62px; padding-bottom: 60px; justify-content: flex-start; padding-top: 74px; }
+  /* HUD'u rahatla */
+  .hud { padding: 0 10px; gap: 6px; }
+  .hud-logo { font-size: 11px; max-width: 120px; letter-spacing: 0.5px; }
+  .hud-level { font-size: 10px; padding: 3px 7px; }
+  .hud-page { font-size: 9px; padding: 2px 6px; min-width: 32px; }
+  .hud-center { display: none; } /* XP barı HUD'dan kaldır, slide içinde görünsün */
+  .hud-right { gap: 4px; }
+  .hud-right .badge-item { font-size: 14px; }
+  .hud-right .badge-item:nth-child(n+7) { display: none; }
+}
+/* 701-820px arası biraz daha nefes */
+@media (min-width: 701px) and (max-width: 820px) {
+  .slide { padding-left: 70px; padding-right: 70px; padding-top: 74px; padding-bottom: 70px; justify-content: flex-start; }
+  .arrow-btn { width: 44px; height: 44px; }
+  .hud-logo { max-width: 160px; font-size: 12px; }
+  .hud-right .badge-item:nth-child(n+7) { display: inline-block; }
+  .hud-right .badge-item:nth-child(n+9) { display: none; }
+}
+
+/* ==================================================================== */
+/* MOBİL SCROLL REFACTOR (≤820px) — iframe/iOS scroll bug'ını at:        */
+/* Slide artık position:static, body scroll eder, sadece .active görünür */
+/* ==================================================================== */
+@media (max-width: 820px) {
+  html, body {
+    height: auto;
+    min-height: 100dvh;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .presentation {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+  .slide {
+    position: static;
+    display: none;         /* Sadece .active göster */
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+    opacity: 1;
+    pointer-events: auto;
+    transition: none;
+    overflow: visible;     /* Body scroll etsin */
+    touch-action: auto;
+  }
+  .slide.active {
+    display: flex;
+  }
+  /* HUD ve bottom-nav zaten position:fixed — onlar ekrana yapışık kalır */
+  /* Ama iframe içinde alt nav yerine arrows ve pips yine fixed'de kalsın */
+  .bottom-nav { position: fixed; }
+  .arrow-btn {
+    position: fixed;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+  }
+  .pixel-corner { position: fixed; }
+  .pc-tl, .pc-tr { top: 38px; }
+  .pc-bl, .pc-br { bottom: 34px; }
+  .level-title { font-size: 16px; }
+  .level-banner { gap: 8px; }
+}
+
+/* Güvenli alan — iPhone notch + home indicator */
+@supports (padding: env(safe-area-inset-top)) {
+  .hud { padding-top: env(safe-area-inset-top); height: calc(52px + env(safe-area-inset-top)); }
+  .bottom-nav { padding-bottom: env(safe-area-inset-bottom); height: calc(48px + env(safe-area-inset-bottom)); }
+  .pc-tl, .pc-tr { top: calc(52px + env(safe-area-inset-top)); }
+  .pc-bl, .pc-br { bottom: calc(48px + env(safe-area-inset-bottom)); }
+}
+
+/* ============================================================
+   TEKNO QUEST · V2 — GÖKYÜZÜ TEMASI
+   Çocuk psikoloğu önerilerine göre yeniden tasarım:
+   - Açık mavi gökyüzü arkaplan (koyu/yorucu değil)
+   - Lacivert yazı (okunaklı, kontrast)
+   - Turuncu vurgular (sıcak, dikkat çekici)
+   - Yumuşak yeşil/sarı ikonlar
+   - NEON yok, parlama yok
+   - Animasyonlar daha yavaş
+   ============================================================ */
+:root {
+  --bg:        #e0f2fe;   /* açık gökyüzü mavisi */
+  --bg-soft:   #f0f9ff;
+  --text:      #1e3a8a;   /* lacivert */
+  --dim:       rgba(30,58,138,0.08);
+  --primary:   #f97316;   /* turuncu vurgu */
+  --success:   #16a34a;   /* yumuşak yeşil */
+  --info:      #0284c7;   /* gök mavisi */
+  --purple:    #7c3aed;
+  --warm:      #f97316;
+  --pink:      #ec4899;
+  --mint:      #14b8a6;
+  --red:       #dc2626;
+  --holo-bg:     rgba(255,255,255,0.75);
+  --holo-border: rgba(249,115,22,0.3);
+  --grid:        rgba(30,58,138,0.035);
+}
+
+html, body {
+  background:
+    radial-gradient(ellipse at 20% 15%, rgba(255,255,255,0.85) 0%, transparent 45%),
+    radial-gradient(ellipse at 80% 85%, rgba(255,255,255,0.7) 0%, transparent 50%),
+    linear-gradient(180deg, #bae6fd 0%, #e0f2fe 50%, #f0f9ff 100%);
+  color: var(--text);
+}
+
+/* Arka plan katmanları — V2: yumuşat */
+.grid-bg { opacity: 0.4; }
+.scanline { display: none; }           /* tarayıcı çizgisi yok */
+.star { background: rgba(255,255,255,0.85); box-shadow: 0 0 4px rgba(255,255,255,0.6); }
+@keyframes twinkle { 0%,100%{opacity:0.4} 50%{opacity:0.9} }  /* daha yumuşak */
+
+/* Particles (kar tanesi gibi hafif bulutcuklar) */
+.particle { background: rgba(255,255,255,0.6) !important; filter: blur(0.5px); }
+
+/* Pixel köşeler — turuncu */
+.pc-tl, .pc-tr, .pc-bl, .pc-br {
+  border-color: var(--primary) !important;
+}
+
+/* ====== V2: NEON METİN GÖLGELERİNİ KALDIR ====== */
+[class*="neon"],
+.title, .subtitle, .big-text, .mega-title,
+.level-title, .level-label,
+.intro-title, .intro-subtitle,
+.final-title, .final-cta {
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+}
+
+/* Genel "glow" efektlerini sıfırla */
+* {
+  --glow: none;
+}
+
+/* ====== V2: Sadece ANA CTA butonları turuncu ====== */
+.intro-start, .final-cta, .oath-btn, .btn-primary {
+  background: #f97316 !important;
+  color: #ffffff !important;
+  border: 2px solid #ea580c !important;
+  box-shadow: 0 2px 8px rgba(249,115,22,0.25) !important;
+  text-shadow: none !important;
+}
+.intro-start:hover, .final-cta:hover, .oath-btn:hover, .btn-primary:hover {
+  background: #ea580c !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(249,115,22,0.35) !important;
+}
+
+/* Kişilik testi seçenekleri — beyaz kart + lacivert yazı (ayırt edilebilir) */
+.cq-opt {
+  background: rgba(255,255,255,0.92) !important;
+  color: #1e3a8a !important;
+  border: 2px solid rgba(249,115,22,0.35) !important;
+  text-shadow: none !important;
+  font-weight: 600;
+}
+.cq-opt:hover {
+  background: rgba(255,237,213,0.95) !important;
+  border-color: #f97316 !important;
+  color: #ea580c !important;
+}
+.cq-opt.selected, .cq-opt:active {
+  background: #f97316 !important;
+  color: #fff !important;
+  border-color: #ea580c !important;
+}
+
+/* Navigasyon okları — yumuşak turuncu daire */
+.arrow-btn {
+  background: rgba(255,255,255,0.9) !important;
+  color: #f97316 !important;
+  border: 2px solid #f97316 !important;
+  box-shadow: 0 2px 6px rgba(30,58,138,0.08) !important;
+  text-shadow: none !important;
+}
+.arrow-btn:hover {
+  background: #f97316 !important;
+  color: #fff !important;
+}
+
+/* ====== V2: Kartlar / Panolar ====== */
+.card, .quest-card, .info-box, .holo-panel, .fact-card,
+.stat-card, .timeline-card, .profession-card,
+.q-know, .q-box, .quest-text, .level-banner {
+  background: rgba(255,255,255,0.85) !important;
+  border: 1px solid rgba(30,58,138,0.15) !important;
+  color: var(--text) !important;
+  box-shadow: 0 2px 10px rgba(30,58,138,0.06) !important;
+  backdrop-filter: blur(4px);
+}
+
+/* Vurgulu (strong) yazılar: turuncu */
+strong, b, .highlight, .accent {
+  color: #ea580c !important;
+}
+
+/* Başlık renkleri */
+h1, h2, h3, .title, .big-title, .mega-title {
+  color: var(--text) !important;
+  text-shadow: none !important;
+}
+
+/* HUD barı */
+.hud, .bottom-nav {
+  background: rgba(255,255,255,0.85) !important;
+  border-color: rgba(30,58,138,0.12) !important;
+  color: var(--text) !important;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 0 rgba(30,58,138,0.06) !important;
+}
+.hud *, .bottom-nav * {
+  color: var(--text) !important;
+  text-shadow: none !important;
+}
+
+/* XP barı: turuncu */
+.xp-fill, .progress-fill {
+  background: linear-gradient(90deg, #f97316 0%, #fb923c 100%) !important;
+  box-shadow: 0 0 6px rgba(249,115,22,0.4) !important;
+}
+
+/* ====== V2: Sadece V1 neon-pulse / flash / shake türü rahatsız edici animasyonlar yavaşlatılsın ====== */
+[class*="pulse"], [class*="flash"], [class*="shake"], [class*="blink"],
+.neon-pulse, .badge-blink {
+  animation-duration: 2.4s !important;
+}
+.star { animation-duration: 4s !important; }
+
+/* Pulse / glow animasyonları iptal */
+@keyframes neonPulse { 0%,100%{filter: none} }
+@keyframes glowBox   { 0%,100%{box-shadow: 0 2px 10px rgba(30,58,138,0.06)} }
+
+/* V2'de aşırı parlak sarı neon kullanımı temizlensin */
+.neon-yellow, [style*="color: #ffe600"], [style*="color:#ffe600"] {
+  color: #ea580c !important;
+  text-shadow: none !important;
+}
+.neon-green {
+  color: var(--success) !important;
+  text-shadow: none !important;
+}
+.neon-blue, .neon-info {
+  color: var(--info) !important;
+  text-shadow: none !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   V2 METİN REHABİLİTASYONU — Beyaz/açık tonlu metinler okunmuyordu.
+   Açık gökyüzü arkaplanda tüm metinleri lacivert'e zorla;
+   yalnızca özel accent renkleri istisna (strong, success, info).
+   ════════════════════════════════════════════════════════════ */
+body h1, body h2, body h3, body h4, body h5, body h6,
+body p, body li, body span, body div,
+body .slide-title, body .slide-sub,
+body .intro-title, body .intro-subtitle,
+body .final-title, body .final-sub, body .final-tag,
+body .gc-text, body .gc-title,
+body .quest-text, body .q-know, body .q-title, body .q-desc,
+body .mc-text, body .mc-label,
+body .pj-desc, body .pj-title,
+body .pr-by, body .pr-name, body .pr-year, body .pr-desc,
+body .ai-details, body .ai-desc,
+body .ai-life li, body .ai-types li,
+body .sc-desc, body .sc-can, body .sc-cant, body .sc-title,
+body .cm-text, body .cm-title,
+body .sf-text, body .sf-col h4,
+body .fb-text, body .fb-title,
+body .tb-text, body .tb-col h3,
+body .level-title, body .level-label, body .level-banner,
+body .keyboard-hint, body .hbar-label,
+body .os-label, body .lc-label, body .lc-num,
+body .counter-group-label, body .counter-source,
+body .orbit-label, body .orbit-num,
+body .timeline-text, body .timeline-year,
+body .profession-title, body .profession-desc,
+body .fact-title, body .fact-text,
+body .stat-title, body .stat-value,
+body .pixel-title, body .pixel-text,
+body .blue-text, body .white-text, body .light-text,
+body .data-label, body .data-value,
+body .step-title, body .step-desc,
+body .hud *, body .bottom-nav * {
+  color: #1e3a8a !important;
+  text-shadow: none !important;
+}
+
+/* İstisnalar — vurgu renkleri korunur */
+body strong, body b { color: #ea580c !important; }
+body .neon-green, body .xp-label, body .xp-count,
+body .sf-col.real h4, body .tb-col.new h3 { color: #16a34a !important; }
+body .neon-blue, body .info-text,
+body .sf-col.fic h4, body .tb-col.old h3 { color: #0284c7 !important; }
+body .mini-card.warm .mc-label, body .warm-label { color: #ea580c !important; }
+body .mini-card.purple .mc-label { color: #7c3aed !important; }
+body .mini-card.mint .mc-label { color: #14b8a6 !important; }
+body .mini-card.pink .mc-label { color: #ec4899 !important; }
+
+/* Kart arkaplanları beyaz-şeffaf → okunaklı */
+body .mini-card, body .timeline-card, body .fact-card,
+body .stat-card, body .os-card, body .pj-card, body .pr-card,
+body .sf-col, body .tb-col, body .sc-card, body .cm-card,
+body .fb-card, body .step-card, body .profession-card,
+/* Ek olarak bulunan koyu-lacivert kartlar */
+body .msg-map, body .one-second-panel, body .growth-chart, body .dl-race,
+body .jrn-step, body .pj-step, body .quote-card, body .extras-col,
+body .ai-tool, body .ai-tl-cell, body .ai-types, body .ai-life, body .career-quiz,
+body .day-2030, body .crypto-box, body .money-box, body .new-jobs, body .study {
+  background: rgba(255,255,255,0.88) !important;
+  border: 1px solid rgba(30,58,138,0.15) !important;
+  box-shadow: 0 2px 10px rgba(30,58,138,0.06) !important;
+  color: #1e3a8a !important;
+}
+
+/* Şifre girdisi gibi siyah inputlar */
+body .pw-input {
+  background: rgba(255,255,255,0.9) !important;
+  color: #1e3a8a !important;
+  border: 1px solid rgba(30,58,138,0.25) !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   V2 GÖKYÜZÜ ATMOSFERİ — güneş + kayan bulutlar
+   V1'deki "uzay hissi"nin gündüz versiyonu
+   ════════════════════════════════════════════════════════════ */
+
+/* Güneş (sağ üstte) */
+body::before {
+  content: '';
+  position: fixed;
+  top: -80px;
+  right: -80px;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(254,240,138,0.9) 0%, rgba(253,186,116,0.5) 35%, transparent 70%);
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  animation: sunGlow 8s ease-in-out infinite;
+  filter: blur(2px);
+}
+@keyframes sunGlow {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50%      { transform: scale(1.08); opacity: 1; }
+}
+
+/* Bulut katmanı 1 — yavaş, büyük bulutlar (stars-bg'yi dönüştür) */
+.stars-bg {
+  background-image:
+    radial-gradient(ellipse 120px 50px at 10% 30%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(ellipse 160px 55px at 35% 70%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 65%),
+    radial-gradient(ellipse 140px 50px at 65% 20%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(ellipse 180px 60px at 85% 55%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 65%),
+    radial-gradient(ellipse 100px 40px at 15% 85%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 60%);
+  background-size: 100% 100%;
+  animation: cloudDriftSlow 80s linear infinite;
+  opacity: 0.9 !important;
+}
+.stars-bg .star { display: none; }  /* eski yıldızları gizle */
+
+@keyframes cloudDriftSlow {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100vw); }
+}
+
+/* Bulut katmanı 2 — daha hızlı, küçük bulutlar (particles-container'ı dönüştür) */
+.particles-container {
+  background-image:
+    radial-gradient(ellipse 70px 25px at 20% 15%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(ellipse 90px 30px at 60% 45%, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0) 65%),
+    radial-gradient(ellipse 60px 22px at 40% 80%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(ellipse 80px 28px at 90% 25%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 65%);
+  background-size: 100% 100%;
+  animation: cloudDriftFast 50s linear infinite;
+  opacity: 0.75 !important;
+}
+.particles-container .particle { display: none; }
+
+@keyframes cloudDriftFast {
+  0%   { transform: translateX(100vw); }
+  100% { transform: translateX(0); }
+}
+
+/* Grid-bg tamamen kapatılsın — gökyüzü hissini bozuyor */
+.grid-bg { display: none; }
+
+/* HUD arkaplanı belirginleştir (yazılar görünsün) */
+body .hud, body .bottom-nav {
+  background: rgba(255,255,255,0.92) !important;
+  border-bottom: 1px solid rgba(30,58,138,0.12) !important;
+  color: #1e3a8a !important;
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="scanline"></div>
+<div class="stars-bg" id="starsContainer"></div>
+<div class="particles-container" id="particles"></div>
+<div class="pixel-corner pc-tl"></div>
+<div class="pixel-corner pc-tr"></div>
+<div class="pixel-corner pc-bl"></div>
+<div class="pixel-corner pc-br"></div>
+
+<!-- === ÜST HUD === -->
+<div class="hud">
+  <div class="hud-left">
+    <div class="hud-logo">TEKNO QUEST</div>
+    <div class="hud-level" id="hudLevel">LV.1</div>
+    <div class="hud-page" id="hudPage">1/1</div>
+  </div>
+  <div class="hud-center">
+    <div class="xp-label">XP</div>
+    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xpFill" style="width:0%"></div></div>
+    <div class="xp-count" id="xpCount">0 / 1000</div>
+  </div>
+  <div class="hud-right">
+    <div class="badge-item" id="b0" title="Internet Master">🌐</div>
+    <div class="badge-item" id="b1" title="History Explorer">📜</div>
+    <div class="badge-item" id="b2" title="Speed Champion">⚡</div>
+    <div class="badge-item" id="b3" title="AI Explorer">🤖</div>
+    <div class="badge-item" id="b4" title="Future Architect">🔮</div>
+    <div class="badge-item" id="b5" title="Technology Guru">💡</div>
+    <div class="badge-item" id="b6" title="Career Legend">🏆</div>
+    <div class="badge-item" id="b7" title="Smart User">🧭</div>
+  </div>
+</div>
+
+<div class="presentation" id="pres">
+
+  <!-- ================= S1 — KAPAK ================= -->
+  <div class="slide active" id="s1">
+    <div class="orbit-container">
+      <div class="orbit-ring orbit-ring-1"></div>
+      <div class="orbit-ring orbit-ring-2"></div>
+      <div class="planet">🌍</div>
+      <div class="orbit-moon">🛸</div>
+    </div>
+    <div class="s1-title">TECHNOLOGY QUEST</div>
+    <div class="s1-tagline">FROM THE INTERNET TO ARTIFICIAL INTELLIGENCE — THE CODE OF THE FUTURE</div>
+
+    <div class="live-counters-wrap">
+      <div class="counter-group-label" aria-label="Global statistics">🌍 GLOBAL</div>
+      <div class="live-counters" role="group" aria-label="Daily statistics around the world">
+        <div class="lc-box">
+          <div class="lc-num" id="lc1" aria-live="polite">0</div>
+          <div class="lc-label">🔍 Google searches / day</div>
+        </div>
+        <div class="lc-box">
+          <div class="lc-num" id="lc2" aria-live="polite">0</div>
+          <div class="lc-label">💬 WhatsApp messages / day</div>
+        </div>
+        <div class="lc-box">
+          <div class="lc-num" id="lc3" aria-live="polite">0</div>
+          <div class="lc-label">📺 YouTube hours / day</div>
+        </div>
+      </div>
+
+      <div class="counter-group-label tr-label" aria-label="Turkey statistics">
+        <svg class="tr-flag" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="30" height="20" fill="#E30A17"/>
+          <circle cx="11" cy="10" r="5" fill="#fff"/>
+          <circle cx="12.5" cy="10" r="4" fill="#E30A17"/>
+          <polygon fill="#fff" points="17.6,10 21.1,8.86 18.94,11.83 18.94,8.17 21.1,11.14"/>
+        </svg>
+        TURKEY
+      </div>
+      <div class="live-counters" role="group" aria-label="Daily statistics in Turkey">
+        <div class="lc-box">
+          <div class="lc-num" id="lc4" aria-live="polite">0</div>
+          <div class="lc-label">🔍 Google searches / day</div>
+        </div>
+        <div class="lc-box">
+          <div class="lc-num" id="lc5" aria-live="polite">0</div>
+          <div class="lc-label">💬 WhatsApp messages / day</div>
+        </div>
+        <div class="lc-box">
+          <div class="lc-num" id="lc6" aria-live="polite">0</div>
+          <div class="lc-label">📺 YouTube hours / day</div>
+        </div>
+      </div>
+      <div class="counter-source">* Estimated value • Source: DataReportal &amp; TÜİK 2025 • Turkey has 77.3 million internet users</div>
+    </div>
+
+    <div class="health-bars">
+      <div class="hbar">
+        <div class="hbar-label">CURIOSITY</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:90%;background:linear-gradient(90deg,var(--success),#a8ff3e)"></div></div>
+      </div>
+      <div class="hbar">
+        <div class="hbar-label">IMAGINATION</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:100%;background:linear-gradient(90deg,var(--info),var(--purple))"></div></div>
+      </div>
+      <div class="hbar">
+        <div class="hbar-label">COURAGE</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:85%;background:linear-gradient(90deg,var(--warm),var(--primary))"></div></div>
+      </div>
+    </div>
+
+    <div class="intro-start" onclick="changeSlide(1)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();changeSlide(1);}">▶ START THE GAME</div>
+    <div class="keyboard-hint">← → USE ARROW KEYS TO NAVIGATE</div>
+  </div>
+
+  <!-- ================= S2 — LV1 1/2 : MESAJIN YOLCULUĞU ================= -->
+  <div class="slide" id="s2">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 1</div>
+      <div class="level-title">THE JOURNEY OF A MESSAGE</div>
+      <div class="page-tag">PAGE 1/2</div>
+    </div>
+    <div class="slide-sub">A message travels to the other side of the world in less than a second. Want to know how?</div>
+
+    <div class="msg-map">
+      <div class="msg-map-title">📡 ISTANBUL → NEW YORK · 9,500 km</div>
+      <svg class="msg-map-svg" viewBox="0 0 950 280">
+        <path d="M 80 180 Q 450 30 870 150" stroke="rgba(0,245,255,0.35)" stroke-width="3" stroke-dasharray="8 6" fill="none"/>
+        <circle cx="80" cy="180" r="12" fill="var(--info)" filter="drop-shadow(0 0 12px var(--info))"/>
+        <text x="80" y="230" class="city-label" text-anchor="middle">ISTANBUL</text>
+        <circle cx="870" cy="150" r="12" fill="var(--warm)" filter="drop-shadow(0 0 12px var(--warm))"/>
+        <text x="870" y="200" class="city-label" text-anchor="middle">NEW YORK</text>
+        <circle class="msg-packet" r="7"/>
+        <circle class="msg-packet p2" r="7"/>
+        <circle class="msg-packet p3" r="7"/>
+        <circle class="msg-packet p4" r="7"/>
+      </svg>
+      <div class="msg-legend">🚀 Packets cover this 9,500 km journey in one tenth of a second — at the speed of light!</div>
+    </div>
+
+    <div class="holo-card" style="max-width:1000px; margin: 30px auto 0;">
+      <div class="gc-title" style="text-align:center; margin-bottom:16px;">
+        ⚡ SO HOW FAST IS THE SPEED OF LIGHT?
+      </div>
+      <div class="gc-text" style="line-height: 1.9;">
+        Just imagine: You are in Istanbul, your friend is in New York.
+        You type "Hello!"
+        <br><br>
+        • If you walked there: <strong>~2,000 days</strong> (more than 5 years!)<br>
+        • If you flew there: <strong>~10 hours</strong><br>
+        • If your message traveled as sound: <strong>~7 hours 45 minutes</strong><br>
+        • Your message travels at the speed of light: <strong>0.1 seconds</strong> — shorter than a blink of an eye!
+        <br><br>
+        Light travels <strong>300,000 km</strong> every second. That means it can go around
+        the world <strong>7.5 times</strong> in just 1 second!
+      </div>
+    </div>
+
+    <div class="one-second-panel">
+      <div class="one-second-title">⏱ WHAT HAPPENS ON THE INTERNET IN 1 SECOND?</div>
+      <div class="os-row"><span class="os-icon">✉️</span><span class="os-label">Emails sent</span><span class="os-num">3 million</span></div>
+      <div class="os-row"><span class="os-icon">🎵</span><span class="os-label">Spotify songs played</span><span class="os-num">5,500</span></div>
+      <div class="os-row"><span class="os-icon">🎬</span><span class="os-label">TikTok videos watched</span><span class="os-num">167,000</span></div>
+      <div class="os-row"><span class="os-icon">📦</span><span class="os-label">Data packets transferred</span><span class="os-num">3 billion</span></div>
+    </div>
+  </div>
+
+  <!-- ================= S3 — LV1 2/2 : İNTERNET NEREDEN GELİYOR? ================= -->
+  <div class="slide" id="s3">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 1</div>
+      <div class="level-title">🌊 WHERE DOES THE INTERNET COME FROM?</div>
+      <div class="page-tag">PAGE 2/2</div>
+    </div>
+    <div class="slide-sub">Hint: Don't look at the sky — look at the bottom of the sea! 99% of the internet comes from cables lying in the ocean.</div>
+
+    <div class="page-journey">
+      <div class="pj-step">
+        <div class="pj-icon">📱</div>
+        <div class="pj-num">STEP 1</div>
+        <div class="pj-title">YOUR PHONE</div>
+        <div class="pj-desc">Sends the command "Get me the video!"</div>
+        <div class="pj-arrow">→</div>
+      </div>
+      <div class="pj-step">
+        <div class="pj-icon">📡</div>
+        <div class="pj-num">STEP 2</div>
+        <div class="pj-title">MODEM</div>
+        <div class="pj-desc">Turns WiFi into a cable signal.</div>
+        <div class="pj-arrow">→</div>
+      </div>
+      <div class="pj-step">
+        <div class="pj-icon">🌊</div>
+        <div class="pj-num">STEP 3</div>
+        <div class="pj-title">OCEAN CABLE</div>
+        <div class="pj-desc">From the bottom of the Mediterranean to America!</div>
+        <div class="pj-arrow">→</div>
+      </div>
+      <div class="pj-step">
+        <div class="pj-icon">🎬</div>
+        <div class="pj-num">STEP 4</div>
+        <div class="pj-title">VIDEO ARRIVES</div>
+        <div class="pj-desc">The video reaches your phone in 0.2 seconds.</div>
+      </div>
+    </div>
+
+    <div class="holo-card" style="max-width:1100px; margin: 30px auto 0;">
+      <div class="gc-title" style="text-align:center; margin-bottom:20px;">
+        🌊 THE GIANT NETWORK AT THE BOTTOM OF THE SEA
+      </div>
+
+      <svg viewBox="0 0 4378 2435" style="width:100%; max-height:520px; margin-bottom:20px; border-radius:12px;" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <!-- Okyanus zemini -->
+        <defs>
+          <radialGradient id="oceanBg" cx="50%" cy="50%" r="75%">
+            <stop offset="0%" stop-color="#1e3a8a"/>
+            <stop offset="60%" stop-color="#172554"/>
+            <stop offset="100%" stop-color="#0c1a3e"/>
+          </radialGradient>
+          <pattern id="oceanGrid" width="120" height="120" patternUnits="userSpaceOnUse">
+            <path d="M 120 0 L 0 0 0 120" fill="none" stroke="rgba(147,197,253,0.07)" stroke-width="1.5"/>
+          </pattern>
+        </defs>
+        <rect width="4378" height="2435" fill="url(#oceanBg)"/>
+        <rect width="4378" height="2435" fill="url(#oceanGrid)"/>
+
+        <!-- GERÇEK DETAYLI DÜNYA HARİTASI (Wikimedia public domain — yeşile boyandı) -->
+        <image href="/world-map.svg" x="0" y="0" width="4378" height="2435" opacity="0.95"/>
+
+        <!-- TÜRKİYE TURUNCU VURGU (Anadolu yarımadası — daha sola/yukarı, doğru pozisyona) -->
+        <g>
+          <ellipse cx="2470" cy="640" rx="190" ry="80" fill="#f97316" opacity="0.4"/>
+          <ellipse cx="2470" cy="640" rx="190" ry="80" fill="none" stroke="#ea580c" stroke-width="6" opacity="0.75"/>
+        </g>
+
+        <!-- GERÇEK DENİZALTI KABLO AĞI (kaynak: TeleGeography Submarine Cable Map) -->
+        <!-- ~55 ana kablo, gerçek koridorlardan, farklı renkler ile yoğun ağ görünümü -->
+
+        <!-- ═══════════ ATLANTİK KUZEY (NYC bölgesi ↔ Avrupa) — sarı, çok yoğun ═══════════ -->
+        <g stroke="#fbbf24" stroke-width="3.5" fill="none" opacity="0.75" stroke-linecap="round">
+          <!-- NYC → İngiltere (Bude) — TAT-14, AEC-1, AEC-2 -->
+          <path d="M 1289,663 C 1500,560 1850,510 2128,542"/>
+          <path d="M 1289,663 C 1500,545 1830,500 2120,540"/>
+          <path d="M 1289,663 C 1480,575 1820,525 2125,545"/>
+          <!-- NYC → İrlanda (AEConnect, Hibernia, Apollo) -->
+          <path d="M 1325,649 C 1580,540 1830,500 2095,548"/>
+          <path d="M 1325,649 C 1600,555 1830,520 2090,553"/>
+          <!-- NYC → Fransa (Dunant, Amitié) -->
+          <path d="M 1289,663 C 1550,680 1900,650 2200,605"/>
+          <path d="M 1289,663 C 1560,690 1910,675 2210,615"/>
+          <!-- NYC → İspanya (MAREA, Grace Hopper) -->
+          <path d="M 1289,663 C 1500,720 1850,720 2154,636"/>
+          <path d="M 1289,663 C 1480,710 1830,710 2150,640"/>
+          <!-- NYC → Portekiz (EllaLink Atlantic) -->
+          <path d="M 1289,663 C 1500,755 1830,775 2079,703"/>
+          <!-- Miami → İngiltere (TGN-Atlantic) -->
+          <path d="M 1216,879 C 1450,800 1800,650 2128,542"/>
+          <!-- Miami → İspanya -->
+          <path d="M 1216,879 C 1500,820 1850,720 2154,636"/>
+        </g>
+
+        <!-- ═══════════ ATLANTİK GÜNEY (Karayip + G. Amerika ↔ Afrika/Avrupa) — sarı ═══════════ -->
+        <g stroke="#fbbf24" stroke-width="3.5" fill="none" opacity="0.7" stroke-linecap="round">
+          <!-- Miami → Karayip → Brezilya (BRUSA, GlobeNet) -->
+          <path d="M 1216,879 C 1300,1000 1500,1100 1715,1272"/>
+          <!-- Brezilya → Portekiz (EllaLink) -->
+          <path d="M 1763,1326 C 1900,1100 2000,900 2079,703"/>
+          <!-- Brezilya (Fortaleza) → Angola (SACS) -->
+          <path d="M 1715,1272 C 1900,1290 2100,1260 2280,1240"/>
+          <!-- Brezilya → Güney Afrika (SAEx-2, Atlantis-2) -->
+          <path d="M 1763,1326 C 1900,1500 2200,1650 2408,1678"/>
+          <!-- Buenos Aires → Cape Town -->
+          <path d="M 1485,1678 C 1800,1750 2150,1750 2408,1678"/>
+        </g>
+
+        <!-- ═══════════ AKDENİZ + SÜVEYŞ — turkuaz (gerçek deniz rotaları, kıta kesmez) ═══════════ -->
+        <!-- Akdeniz tabanı yaklaşık y=720-820. Kablolar İtalya/Yunan adalarının ALTINDAN geçer -->
+        <g stroke="#06b6d4" stroke-width="3.5" fill="none" opacity="0.8" stroke-linecap="round">
+          <!-- Marsilya → İstanbul: İtalya/Yunan adalarının güneyinden, Çanakkale boğazı üzerinden -->
+          <path d="M 2249,636 C 2280,760 2360,810 2410,790 C 2415,720 2418,650 2420,610"/>
+          <!-- Marsilya → Süveyş (SEA-ME-WE-5/AAE-1/IMEWE): Akdeniz orta hat -->
+          <path d="M 2249,636 C 2300,780 2430,820 2566,812"/>
+          <path d="M 2249,636 C 2310,790 2440,820 2570,810"/>
+          <path d="M 2249,636 C 2295,775 2425,815 2562,808"/>
+          <!-- İtalya (Sicilya) → Süveyş (Italia 1, Mediterraneo) -->
+          <path d="M 2400,720 C 2470,790 2540,810 2566,812"/>
+          <path d="M 2410,725 C 2480,790 2545,805 2570,810"/>
+          <!-- İspanya → Cezayir kıyısı → Süveyş (Med Cable) -->
+          <path d="M 2154,636 C 2230,750 2350,800 2470,810 C 2530,815 2566,812 2566,812"/>
+          <!-- TÜRKİYE: İstanbul → Ege → Doğu Akdeniz → Mısır (TURCYOS, KEDI) -->
+          <path d="M 2420,610 C 2440,720 2510,800 2566,812"/>
+          <path d="M 2420,610 C 2450,725 2520,800 2570,810"/>
+          <!-- Yunanistan adaları → Mısır -->
+          <path d="M 2380,680 C 2430,740 2510,800 2562,810"/>
+          <!-- Türkiye güney kıyısı → Kıbrıs → İsrail/Mısır -->
+          <path d="M 2470,650 C 2510,720 2540,790 2566,812"/>
+        </g>
+
+        <!-- ═══════════ KARADENİZ — turuncu (Türkiye'ye özel) ═══════════ -->
+        <g stroke="#fb923c" stroke-width="3.5" fill="none" opacity="0.85" stroke-linecap="round">
+          <!-- KAFOS: İstanbul → Köstence (Romanya) -->
+          <path d="M 2420,610 C 2410,580 2410,560 2440,558"/>
+          <!-- İstanbul → Ukrayna -->
+          <path d="M 2420,610 C 2430,575 2470,555 2510,545"/>
+        </g>
+
+        <!-- ═══════════ HİNT OKYANUSU — pembe (gerçek deniz rotaları) ═══════════ -->
+        <!-- Süveyş → Mumbai: Kızıldeniz boyunca güney → Aden Körfezi → Hint Okyanusu (Arabistan'ı KESMEZ) -->
+        <g stroke="#ec4899" stroke-width="3.5" fill="none" opacity="0.75" stroke-linecap="round">
+          <!-- Süveyş → Aden → Mumbai (AAE-1, SEA-ME-WE-5, IMEWE, FALCON) -->
+          <path d="M 2566,812 C 2620,950 2680,1050 2740,1080 C 2880,1080 2980,1020 3065,961"/>
+          <path d="M 2570,810 C 2625,955 2685,1055 2745,1085 C 2885,1085 2985,1025 3070,963"/>
+          <path d="M 2562,808 C 2615,945 2675,1045 2735,1075 C 2875,1075 2975,1015 3060,958"/>
+          <!-- Mumbai → Singapur: Sri Lanka güneyinden, Bengal Körfezi'nden geçer -->
+          <path d="M 3065,961 C 3150,1080 3280,1180 3454,1204"/>
+          <path d="M 3070,963 C 3155,1085 3285,1185 3460,1210"/>
+          <path d="M 3060,958 C 3145,1075 3275,1175 3450,1200"/>
+          <!-- Mumbai → Doğu Afrika (Mombasa) — Hint Okyanusu boyunca -->
+          <path d="M 3065,961 C 2950,1100 2800,1200 2675,1272"/>
+          <!-- Hindistan güney → Bengal Körfezi → Tayland → Hong Kong (Burma kıyısı) -->
+          <path d="M 3065,961 C 3200,1080 3400,1050 3576,920"/>
+          <!-- Singapur → Avustralya batı (Endonezya batısından, Hint Okyanusu) -->
+          <path d="M 3454,1204 C 3470,1380 3520,1530 3588,1651"/>
+          <path d="M 3454,1204 C 3460,1385 3515,1535 3588,1651"/>
+          <!-- Singapur → Avustralya doğu (Endonezya kuzeyinden Java Denizi) -->
+          <path d="M 3454,1204 C 3700,1300 3900,1500 4025,1678"/>
+        </g>
+
+        <!-- ═══════════ AFRİKA ÇEVRESİ — yeşil ═══════════ -->
+        <g stroke="#10b981" stroke-width="3.5" fill="none" opacity="0.75" stroke-linecap="round">
+          <!-- 2Africa: Avrupa → Batı Afrika → Cape Town → Doğu Afrika → Mumbai (büyük halka) -->
+          <path d="M 2079,703 C 2080,900 2150,1100 2225,1280 C 2280,1500 2350,1650 2408,1700 C 2500,1720 2600,1550 2675,1272 C 2800,1100 2950,1000 3065,961"/>
+          <!-- WACS: Avrupa → Batı Afrika ülkeleri (Lagos) -->
+          <path d="M 2079,703 C 2100,900 2160,1080 2225,1137"/>
+          <!-- ACE: Fransa → Batı Afrika kıyısı boyunca -->
+          <path d="M 2200,615 C 2200,800 2200,1000 2220,1140"/>
+          <!-- METISS: Doğu Afrika → Madagaskar → Mauritius -->
+          <path d="M 2675,1272 C 2720,1370 2740,1430 2761,1475"/>
+          <!-- EASSy / SEACOM: Cape Town → Doğu Afrika kıyısı -->
+          <path d="M 2408,1678 C 2500,1500 2620,1380 2675,1272"/>
+          <!-- Lagos → Cape Town (batı Afrika güney rotası) -->
+          <path d="M 2225,1137 C 2280,1300 2350,1500 2408,1678"/>
+        </g>
+
+        <!-- ═══════════ PASİFİK KUZEY (Tokyo/HK ↔ ABD batı) — mor ═══════════ -->
+        <!-- DİKKAT: Pasifik bizim haritada wrap-around oluyor (Avrupa merkezli). -->
+        <!-- Her kablo İKİ parçaya bölündü: doğudan sağ kenara, sonra sol kenardan ABD'ye -->
+        <!-- Hawaii (268, 933) sol tarafta, Pasifik orta -->
+        <g stroke="#a855f7" stroke-width="3.5" fill="none" opacity="0.7" stroke-linecap="round">
+
+          <!-- Tokyo → sağ kenar (Pasifik kuzey çıkışı) -->
+          <path d="M 3892,731 C 4080,720 4250,750 4378,800"/>
+          <path d="M 3892,731 C 4090,725 4260,755 4378,810"/>
+          <path d="M 3892,731 C 4070,740 4230,770 4378,830"/>
+
+          <!-- Sol kenardan → Hawaii → Oregon (Pasifik kuzey, JUPITER/FASTER) -->
+          <path d="M 0,810 C 80,830 180,900 268,933"/>
+          <path d="M 0,820 C 90,835 190,910 268,933"/>
+          <path d="M 268,933 C 380,820 540,690 693,622"/>
+          <path d="M 268,933 C 390,815 545,685 695,625"/>
+
+          <!-- Hong Kong → sağ kenar (Pasifik orta) -->
+          <path d="M 3576,920 C 3900,920 4150,925 4378,930"/>
+          <path d="M 3576,920 C 3920,925 4170,930 4378,940"/>
+
+          <!-- Sol kenardan → Hawaii → LA (PLCN, HKA) -->
+          <path d="M 0,940 C 90,945 180,940 268,933"/>
+          <path d="M 268,933 C 400,870 600,820 754,758"/>
+          <path d="M 268,933 C 410,880 610,815 760,762"/>
+
+          <!-- Manila → sağ kenar (SEA-US) -->
+          <path d="M 3661,1015 C 3950,1010 4170,990 4378,980"/>
+          <!-- Sol kenar → Hawaii → ABD batı -->
+          <path d="M 0,980 C 100,970 200,950 268,933"/>
+
+          <!-- Tayvan → sağ kenar -->
+          <path d="M 3680,870 C 3950,875 4180,885 4378,890"/>
+          <!-- Sol kenar → Hawaii üzerinden ABD -->
+          <path d="M 0,890 C 100,910 180,925 268,933"/>
+        </g>
+
+        <!-- ═══════════ PASİFİK GÜNEY (Sydney/Auckland ↔ Hawaii/ABD) — mor ═══════════ -->
+        <g stroke="#a855f7" stroke-width="3.5" fill="none" opacity="0.7" stroke-linecap="round">
+          <!-- Sydney → sağ kenar (Pasifik güney) -->
+          <path d="M 4025,1678 C 4180,1500 4300,1300 4378,1100"/>
+          <!-- Auckland → sağ kenar -->
+          <path d="M 4317,1719 C 4350,1500 4378,1300 4378,1150"/>
+          <!-- Sol kenar → Hawaii (Hawaiki, Southern Cross) -->
+          <path d="M 0,1080 C 100,1050 180,990 268,933"/>
+          <path d="M 0,1100 C 90,1060 180,1000 268,933"/>
+          <!-- Sydney → Auckland (Tasman Denizi) -->
+          <path d="M 4025,1678 C 4150,1700 4250,1715 4317,1719"/>
+          <!-- Endonezya → Avustralya (Java Denizi/Timor) -->
+          <path d="M 3454,1204 C 3550,1400 3700,1550 4025,1678"/>
+        </g>
+
+        <!-- ═══════════ ASYA İÇİ (Çin/Japonya/Kore/SE Asya) — kırmızı ═══════════ -->
+        <g stroke="#ef4444" stroke-width="3.5" fill="none" opacity="0.7" stroke-linecap="round">
+          <!-- APG: Hong Kong → Şanghay → Japonya -->
+          <path d="M 3576,920 C 3700,840 3800,780 3892,731"/>
+          <!-- Singapur → Hong Kong -->
+          <path d="M 3454,1204 C 3500,1100 3550,1000 3576,920"/>
+          <path d="M 3454,1204 C 3505,1095 3555,990 3580,920"/>
+          <!-- Hong Kong → Manila -->
+          <path d="M 3576,920 C 3620,960 3650,990 3661,1015"/>
+          <!-- Singapur → Manila → Tokyo -->
+          <path d="M 3454,1204 C 3580,1100 3700,950 3892,731"/>
+          <!-- Kore → Japonya -->
+          <path d="M 3795,790 C 3830,770 3870,750 3892,731"/>
+          <!-- Tokyo → Vladivostok (Rus uzakdoğusu) -->
+          <path d="M 3892,731 C 3850,690 3820,660 3795,640"/>
+          <!-- Hong Kong → Tayvan -->
+          <path d="M 3576,920 C 3620,895 3660,880 3680,870"/>
+        </g>
+
+        <!-- Tüm kablolarda animasyon (akış efekti) -->
+        <g stroke-dasharray="22 14" fill="none">
+          <!-- Animasyon overlay tüm kablolarda görünür şekilde — global animation -->
+        </g>
+
+        <!-- Tüm dashed kablolar için scroll animasyonu -->
+        <style>
+          @keyframes cableFlow {
+            from { stroke-dashoffset: 0; }
+            to { stroke-dashoffset: -72; }
+          }
+          svg g[stroke="#fbbf24"], svg g[stroke="#06b6d4"], svg g[stroke="#ec4899"],
+          svg g[stroke="#a855f7"], svg g[stroke="#10b981"], svg g[stroke="#ef4444"],
+          svg g[stroke="#fb923c"] {
+            stroke-dasharray: 22 14;
+            animation: cableFlow 2.4s linear infinite;
+          }
+        </style>
+
+        <!-- Veri merkezleri / büyük şehirler + hub'lar -->
+        <g>
+          <!-- ═══ ANA ŞEHİRLER (büyük, animasyonlu) ═══ -->
+          <!-- NYC -->
+          <circle cx="1289" cy="663" r="16" fill="#ef4444"/>
+          <circle cx="1289" cy="663" r="32" fill="none" stroke="#ef4444" stroke-width="5" opacity="0.7">
+            <animate attributeName="r" values="16;48;16" dur="2.2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.8;0;0.8" dur="2.2s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Londra -->
+          <circle cx="2189" cy="528" r="16" fill="#ef4444"/>
+          <circle cx="2189" cy="528" r="32" fill="none" stroke="#ef4444" stroke-width="5" opacity="0.6">
+            <animate attributeName="r" values="16;42;16" dur="2.4s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.7;0;0.7" dur="2.4s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Marsilya -->
+          <circle cx="2249" cy="636" r="14" fill="#ef4444"/>
+          <!-- İSTANBUL — BÜYÜK SARI VURGU -->
+          <circle cx="2420" cy="610" r="28" fill="#fbbf24" stroke="#92400e" stroke-width="6"/>
+          <circle cx="2420" cy="610" r="50" fill="none" stroke="#fbbf24" stroke-width="8" opacity="0.7">
+            <animate attributeName="r" values="28;75;28" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.9;0;0.9" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Mumbai -->
+          <circle cx="3065" cy="961" r="16" fill="#ef4444"/>
+          <circle cx="3065" cy="961" r="32" fill="none" stroke="#ef4444" stroke-width="5" opacity="0.6">
+            <animate attributeName="r" values="16;42;16" dur="2.4s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.7;0;0.7" dur="2.4s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Singapur -->
+          <circle cx="3454" cy="1204" r="16" fill="#ef4444"/>
+          <!-- Tokyo -->
+          <circle cx="3892" cy="731" r="16" fill="#ef4444"/>
+          <circle cx="3892" cy="731" r="32" fill="none" stroke="#ef4444" stroke-width="5" opacity="0.7">
+            <animate attributeName="r" values="16;48;16" dur="2.2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.8;0;0.8" dur="2.2s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Sydney -->
+          <circle cx="4025" cy="1678" r="16" fill="#ef4444"/>
+
+          <!-- ═══ EK HUB ŞEHİRLER (küçük, etiketsiz) ═══ -->
+          <!-- Mısır / Süveyş (kritik geçiş noktası) -->
+          <circle cx="2566" cy="812" r="11" fill="#06b6d4"/>
+          <circle cx="2566" cy="812" r="20" fill="none" stroke="#06b6d4" stroke-width="3" opacity="0.6">
+            <animate attributeName="r" values="11;28;11" dur="2.6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.7;0;0.7" dur="2.6s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Hong Kong (Asya hub) -->
+          <circle cx="3576" cy="920" r="11" fill="#ef4444"/>
+          <!-- Manila (Filipinler) -->
+          <circle cx="3661" cy="1015" r="9" fill="#ef4444"/>
+          <!-- Cape Town (Afrika güney hub) -->
+          <circle cx="2408" cy="1678" r="11" fill="#10b981"/>
+          <!-- Lagos (Batı Afrika hub) -->
+          <circle cx="2225" cy="1137" r="9" fill="#10b981"/>
+          <!-- Hawaii Honolulu (Pasifik hub — sol-orta'da, Pasifik içinde) -->
+          <circle cx="268" cy="933" r="11" fill="#a855f7"/>
+          <circle cx="268" cy="933" r="20" fill="none" stroke="#a855f7" stroke-width="3" opacity="0.6">
+            <animate attributeName="r" values="11;28;11" dur="2.6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.7;0;0.7" dur="2.6s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Bude İngiltere (Atlantik landing point) -->
+          <circle cx="2128" cy="542" r="9" fill="#fbbf24"/>
+          <!-- Lizbon (Atlantik güney landing) -->
+          <circle cx="2079" cy="703" r="9" fill="#fbbf24"/>
+          <!-- Miami (Karayip hub) -->
+          <circle cx="1216" cy="879" r="9" fill="#fbbf24"/>
+          <!-- Brezilya (Fortaleza/Recife) -->
+          <circle cx="1715" cy="1272" r="9" fill="#fbbf24"/>
+          <!-- Mombasa (Doğu Afrika) -->
+          <circle cx="2675" cy="1272" r="9" fill="#10b981"/>
+          <!-- Oregon ABD batı (Pasifik landing) -->
+          <circle cx="693" cy="622" r="9" fill="#a855f7"/>
+          <!-- LA -->
+          <circle cx="754" cy="758" r="9" fill="#a855f7" opacity="0.8"/>
+          <!-- Auckland Yeni Zelanda -->
+          <circle cx="4317" cy="1719" r="9" fill="#a855f7"/>
+        </g>
+
+        <!-- Şehir etiketleri (Wikimedia SVG koordinat sisteminde) -->
+        <g font-family="Exo 2, Arial, sans-serif" font-weight="800" text-anchor="middle">
+          <g fill="#fef3c7" stroke="#0c1a3e" stroke-width="9" paint-order="stroke" font-size="62">
+            <text x="1289" y="630">NYC</text>
+            <text x="2189" y="495">London</text>
+            <text x="2249" y="605">Marseille</text>
+            <text x="3065" y="930">Mumbai</text>
+            <text x="3454" y="1255">Singapore</text>
+            <text x="3892" y="700">Tokyo</text>
+            <text x="4025" y="1740">Sydney</text>
+          </g>
+          <!-- İSTANBUL etiketi: noktanın SAĞ ÜSTÜNDE (Marsilya etiketini örtmesin) -->
+          <text x="2475" y="555" fill="#fff7ed" stroke="#7c2d12" stroke-width="11" paint-order="stroke" font-size="82" font-weight="900" text-anchor="start">ISTANBUL</text>
+          <!-- İstanbul'dan etiketin yanına ince çizgi (gösterge) -->
+          <line x1="2445" y1="595" x2="2475" y2="565" stroke="#92400e" stroke-width="3" opacity="0.7"/>
+        </g>
+      </svg>
+
+      <!-- Türkiye'nin denizaltı kablo bağlantısı (gerçek bilgi) -->
+      <div style="margin-top:18px; padding:14px 18px; background:rgba(255,230,0,0.08); border:1px solid rgba(255,230,0,0.35); border-radius:10px; max-width:1000px; margin-left:auto; margin-right:auto;">
+        <div style="font-family:'Chakra Petch'; font-weight:700; font-size:1rem; color:var(--primary); margin-bottom:6px; text-align:center;">
+          <svg class="tr-flag" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:26px;height:18px;vertical-align:middle;margin-right:6px;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.15);"><rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.5" cy="10" r="4" fill="#E30A17"/><polygon fill="#fff" points="17.6,10 21.1,8.86 18.94,11.83 18.94,8.17 21.1,11.14"/></svg>HOW DOES TURKEY CONNECT?
+        </div>
+        <div style="font-size:0.95rem; line-height:1.55; color:rgba(255,255,255,0.88); text-align:center;">
+          Istanbul is one of the most important crossing points of the world's internet. Cables run from the bottom of the Black Sea to Romania, and from the bottom of the Mediterranean to Egypt and then on to India.
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-top:10px;">
+        <div style="text-align:center; padding:14px; background:rgba(0,255,200,0.08); border:1px solid rgba(0,255,200,0.3); border-radius:8px;">
+          <div style="font-size:1.8rem; margin-bottom:6px;">🌐</div>
+          <div style="font-size:1.4rem; color:#00ffc8; font-weight:bold;">1.4 million km</div>
+          <div style="font-size:0.9rem; opacity:0.85;">Total length of undersea cables</div>
+        </div>
+        <div style="text-align:center; padding:14px; background:rgba(255,230,0,0.08); border:1px solid rgba(255,230,0,0.3); border-radius:8px;">
+          <div style="font-size:1.8rem; margin-bottom:6px;">🏊</div>
+          <div style="font-size:1.4rem; color:#ffe600; font-weight:bold;">8 km deep</div>
+          <div style="font-size:0.9rem; opacity:0.85;">Some cables lie at the very bottom of the ocean</div>
+        </div>
+        <div style="text-align:center; padding:14px; background:rgba(255,100,150,0.08); border:1px solid rgba(255,100,150,0.3); border-radius:8px;">
+          <div style="font-size:1.8rem; margin-bottom:6px;">🦈</div>
+          <div style="font-size:1.4rem; color:#ff6496; font-weight:bold;">~100 faults a year</div>
+          <div style="font-size:0.9rem; opacity:0.85;">From shark bites or ship anchors</div>
+        </div>
+      </div>
+
+      <div class="gc-text" style="text-align:center; margin-top:18px; font-style:italic;">
+        If these cables were laid end to end, they would wrap around the Earth <strong>35 times</strong>!
+        (The Earth's circumference is 40,075 km)
+      </div>
+    </div>
+
+    <div class="mini-cards mc4">
+      <div class="mini-card"><div class="mc-label">🌐 550+ CABLES</div><div class="mc-text">There are more than 550 cables across the world's oceans — each one kilometers long!</div></div>
+      <div class="mini-card mint"><div class="mc-label">📏 1.4 MILLION KM</div><div class="mc-text">If all the cables were laid end to end, they would wrap around the Earth 35 times!</div></div>
+      <div class="mini-card warm"><div class="mc-label">💡 INCREDIBLE SPEED</div><div class="mc-text">Information travels through these cables at the speed of light. It reaches America before you can blink!</div></div>
+      <div class="mini-card purple"><div class="mc-label">🦈 PROTECTED FROM SHARKS</div><div class="mc-text">Sometimes sharks bite the cables! That's why they are wrapped in tough steel armor.</div></div>
+    </div>
+  </div>
+
+  <!-- ================= S4 — LV2 1/3 : TÜRKİYE QUEST TARİHİ (1993 → 2026) ================= -->
+  <div class="slide" id="s4">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 2</div>
+      <div class="level-title"><svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:32px;height:22px;vertical-align:middle;margin-right:10px;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.2);"><rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.5" cy="10" r="4" fill="#E30A17"/><polygon fill="#fff" points="17.6,10 21.1,8.86 18.94,11.83 18.94,8.17 21.1,11.14"/></svg>TURKEY QUEST — HISTORY</div>
+      <div class="page-tag">PAGE 1/3</div>
+    </div>
+    <div class="slide-sub">How did the internet arrive in Turkey and how did it grow? A big journey from 1993 to today...</div>
+
+    <div class="quest-list">
+      <div class="quest-item holo-card accent-cyan">
+        <div class="quest-year">1993</div>
+        <div class="q-spacer"></div>
+        <div class="q-dot"></div>
+        <div class="quest-icon">🔌</div>
+        <div class="quest-text">
+          <strong>✅ THE FIRST CONNECTION — METU (ODTÜ), Ankara</strong>
+          <span>Turkey connected to the internet for the very first time — at just 64 kbps. A single picture took 5 minutes to load!</span>
+          <em class="q-know">💡 Did you know? The person who sent Turkey's first email was <strong>Prof. Mustafa Akgül</strong>. He is remembered as "the Father of the Turkish Internet."</em>
+        </div>
+        <div class="quest-badge qb-done">COMPLETED</div>
+      </div>
+
+      <div class="quest-item holo-card accent-green">
+        <div class="quest-year">1996</div>
+        <div class="q-spacer"></div>
+        <div class="q-dot"></div>
+        <div class="quest-icon">🏠</div>
+        <div class="quest-text">
+          <strong>✅ THE INTERNET ENTERED HOMES</strong>
+          <span>Türk Telekom brought dial-up internet into homes. The modem made funny "beep-buzz" sounds while connecting!</span>
+          <em class="q-know">💡 Did you know? Back then, downloading one song took <strong>about 20 minutes</strong>. And if someone picked up the phone, the internet connection cut off instantly!</em>
+        </div>
+        <div class="quest-badge qb-done">COMPLETED</div>
+      </div>
+
+      <div class="quest-item holo-card accent-purple">
+        <div class="quest-year">2000s</div>
+        <div class="q-spacer"></div>
+        <div class="q-dot"></div>
+        <div class="quest-icon">⚡</div>
+        <div class="quest-text">
+          <strong>✅ ADSL AND FASTER SPEEDS</strong>
+          <span>Broadband arrived! The first Turkish sites were launched: Mynet, Hürriyet Online, and <strong>Ekşi Sözlük (1999)</strong>.</span>
+          <em class="q-know">💡 The first Turkish websites were <code>itu.edu.tr</code> and <code>tubitak.gov.tr</code>.</em>
+        </div>
+        <div class="quest-badge qb-done">COMPLETED</div>
+      </div>
+
+      <div class="quest-item holo-card accent-pink">
+        <div class="quest-year">2010s</div>
+        <div class="q-spacer"></div>
+        <div class="q-dot"></div>
+        <div class="quest-icon">📱</div>
+        <div class="quest-text">
+          <strong>✅ THE SMARTPHONE REVOLUTION</strong>
+          <span>In 2009 the iPhone 3G arrived in Turkey. The age of internet-in-your-pocket — WhatsApp, Instagram and YouTube became part of our lives!</span>
+          <em class="q-know">💡 Today in Turkey, each person uses the internet for an average of <strong>7 hours</strong> a day!</em>
+        </div>
+        <div class="quest-badge qb-done">COMPLETED</div>
+      </div>
+
+      <div class="quest-item holo-card accent-yellow active">
+        <div class="quest-year">2026</div>
+        <div class="q-spacer"></div>
+        <div class="q-dot"></div>
+        <div class="quest-icon">🚀</div>
+        <div class="quest-text">
+          <strong>🔥 ACTIVE QUEST — The Fiber & 5G Age</strong>
+          <span>More than 60 million users and fiber internet everywhere. 5G has arrived in Turkey — phones are now lightning fast!</span>
+          <em class="q-know">💡 Turkey is the <strong>5th country</strong> in the world for social media use!</em>
+        </div>
+        <div class="quest-badge qb-active">ACTIVE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S5 — LV2 2/3 : RAKAMLARLA TÜRKİYE ================= -->
+  <div class="slide" id="s5">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 2</div>
+      <div class="level-title"><svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:32px;height:22px;vertical-align:middle;margin-right:10px;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.2);"><rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.5" cy="10" r="4" fill="#E30A17"/><polygon fill="#fff" points="17.6,10 21.1,8.86 18.94,11.83 18.94,8.17 21.1,11.14"/></svg>TURKEY IN NUMBERS</div>
+      <div class="page-tag">PAGE 2/3</div>
+    </div>
+    <div class="slide-sub">In 30 years, <strong>from 3 people to 70 million</strong> — the story of a miracle</div>
+
+    <div class="growth-chart">
+      <div class="growth-title">📊 NUMBER OF INTERNET USERS — TURKEY</div>
+      <div class="growth-row"><div class="growth-year">1993</div><div class="growth-bar"><div class="growth-fill" style="width:0.5%"></div></div><div class="growth-val">~3 people 👤</div></div>
+      <div class="growth-row"><div class="growth-year">1996</div><div class="growth-bar"><div class="growth-fill" style="width:2%"></div></div><div class="growth-val">~30,000</div></div>
+      <div class="growth-row"><div class="growth-year">2000</div><div class="growth-bar"><div class="growth-fill" style="width:8%"></div></div><div class="growth-val">2 million</div></div>
+      <div class="growth-row"><div class="growth-year">2010</div><div class="growth-bar"><div class="growth-fill" style="width:40%"></div></div><div class="growth-val">25 million</div></div>
+      <div class="growth-row"><div class="growth-year">2024</div><div class="growth-bar"><div class="growth-fill" style="width:100%"></div></div><div class="growth-val">70+ million 🚀</div></div>
+    </div>
+
+    <div class="fact-box">
+      ⏳ <strong style="color:var(--primary)">In 30 years</strong>, from 3 people to <strong style="color:var(--success)">70 million</strong>! Not even one generation has passed, yet Turkey became a completely different country. Can you imagine — when your grandparents were little, there was no internet at all!
+    </div>
+  </div>
+
+  <!-- ================= S6 — LV2 3/3 : İNTERNETİN EVRİMİ ================= -->
+  <div class="slide" id="s6">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 2</div>
+      <div class="level-title">🌐 THE EVOLUTION OF THE INTERNET</div>
+      <div class="page-tag">PAGE 3/3</div>
+    </div>
+    <div class="slide-sub">The internet itself keeps growing — from yesterday to today, from today to tomorrow</div>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:16px; max-width:1300px; margin:0 auto;">
+
+      <div class="holo-card" style="border-left:4px solid #888;">
+        <div class="xp-tag">+8 XP</div>
+        <div style="font-size:2rem; margin-bottom:8px;">📖</div>
+        <div class="gc-title" style="color:#aaa;">WEB 1.0 — "READ"</div>
+        <div style="font-size:0.85rem; opacity:0.7; margin-bottom:8px;">1990s</div>
+        <div class="gc-text">
+          The first internet. There was only text and pictures. You
+          would open a website, read it, and close it. You couldn't
+          write or share anything. There was no interaction.
+        </div>
+      </div>
+
+      <div class="holo-card" style="border-left:4px solid #00c8ff;">
+        <div class="xp-tag">+10 XP</div>
+        <div style="font-size:2rem; margin-bottom:8px;">💬</div>
+        <div class="gc-title" style="color:#00c8ff;">WEB 2.0 — "SHARE"</div>
+        <div style="font-size:0.85rem; opacity:0.7; margin-bottom:8px;">2000s — TODAY</div>
+        <div class="gc-text">
+          The age of YouTube, Instagram and TikTok. Now you can film
+          and share videos, write comments and give likes. The
+          internet used to be just a place to read information; now
+          it's a huge space where everyone can express themselves.
+        </div>
+      </div>
+
+      <div class="holo-card" style="border-left:4px solid #c864ff;">
+        <div class="xp-tag">+10 XP</div>
+        <div style="font-size:2rem; margin-bottom:8px;">🪙</div>
+        <div class="gc-title" style="color:#c864ff;">WEB 3.0 — "OWN"</div>
+        <div style="font-size:0.85rem; opacity:0.7; margin-bottom:8px;">COMING</div>
+        <div class="gc-text">
+          The age of digital ownership. A picture you drew, a game
+          character you made, a song you wrote — on the internet you
+          can prove that it's yours. No one can copy it and say "it's
+          mine." Cryptocurrencies also work using this system.
+        </div>
+      </div>
+
+      <div class="holo-card" style="border-left:4px solid #ffc832;">
+        <div class="xp-tag">+12 XP</div>
+        <div style="font-size:2rem; margin-bottom:8px;">🧠</div>
+        <div class="gc-title" style="color:#ffc832;">WEB 4.0 — "UNDERSTAND"</div>
+        <div style="font-size:0.85rem; opacity:0.7; margin-bottom:8px;">SOON</div>
+        <div class="gc-text">
+          AI, glasses and computers may all become one. The internet
+          could get to know you better: it might ask, "You seem a
+          little sad today — shall I play a song you love?" Out on the
+          street, your glasses could help you find your way and show
+          you shop menus. The internet could stop being just a website
+          and become like a friend who is with you every day.
+        </div>
+      </div>
+
+    </div>
+
+    <div style="text-align:center; margin-top:24px; padding:16px; background:rgba(255,230,0,0.08); border:1px solid rgba(255,230,0,0.3); border-radius:10px; max-width:900px; margin-left:auto; margin-right:auto;">
+      <div style="font-size:1.05rem; line-height:1.7;">
+        💫 The next version of the internet will be written by <strong>today's children</strong>.
+        Maybe <strong>you</strong> will create <strong>Web 5.0</strong>!
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S7 — LV3 1/2 : 1G → 6G GRAFİĞİ ================= -->
+  <div class="slide" id="s7">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 3</div>
+      <div class="level-title">MOBILE SPEED: 1G → 6G</div>
+      <div class="page-tag">PAGE 1/2</div>
+    </div>
+    <div class="slide-sub">Each "G" is a generation — from 1G to 6G, how have phones' abilities grown?</div>
+
+
+    <div class="speed-chart">
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:#888">1G</div>
+        <div class="sc-speed">~2 kb/s</div>
+        <div class="sc-stars">⭐☆☆☆☆</div>
+        <div class="sc-can">You can make phone calls 📞</div>
+        <div class="sc-bar" style="height:14px; background:rgba(150,150,150,0.3); border:1px solid rgba(150,150,150,0.5);"><div class="sc-bar-label">Voice Only</div></div>
+      </div>
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:#4aa">2G</div>
+        <div class="sc-speed">~64 kb/s</div>
+        <div class="sc-stars">⭐⭐☆☆☆</div>
+        <div class="sc-can">A "Goodnight" text ✉️</div>
+        <div class="sc-bar" style="height:36px; background:rgba(100,200,200,0.22); border:1px solid rgba(100,200,200,0.5);"><div class="sc-bar-label">SMS</div></div>
+      </div>
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:#00b4ff">3G</div>
+        <div class="sc-speed">~2 Mb/s</div>
+        <div class="sc-stars">⭐⭐⭐☆☆</div>
+        <div class="sc-can">Video calls 🎥</div>
+        <div class="sc-bar" style="height:68px; background:rgba(0,180,255,0.22); border:1px solid rgba(0,180,255,0.5);"><div class="sc-bar-label">Video Call</div></div>
+      </div>
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:var(--info)">4G</div>
+        <div class="sc-speed" style="color:var(--info)">~100 Mb/s</div>
+        <div class="sc-stars">⭐⭐⭐⭐☆</div>
+        <div class="sc-can">Netflix on the bus 🎬</div>
+        <div class="sc-bar" style="height:110px; background:rgba(0,245,255,0.18); border:1px solid rgba(0,245,255,0.55); box-shadow:0 0 22px rgba(0,245,255,0.2);"><div class="sc-bar-label" style="color:var(--info)">Netflix HD</div></div>
+      </div>
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:var(--primary)">5G</div>
+        <div class="sc-speed" style="color:var(--primary)">~10 Gb/s</div>
+        <div class="sc-stars">⭐⭐⭐⭐⭐</div>
+        <div class="sc-can">Surgery from far away 🏥</div>
+        <div class="sc-bar" style="height:160px; background:rgba(255,230,0,0.18); border:1px solid rgba(255,230,0,0.6); box-shadow:0 0 30px rgba(255,230,0,0.25);"><div class="sc-bar-label" style="color:var(--primary)">Robots & VR</div></div>
+      </div>
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:#c084fc">6G</div>
+        <div class="sc-speed" style="color:#c084fc">~1 Tb/s</div>
+        <div class="sc-stars">🌟🌟🌟🌟🌟</div>
+        <div class="sc-can">Holographic calls 🌐</div>
+        <div class="sc-bar" style="height:215px; background:rgba(192,132,252,0.2); border:1px solid rgba(192,132,252,0.65); box-shadow:0 0 36px rgba(192,132,252,0.35);"><div class="sc-bar-label" style="color:#c084fc">Hologram & XR</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S8 — LV3 2/2 : İNDİRME YARIŞI ================= -->
+  <div class="slide" id="s8">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 3</div>
+      <div class="level-title">THE DOWNLOAD RACE</div>
+      <div class="page-tag">PAGE 2/2</div>
+    </div>
+    <div class="slide-sub">How many seconds does the same <strong>1 GB movie</strong> take to download? Watch the race between the generations!</div>
+
+    <div class="dl-race">
+      <div class="dl-title">🏁 SAME MOVIE, 6 DIFFERENT GENERATIONS</div>
+      <div class="dl-row"><div class="dl-gen" style="color:#888">1G</div><div class="dl-track"><div class="dl-fill" style="background:#888; animation-duration:90s"></div></div><div class="dl-time" style="color:#888">~90 hours!</div></div>
+      <div class="dl-row"><div class="dl-gen" style="color:#4aa">2G</div><div class="dl-track"><div class="dl-fill" style="background:#4aa; animation-duration:30s"></div></div><div class="dl-time" style="color:#4aa">~35 hours</div></div>
+      <div class="dl-row"><div class="dl-gen" style="color:#00b4ff">3G</div><div class="dl-track"><div class="dl-fill" style="background:#00b4ff; animation-duration:12s"></div></div><div class="dl-time" style="color:#00b4ff">~70 minutes</div></div>
+      <div class="dl-row"><div class="dl-gen" style="color:var(--info)">4G</div><div class="dl-track"><div class="dl-fill" style="background:var(--info); animation-duration:4s"></div></div><div class="dl-time" style="color:var(--info)">~80 seconds</div></div>
+      <div class="dl-row"><div class="dl-gen" style="color:var(--primary)">5G</div><div class="dl-track"><div class="dl-fill" style="background:var(--primary); animation-duration:1s"></div></div><div class="dl-time" style="color:var(--primary)">~1 second ⚡</div></div>
+      <div class="dl-row"><div class="dl-gen" style="color:#c084fc">6G</div><div class="dl-track"><div class="dl-fill" style="background:linear-gradient(90deg,#c084fc,#39ff14); animation-duration:0.5s"></div></div><div class="dl-time" style="color:#c084fc">~0.01 sec ⚡⚡</div></div>
+    </div>
+
+    <div class="fact-box">
+      🤯 <strong style="color:var(--primary)">SAME MOVIE:</strong> with 1G it takes <strong>90 hours</strong> (4 days!), with 5G only <strong style="color:var(--success)">1 second</strong>, and soon with <strong style="color:#c084fc">6G</strong> it'll be done in the blink of an eye! Can you see how much faster technology has become?
+    </div>
+  </div>
+
+  <!-- ================= S9 — LV4 1/1 : GÜNLÜK HAYATTA YZ ================= -->
+  <div class="slide" id="s9">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 4</div>
+      <div class="level-title">WHERE IS AI IN YOUR LIFE?</div>
+      <div class="page-tag">PAGE 1/1</div>
+    </div>
+    <div class="slide-sub">In fact, we've already started using AI in every part of our lives.</div>
+
+    <div class="ai-split">
+      <div class="ai-types">
+        <div class="ai-h">🧬 TYPES OF AI</div>
+        <div><strong>Generative AI:</strong> ChatGPT, Gemini, image-making AIs — they produce text, pictures and sound. Today millions of people use them every day.</div>
+        <div style="margin-top:10px;"><strong>General AI (AGI):</strong> AI that understands and thinks about any topic, just like a human. It doesn't exist yet — but scientists are working on it.</div>
+        <div style="margin-top:10px;"><strong>Super AI (ASI):</strong> AI that is meant to be even smarter than humans. Scientists keep working on this and similar projects.</div>
+      </div>
+      <div class="ai-life">
+        <div class="ai-h">👁 AI IN DAILY LIFE</div>
+        <ul>
+          <li>📱 <strong>Your phone:</strong> Unlocks itself by recognizing your face.</li>
+          <li>📷 <strong>Photo album:</strong> Tells cats and people apart and notices each one.</li>
+          <li>▶ <strong>YouTube suggestions:</strong> Recommends content just for you.</li>
+          <li>🗺️ <strong>Navigation:</strong> Predicts traffic and suggests the fastest route.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S10 — LV5 1/2 : YZ 6 GELECEK ================= -->
+  <div class="slide" id="s10">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 5</div>
+      <div class="level-title">MAP OF THE FUTURE</div>
+      <div class="page-tag">PAGE 1/2</div>
+    </div>
+    <div class="slide-sub">What will AI bring into our lives in the coming years?</div>
+
+    <div class="game-grid g3">
+      <div class="holo-card game-card accent-cyan"><div class="xp-tag">+8 XP</div><span class="gc-icon">🚗</span><div class="gc-title">SELF-DRIVING CARS</div><div class="gc-text">No steering wheel, no pedals! AI reads the traffic and drives safely.</div></div>
+      <div class="holo-card game-card accent-purple"><div class="xp-tag">+8 XP</div><span class="gc-icon">🏫</span><div class="gc-title">PERSONAL TEACHER</div><div class="gc-text">A lesson plan just for you. It knows the topics you find tricky!</div></div>
+      <div class="holo-card game-card accent-green"><div class="xp-tag">+10 XP</div><span class="gc-icon">💊</span><div class="gc-title">PERSONAL MEDICINE</div><div class="gc-text">Medicine made just for you — many illnesses can be cured!</div></div>
+      <div class="holo-card game-card accent-warm"><div class="xp-tag">+10 XP</div><span class="gc-icon">🌍</span><div class="gc-title">PLANET PROTECTOR</div><div class="gc-text">AI works out the best solutions for the climate crisis!</div></div>
+      <div class="holo-card game-card accent-pink"><div class="xp-tag">+12 XP</div><span class="gc-icon">🎮</span><div class="gc-title">LIVING GAMES</div><div class="gc-text">Characters that think, so every game turns out different!</div></div>
+      <div class="holo-card game-card accent-yellow"><div class="xp-tag">+12 XP</div><span class="gc-icon">🤝</span><div class="gc-title">ROBOT HELPER</div><div class="gc-text">Smart robots at home, in hospitals and in factories!</div></div>
+    </div>
+  </div>
+
+  <!-- ================= S11 — LV5 2/2 : 2030'DA BİR GÜN ================= -->
+  <div class="slide" id="s11">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 5</div>
+      <div class="level-title">A DAY IN 2030</div>
+      <div class="page-tag">PAGE 2/2</div>
+    </div>
+    <div class="slide-sub">What will a child's day look like 6 years from now? Here's a lively scenario:</div>
+
+    <div class="day-2030">
+      <div class="d30-title">📅 YOUR FUTURE — A 24-HOUR DAY</div>
+      <div class="d30-steps">
+        <div class="d30-step"><div class="d30-time">07:00</div><div class="d30-icon">☀️</div><div class="d30-desc">AI wakes you up with music</div></div>
+        <div class="d30-step"><div class="d30-time">08:00</div><div class="d30-icon">🍳</div><div class="d30-desc">The smart fridge makes breakfast</div></div>
+        <div class="d30-step"><div class="d30-time">08:30</div><div class="d30-icon">🚙</div><div class="d30-desc">A self-driving car takes you to school</div></div>
+        <div class="d30-step"><div class="d30-time">11:00</div><div class="d30-icon">📚</div><div class="d30-desc">An AI teacher gives the lesson</div></div>
+        <div class="d30-step"><div class="d30-time">18:00</div><div class="d30-icon">🥽</div><div class="d30-desc">At a VR concert with friends</div></div>
+        <div class="d30-step"><div class="d30-time">22:00</div><div class="d30-icon">🌙</div><div class="d30-desc">AI tells you a bedtime story</div></div>
+      </div>
+    </div>
+
+    <div class="fact-box">
+      ✨ This isn't far from reality — most of this technology already exists today! It just needs to become more common.
+    </div>
+  </div>
+
+  <!-- ================= S12 — LV6 1/4 : ZATEN HAYATIMIZDA ================= -->
+  <div class="slide" id="s12">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 6</div>
+      <div class="level-title">ALREADY IN OUR LIVES</div>
+      <div class="page-tag">PAGE 1/4</div>
+    </div>
+    <div class="slide-sub">The future of technology has actually already begun — and you're using it too!</div>
+
+    <div class="game-grid g4" style="max-width:1200px;">
+      <div class="holo-card game-card accent-cyan">
+        <div class="xp-tag">+8 XP</div>
+        <span class="gc-icon">🥽</span>
+        <div class="gc-title">VIRTUAL REALITY (VR)</div>
+        <div class="gc-text">
+          With VR goggles you can explore the bottom of the sea,
+          outer space or another city without ever leaving home.
+          When you play a game, you feel like you're inside it.
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-green">
+        <div class="xp-tag">+10 XP</div>
+        <span class="gc-icon">⌚</span>
+        <div class="gc-title">SMART DEVICES</div>
+        <div class="gc-text">
+          A smartwatch measures your heartbeat and keeps an eye on
+          you. A smart TV suggests shows for you. Smart lights can be
+          controlled with your voice. Phone, watch, fridge — they can
+          all connect to each other and be controlled together.
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-warm">
+        <div class="xp-tag">+10 XP</div>
+        <span class="gc-icon">🌱</span>
+        <div class="gc-title">GREEN ENERGY</div>
+        <div class="gc-text">
+          Have you seen solar panels on rooftops and wind turbines in
+          the fields? They make electricity from the sun and the wind.
+          They never run out like oil, and they don't pollute the air.
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-pink">
+        <div class="xp-tag">+12 XP</div>
+        <span class="gc-icon">🧬</span>
+        <div class="gc-title">GENE THERAPY</div>
+        <div class="gc-text">
+          Scientists have learned how to repair faulty genes. Some
+          types of cancer and genetic illnesses can now be treated.
+          A special technology called "CRISPR" cuts genes like
+          scissors and pastes in the correct one.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S13 — LV6 2/4 : DÜNYADA YENİ TEKNOLOJİLER ================= -->
+  <div class="slide" id="s13">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 6</div>
+      <div class="level-title">NEW TECHNOLOGIES AROUND THE WORLD</div>
+      <div class="page-tag">PAGE 2/4</div>
+    </div>
+    <div class="slide-sub">Some countries have started using them — spreading worldwide may take time.</div>
+
+    <div class="game-grid g4" style="max-width:1200px;">
+      <div class="holo-card game-card accent-cyan">
+        <div class="xp-tag">+8 XP</div>
+        <span class="gc-icon">🕶️</span>
+        <div class="gc-title">AR GLASSES</div>
+        <div class="gc-text">
+          These special glasses are now on sale. As you walk down the
+          street you can see information floating above the shops, and
+          in history class the pictures in your book can come to life.
+          Digital information is added on top of the real world.
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-purple">
+        <div class="xp-tag">+10 XP</div>
+        <span class="gc-icon">🚗</span>
+        <div class="gc-title">SELF-DRIVING CARS</div>
+        <div class="gc-text">
+          In some American cities, taxis that work with no human at
+          the wheel are already giving rides. Thanks to their cameras
+          and sensors, they see traffic lights, notice pedestrians and
+          park safely.
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-pink">
+        <div class="xp-tag">+10 XP</div>
+        <span class="gc-icon">🤖</span>
+        <div class="gc-title">HOME ROBOTS</div>
+        <div class="gc-text">
+          Robot vacuum cleaners are already used in many homes.
+          Human-like robots that clear the dishes, fold the laundry
+          and set the table are being tested in different parts of
+          the world — soon they could come into our homes too.
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-yellow">
+        <div class="xp-tag">+12 XP</div>
+        <span class="gc-icon">🧠</span>
+        <div class="gc-title">THE INTERNET OF THOUGHTS</div>
+        <div class="gc-text">
+          Scientists placed a chip as small as a grain of rice into a
+          patient's brain. This chip can read the signals in the brain
+          — and the patient was able to play a computer game just by
+          thinking. Research in this field is still going on.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S14 — LV6 3/4 : UZAK GELECEK ================= -->
+  <div class="slide" id="s14">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 6</div>
+      <div class="level-title">THE FAR FUTURE</div>
+      <div class="page-tag">PAGE 3/4</div>
+    </div>
+    <div class="slide-sub">Amazing technologies that could enter our lives within 15-25 years</div>
+
+    <div class="game-grid g4" style="max-width:1200px;">
+      <div class="holo-card game-card accent-pink">
+        <div class="xp-tag">+8 XP</div>
+        <span class="gc-icon">⚛️</span>
+        <div class="gc-title">QUANTUM COMPUTERS</div>
+        <div class="gc-text">
+          Computers that solve in seconds calculations that would take
+          normal computers years. They could correctly predict the
+          weather a month ahead and discover new medicines. Right now
+          they only exist in laboratories, working in very cold rooms.
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-warm">
+        <div class="xp-tag">+10 XP</div>
+        <span class="gc-icon">🛰️</span>
+        <div class="gc-title">THE SPACE ECONOMY</div>
+        <div class="gc-text">
+          In space the Sun never sets — there's light 24 hours a day
+          and no clouds at all. People are sending giant panels into
+          space: they'll collect electricity up there and send it down
+          to Earth. Computer servers could move to space too. Because
+          space is so cold, no electricity is needed to cool them.
+          The servers for videos, games and AI could run in space!
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-yellow">
+        <div class="xp-tag">+10 XP</div>
+        <span class="gc-icon">🦾</span>
+        <div class="gc-title">THE BIONIC BODY</div>
+        <div class="gc-text">
+          Someone who can't use their arm after an accident can now
+          wear a robotic arm. This arm senses the signals from the
+          brain: when you think "lift," it lifts. There are sensors on
+          the fingertips — it can feel whether what it touches is hot
+          or cold! A bionic eye is also being developed for people who
+          have lost their sight. In the future, barriers will be much
+          easier to overcome.
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-green">
+        <div class="xp-tag">+12 XP</div>
+        <span class="gc-icon">🔥</span>
+        <div class="gc-title">FUSION ENERGY</div>
+        <div class="gc-text">
+          The same thing that happens inside the Sun is being made in
+          an ice-cold lab on Earth: atoms join together, and a huge
+          amount of energy is released. Scientists are learning how to
+          do this on Earth. If they succeed, there will be endless,
+          clean energy — electricity that never pollutes and never
+          runs out!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S15 — LV6 4/4 : SCİFİ & TÜRKİYE ================= -->
+  <div class="slide" id="s15">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 6</div>
+      <div class="level-title">FROM SCIENCE FICTION TO REALITY <svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:32px;height:22px;vertical-align:middle;margin-left:10px;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.2);"><rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.5" cy="10" r="4" fill="#E30A17"/><polygon fill="#fff" points="17.6,10 21.1,8.86 18.94,11.83 18.94,8.17 21.1,11.14"/></svg></div>
+      <div class="page-tag">PAGE 4/4</div>
+    </div>
+    <div class="slide-sub">It was once a movie script — now it's part of our lives!</div>
+
+    <div class="scifi-flow">
+      <div class="sf-col real">
+        <h4>✅ OLD SCIENCE FICTION → REAL TODAY</h4>
+        <ul>
+          <li><strong>Video calls</strong> (Star Trek 1966) → Zoom 📹</li>
+          <li><strong>Tablet</strong> (2001: A Space Odyssey 1968) → iPad 📱</li>
+          <li><strong>Voice control</strong> → Siri/Alexa 🎤</li>
+          <li><strong>Mobile phone</strong> (Star Trek) → In every pocket 📞</li>
+        </ul>
+      </div>
+      <div class="sf-col fic">
+        <h4>🔮 STILL SCIENCE FICTION</h4>
+        <ul>
+          <li>✨ <strong>Teleportation</strong> — moving atoms</li>
+          <li>⏰ <strong>Time travel</strong> — to the past or the future</li>
+          <li>🦸 <strong>Superpowers</strong> — flying, turning invisible</li>
+          <li>🪐 <strong>Traveling to other galaxies</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tr-tech">
+      <div class="tr-tech-card"><div class="trt-emoji">🚗</div><div class="trt-name">TOGG</div><div class="trt-sub">Turkey's own electric car</div></div>
+      <div class="tr-tech-card"><div class="trt-emoji">🚁</div><div class="trt-name">TB2 BAYRAKTAR</div><div class="trt-sub">A world-famous drone</div></div>
+      <div class="tr-tech-card"><div class="trt-emoji">🚢</div><div class="trt-name">MİLGEM</div><div class="trt-sub">Turkey's own naval ships</div></div>
+      <div class="tr-tech-card"><div class="trt-emoji">🚀</div><div class="trt-name">ROKETSAN</div><div class="trt-sub">Turkey's own space and rocket technology</div></div>
+      <div class="tr-tech-card"><div class="trt-emoji">🛰️</div><div class="trt-name">TÜRKSAT</div><div class="trt-sub">Turkish satellites in space!</div></div>
+    </div>
+  </div>
+
+  <!-- ================= S16 — LV7 1/3 : 6 MESLEK ================= -->
+  <div class="slide" id="s16">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 7</div>
+      <div class="level-title">CAREERS OF THE FUTURE</div>
+      <div class="page-tag">PAGE 1/3</div>
+    </div>
+    <div class="slide-sub">Choose your character! Which path will you take when you grow up?</div>
+
+    <div class="career-rpg">
+      <div class="holo-card crpg accent-green">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🤖</div>
+        <div class="c-class">AI ENGINEER</div>
+        <div class="c-routine">Day: trains AI models, writes code, studies data.</div>
+        <div class="c-role-model">★ Demis Hassabis (DeepMind)</div>
+      </div>
+      <div class="holo-card crpg accent-purple">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🥽</div>
+        <div class="c-class">METAVERSE ARCHITECT</div>
+        <div class="c-routine">Day: designs 3D worlds, builds virtual cities.</div>
+        <div class="c-role-model">★ Palmer Luckey (Oculus)</div>
+      </div>
+      <div class="holo-card crpg accent-pink">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🧬</div>
+        <div class="c-class">GENE ENGINEER</div>
+        <div class="c-routine">Day: studies DNA, develops cures for diseases.</div>
+        <div class="c-role-model">★ Jennifer Doudna (CRISPR)</div>
+      </div>
+      <div class="holo-card crpg accent-warm">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🌍</div>
+        <div class="c-class">CLIMATE TECHNOLOGIST</div>
+        <div class="c-routine">Day: develops green technology, reduces CO2.</div>
+        <div class="c-role-model">★ Boyan Slat (Ocean Cleanup)</div>
+      </div>
+      <div class="holo-card crpg accent-cyan">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🚀</div>
+        <div class="c-class">SPACE ENGINEER</div>
+        <div class="c-routine">Day: designs rockets, plans space missions.</div>
+        <div class="c-role-model">★ Elon Musk (SpaceX)</div>
+      </div>
+      <div class="holo-card crpg accent-yellow">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🛡️</div>
+        <div class="c-class">CYBER HERO</div>
+        <div class="c-routine">Day: blocks internet dangers, protects information.</div>
+        <div class="c-role-model">★ Bruce Schneier (Cybersecurity expert)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S17 — LV7 2/3 : TR YILDIZLARI ================= -->
+  <div class="slide" id="s17">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 7</div>
+      <div class="level-title"><svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:32px;height:22px;vertical-align:middle;margin-right:10px;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.2);"><rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.5" cy="10" r="4" fill="#E30A17"/><polygon fill="#fff" points="17.6,10 21.1,8.86 18.94,11.83 18.94,8.17 21.1,11.14"/></svg>TURKISH TECHNOLOGY STARS</div>
+      <div class="page-tag">PAGE 2/3</div>
+    </div>
+    <div class="slide-sub">You could be on this path too! Here are some Turkish heroes to inspire you:</div>
+
+    <div class="people-row">
+      <div class="person-card">
+        <div class="person-icon">👨‍🔬</div>
+        <div>
+          <div class="person-name">OKTAY SİNANOĞLU</div>
+          <div class="person-role">Theoretical Chemistry Genius</div>
+          <div class="person-do">
+            He finished his PhD at 22 and became a professor at Yale
+            University at 28 — the youngest person ever to earn that
+            title there. He gave chemistry brand-new theories and
+            inspired Turkish scientists.
+          </div>
+        </div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-icon">📡</div>
+        <div>
+          <div class="person-name">ERDAL ARIKAN</div>
+          <div class="person-role">The Inventor of 5G</div>
+          <div class="person-do">
+            A professor at Bilkent University. The mathematical method
+            he discovered, called "polar codes," runs inside every 5G
+            phone in the world today. If your phone connects to the
+            internet quickly, it's partly thanks to him!
+          </div>
+        </div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-icon">🌌</div>
+        <div>
+          <div class="person-name">FERYAL ÖZEL</div>
+          <div class="person-role">NASA Astrophysicist</div>
+          <div class="person-do">
+            She was the Turkish member of the worldwide team that took
+            the very first photo of a black hole. Today she works on
+            space projects at NASA, studying black holes and neutron
+            stars.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="extras-grid">
+      <div class="extras-col new-jobs" style="grid-column: 1 / -1;">
+        <div class="ext-title">🌟 WHATEVER CAREER YOU CHOOSE — TECHNOLOGY IS BY YOUR SIDE!</div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:14px; margin-top:16px;">
+
+          <div style="background:rgba(0,200,255,0.08); border-left:3px solid #00c8ff; padding:12px 14px; border-radius:6px;">
+            <div style="font-weight:bold; margin-bottom:6px; color:#00c8ff;">🤖 FOR THOSE WHO LOVE TECHNOLOGY</div>
+            <div style="font-size:0.9rem; line-height:1.6;">
+              AI Engineer · Game Designer · Cybersecurity Expert · Robot Engineer
+            </div>
+          </div>
+
+          <div style="background:rgba(255,100,150,0.08); border-left:3px solid #ff6496; padding:12px 14px; border-radius:6px;">
+            <div style="font-weight:bold; margin-bottom:6px; color:#ff6496;">🩺 FOR THOSE WHO LOVE LIVING THINGS</div>
+            <div style="font-size:0.9rem; line-height:1.6;">
+              Vet 🐾 · Doctor · Psychologist · Biomedical Engineer · Genetics Expert
+            </div>
+          </div>
+
+          <div style="background:rgba(200,100,255,0.08); border-left:3px solid #c864ff; padding:12px 14px; border-radius:6px;">
+            <div style="font-weight:bold; margin-bottom:6px; color:#c864ff;">🎨 FOR THOSE WHO LOVE TO CREATE</div>
+            <div style="font-size:0.9rem; line-height:1.6;">
+              Digital Artist · UX Designer · Content Creator · Game Artist · Architect
+            </div>
+          </div>
+
+          <div style="background:rgba(100,230,100,0.08); border-left:3px solid #64e664; padding:12px 14px; border-radius:6px;">
+            <div style="font-weight:bold; margin-bottom:6px; color:#64e664;">🌱 FOR THOSE WHO LOVE NATURE</div>
+            <div style="font-size:0.9rem; line-height:1.6;">
+              Sustainability Expert · Green Architect · Climate Analyst · Forest Engineer · Ecologist
+            </div>
+          </div>
+
+          <div style="background:rgba(255,200,50,0.08); border-left:3px solid #ffc832; padding:12px 14px; border-radius:6px; grid-column: span 2;">
+            <div style="font-weight:bold; margin-bottom:6px; color:#ffc832;">📚 FOR THOSE WHO LOVE LANGUAGE AND PEOPLE</div>
+            <div style="font-size:0.9rem; line-height:1.6;">
+              Teacher · Technology Journalist · Cyber Law Lawyer · Digital Ethics Expert · Translator
+            </div>
+          </div>
+
+        </div>
+
+        <div style="text-align:center; margin-top:20px; font-style:italic; opacity:0.9; font-size:1.05rem;">
+          💫 Whatever you want to become — technology will make that job more
+          exciting and more powerful. What matters is: stay curious, ask questions,
+          and keep loving to learn!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S18 — LV7 3/3 : SEN DE BAŞLA ================= -->
+  <div class="slide" id="s18">
+    <div class="level-banner">
+      <div class="level-badge">LEVEL 7</div>
+      <div class="level-title">YOU CAN START TODAY TOO!</div>
+      <div class="page-tag">PAGE 3/3</div>
+    </div>
+    <div class="slide-sub">This isn't just for grown-ups — you can start getting ready today!</div>
+
+    <div class="extras-grid">
+      <div class="extras-col study">
+        <div class="ext-title">📚 WHAT SHOULD I LEARN STARTING TODAY?</div>
+        <ul>
+          <li>🔢 <strong>Math</strong> — the foundation of everything</li>
+          <li>💻 <strong>Coding</strong> — Scratch, then Python (free!)</li>
+          <li>🗣️ <strong>English</strong> — the language of technology</li>
+          <li>🎨 <strong>Creativity</strong> — drawing, music, writing</li>
+          <li>🤔 <strong>Curiosity</strong> — never stop asking "why?"</li>
+        </ul>
+      </div>
+
+      <div class="career-quiz">
+        <div class="cq-title">🎯 MINI QUIZ — WHICH CAREER SUITS YOU?</div>
+        <div class="cq-question" id="cqQ">Choose the one that fits you best:</div>
+        <div class="cq-options" id="cqOpts">
+          <button class="cq-opt" onclick="cqPick('🤖 AI Engineer')">🧩 I love solving puzzles</button>
+          <button class="cq-opt" onclick="cqPick('🥽 Metaverse Architect')">🎨 Drawing and designing is fun</button>
+          <button class="cq-opt" onclick="cqPick('🧬 Gene Engineer')">🔬 I'm curious about living things</button>
+          <button class="cq-opt" onclick="cqPick('🚀 Space Engineer')">🌌 I love looking up at the sky</button>
+        </div>
+        <div class="cq-result" id="cqRes"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S19 — LV8 1/6 : DOPAMIN ================= -->
+  <div class="slide" id="s19">
+    <div class="level-banner">
+      <div class="level-badge mint-badge">LEVEL 8</div>
+      <div class="level-title mint-title">🧠 WHY IS IT HARD TO PUT THE PHONE DOWN?</div>
+      <div class="page-tag">PAGE 1/6</div>
+    </div>
+    <div class="slide-sub">It's not your fault — it's about how your brain works!</div>
+
+    <div class="smart-full">
+      <div class="sf-head">
+        <div class="sf-emo">🧠</div>
+        <h3>WHAT'S HAPPENING INSIDE YOUR BRAIN?</h3>
+      </div>
+      <div class="sf-text">
+        In your brain there's a happiness chemical called
+        <strong style="color:var(--primary)">dopamine</strong>. When something
+        nice happens, your brain releases dopamine and you say, "Ooh, I liked that!"
+        <br><br>
+        In the old days, to get dopamine you had to <strong>pick fruit</strong>,
+        <strong>play games</strong> or <strong>make friends</strong>.
+        It took time and a little effort.
+        <br><br>
+        Now? You scroll TikTok and there's a new video every 10 seconds. With
+        each new video your brain gives a little burst of dopamine. Your brain
+        says: <em>"Wow, this is so easy! Keep going!"</em>
+        <br><br>
+        That's exactly why it's hard to put the phone down. The screen trains
+        your brain to expect <strong>very fast happiness</strong>.
+      </div>
+
+      <div style="margin-top:24px; padding:16px; background:rgba(255,100,100,0.08); border-left:3px solid #ff6464; border-radius:6px;">
+        <div style="font-weight:bold; color:#ff6464; margin-bottom:8px;">⚠️ HERE'S THE PROBLEM:</div>
+        <div style="line-height:1.7;">
+          Once your brain gets used to fast dopamine, the <strong>slower things</strong>
+          (studying, reading a book, doing sports) start to feel boring.
+          That's because they give dopamine slowly.
+        </div>
+      </div>
+
+      <div style="margin-top:16px; padding:16px; background:rgba(100,230,100,0.08); border-left:3px solid #64e664; border-radius:6px;">
+        <div style="font-weight:bold; color:#64e664; margin-bottom:8px;">🎯 THE FIX: THE 12-MINUTE RULE</div>
+        <div style="line-height:1.7;">
+          Even if something feels boring (homework, a book, sport) — just try it
+          for <strong>12 minutes</strong>. After the first 12 minutes your brain
+          starts to say <em>"oh, this isn't so bad after all."</em> The dopamine
+          comes slowly, but it comes to stay!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S20 — LV8 2/6 : BEYİN ŞEKİLLENİYOR ================= -->
+  <div class="slide" id="s20">
+    <div class="level-banner">
+      <div class="level-badge mint-badge">LEVEL 8</div>
+      <div class="level-title mint-title">🧩 WHAT SHAPES YOUR BRAIN?</div>
+      <div class="page-tag">PAGE 2/6</div>
+    </div>
+    <div class="slide-sub">Whatever you do, your brain grows stronger in that direction.</div>
+
+    <div class="smart-full">
+
+      <!-- ANA PRENSIP -->
+      <div class="sf-head">
+        <div class="sf-emo">🧠</div>
+        <h3>YOUR BRAIN IS LIKE A MUSCLE</h3>
+      </div>
+      <div class="sf-text">
+        Your brain has <strong>86 billion cells</strong>. These cells are joined to each other by thin pathways. The more you do something, the <strong>thicker and stronger</strong> the pathways used for that task become.
+        <br><br>
+        When you're learning to ride a bike you struggle and fall. Then your brain strengthens the "bicycle pathway" and you start riding without even thinking. Times tables, chess, a musical instrument, a foreign language — they all work the same way.
+        <br><br>
+        So in the end: <strong>your brain is shaped by whatever you do.</strong> So what are you doing? That's the really important question.
+      </div>
+
+      <!-- YAPAY ZEKA ÖRNEĞİ -->
+      <div style="margin-top:24px; padding:18px; background:rgba(0,207,255,0.08); border-left:4px solid var(--info); border-radius:8px; line-height:1.7;">
+        <div style="font-weight:bold; margin-bottom:10px; font-size:1.05rem; color:var(--info);">🤖 EXAMPLE: DOING HOMEWORK WITH AI</div>
+        <div>
+          Let's say the teacher gives you homework: <em>"Write 3 important events from Atatürk's life."</em>
+          <br><br>
+          <strong>🟢 WAY 1 — By thinking:</strong> You open your book. You read it. You picture the events in your mind. You think, "Which one is more important?" The homework takes 20 minutes, but your brain's <strong>thinking pathway grows stronger.</strong> Even a week later, you still remember those events.
+          <br><br>
+          <strong>🔴 WAY 2 — You ask the AI:</strong> You type the question into an AI tool and the answer comes in 5 seconds. You copy it, paste it, and the homework is done. But your brain <strong>didn't work at all.</strong> If someone asks you the next day which 3 events they were, you can't remember.
+          <br><br>
+          Both reach the right answer. But one improves you, the other improves the AI.
+        </div>
+      </div>
+
+      <!-- İKİ YÖNLÜ KARŞILAŞTIRMA -->
+      <div class="ai-split" style="margin-top:24px;">
+
+        <!-- SOL: ÇOK İNTERNET/EKRAN -->
+        <div class="smart-full" style="max-width:none; background:rgba(255,49,49,0.05); border-color:rgba(255,49,49,0.3);">
+          <div class="sf-head">
+            <div class="sf-emo" style="background:rgba(255,49,49,0.15); border-radius:12px; padding:4px 8px;">📱</div>
+            <h3 style="color:var(--red);">IF YOU USE TOO MUCH INTERNET/SCREEN</h3>
+          </div>
+          <div class="sf-text">
+            Scientists have studied children's brains using MRI machines. In children with more than 7 hours of screen time a day, they noticed these signs:
+          </div>
+          <ul class="sf-list">
+            <li style="border-left-color: var(--red);">🧠 The deep-thinking area (the cortex) was found to be thinner.</li>
+            <li style="border-left-color: var(--red);">📖 The connections in the reading and language areas were seen to weaken.</li>
+            <li style="border-left-color: var(--red);">⏱️ Focusing for a long time became harder, because the brain gets used to short videos.</li>
+            <li style="border-left-color: var(--red);">💭 The ability to imagine fades, because the screen serves up every image ready-made.</li>
+            <li style="border-left-color: var(--red);">🤖 In children who rely on AI tools, the ability to think for themselves was found to weaken.</li>
+            <li style="border-left-color: var(--red);">😴 Blue light disturbs sleep, so the brain can't refresh itself well enough.</li>
+          </ul>
+          <div style="margin-top:12px; padding:10px; background:rgba(255,49,49,0.1); border-radius:6px; font-size:0.9rem; font-style:italic;">
+            Your brain gets shaped "to fit the screen" — it gets used to fast, shallow, ready-made thinking.
+          </div>
+        </div>
+
+        <!-- SAĞ: EL BECERİLERİ -->
+        <div class="smart-full" style="max-width:none; background:rgba(57,255,20,0.05); border-color:rgba(57,255,20,0.3);">
+          <div class="sf-head">
+            <div class="sf-emo" style="background:rgba(57,255,20,0.15); border-radius:12px; padding:4px 8px;">✋</div>
+            <h3 style="color:var(--success);">IF YOU USE YOUR HANDS</h3>
+          </div>
+          <div class="sf-text">
+            An interesting fact: <strong>your hands train your brain.</strong> The nerves in your fingers are connected to the largest area of the brain. That's why every activity that uses your hands makes your brain stronger:
+          </div>
+          <ul class="sf-list">
+            <li style="border-left-color: var(--success);">🧱 <strong>Lego, puzzles:</strong> Spatial thinking, planning and patience</li>
+            <li style="border-left-color: var(--success);">✏️ <strong>Drawing, painting:</strong> Imagination and fine coordination</li>
+            <li style="border-left-color: var(--success);">🎹 <strong>Musical instrument:</strong> Two hands + reading notes + rhythm — all parts of the brain work at once</li>
+            <li style="border-left-color: var(--success);">🥧 <strong>Cooking, kneading dough:</strong> Putting things in order, measuring and touch memory</li>
+            <li style="border-left-color: var(--success);">📚 <strong>Reading books:</strong> The events come alive in your mind — your brain builds the scene on its own</li>
+            <li style="border-left-color: var(--success);">⚽ <strong>Sports, dance:</strong> Body-brain coordination and self-control</li>
+            <li style="border-left-color: var(--success);">🪡 <strong>Origami, crafts:</strong> Concentration, fine movements and patience</li>
+          </ul>
+          <div style="margin-top:12px; padding:10px; background:rgba(57,255,20,0.1); border-radius:6px; font-size:0.9rem; font-style:italic;">
+            Your brain gets shaped "to fit real life" — it gains a deep, flexible and creative way of thinking.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ZEKİ OLMAK NEDİR? -->
+      <div style="margin-top:24px; padding:18px; background:rgba(168,85,247,0.08); border-left:4px solid var(--purple); border-radius:8px; line-height:1.7;">
+        <div style="font-weight:bold; margin-bottom:10px; font-size:1.05rem; color:var(--purple);">🌟 WHAT DOES IT MEAN TO BE SMART?</div>
+        <div>
+          Being smart doesn't mean "knowing everything." Because nowadays AI knows everything too.
+          <br><br>
+          Real intelligence is this: <strong>asking the right question, connecting ideas, creating new things, breaking big problems into pieces, and working with patience.</strong> These are things AI can't do — and they only grow when you <strong>use your own brain.</strong>
+          <br><br>
+          AI is a helpful tool. But you should think first, then ask it. If you fire off a question without thinking, you're the one who falls behind.
+        </div>
+      </div>
+
+      <!-- KAPANIŞ -->
+      <div style="margin-top:20px; padding:18px; background:rgba(255,230,0,0.08); border:1px solid rgba(255,230,0,0.3); border-radius:10px; text-align:center; line-height:1.7;">
+        <div style="font-weight:bold; margin-bottom:10px; font-size:1.1rem; color:var(--primary);">💡 THE BOTTOM LINE: TECHNOLOGY IS NOT THE ENEMY — BALANCE IS KEY</div>
+        <div>
+          Phones, AI, the internet — they're all wonderful tools. But on their own they don't make you better. In fact, if you overuse them, they can weaken your abilities.
+          <br><br>
+          Here's what matters: <strong>Use the screen, but don't forget your hands.</strong> Do your homework, but think for yourself first. Ask questions, but research on your own first. That's the only way your brain grows stronger.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= S21 — LV8 3/6 : EKRAN SÜRESİ ================= -->
+  <div class="slide" id="s21">
+    <div class="level-banner">
+      <div class="level-badge mint-badge">LEVEL 8</div>
+      <div class="level-title mint-title">⏰ SCREEN TIME BALANCE</div>
+      <div class="page-tag">PAGE 3/6</div>
+    </div>
+    <div class="slide-sub">Technology is great — but your eyes and your sleep matter too!</div>
+
+    <div class="smart-full">
+      <div class="sf-head"><div class="sf-emo">⏰</div><h3>HOW MANY HOURS IS ENOUGH?</h3></div>
+      <div class="sf-text">Health experts recommend <strong style="color:var(--primary)">A MAXIMUM OF 2 HOURS</strong> of fun screen time a day for ages 9-10 (not counting homework and learning).</div>
+      <ul class="sf-list">
+        <li>🌙 <strong>Turn off screens 1 hour before bed</strong> — blue light disturbs your sleep!</li>
+        <li>👁 <strong>The 20-20-20 rule:</strong> Every 20 minutes, look 6 meters away for 20 seconds — rest your eyes!</li>
+        <li>🏃 Stand up every 30 minutes and move for 2-3 minutes</li>
+      </ul>
+      <div class="screen-slider-wrap">
+        <div class="sslider-label">📱 HOW MANY HOURS DO YOU SPEND ON SCREENS EACH DAY?</div>
+        <div class="sslider-row">
+          <input type="range" class="sslider" id="screenSlider" min="0" max="8" step="0.5" value="2">
+          <div class="sslider-val" id="screenVal">2 hours</div>
+        </div>
+        <div class="sslider-msg" id="screenMsg" style="color:var(--success)">✅ Great! You're right in the ideal zone.</div>
+      </div>
+
+      <div style="margin-top:28px; padding:18px; background:rgba(0,200,255,0.05); border:1px solid rgba(0,200,255,0.25); border-radius:10px;">
+        <div style="font-weight:bold; color:#00c8ff; margin-bottom:14px; font-size:1.05rem; text-align:center;">
+          📅 WHAT DOES A HEALTHY DAY LOOK LIKE?
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
+
+          <div style="padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:6px;">
+            <div style="font-weight:bold; color:var(--primary); margin-bottom:4px;">🌙 SLEEP</div>
+            <div style="font-size:0.9rem; line-height:1.5;">
+              Ages 9-10 need <strong>9-11 hours</strong> of sleep.
+              Screens off <strong>1 hour before</strong> bedtime!
+            </div>
+          </div>
+
+          <div style="padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:6px;">
+            <div style="font-weight:bold; color:#ffc832; margin-bottom:4px;">📚 SCHOOL + HOMEWORK</div>
+            <div style="font-size:0.9rem; line-height:1.5;">
+              School ~6 hours. <strong>1-2 hours</strong> of focused
+              time for homework. Keep the phone away during this!
+            </div>
+          </div>
+
+          <div style="padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:6px;">
+            <div style="font-weight:bold; color:#64e664; margin-bottom:4px;">🏃 MOVEMENT</div>
+            <div style="font-size:0.9rem; line-height:1.5;">
+              At least <strong>1 hour</strong> of physical activity a day.
+              Park, bike, ball, dance — anything goes!
+            </div>
+          </div>
+
+          <div style="padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:6px;">
+            <div style="font-weight:bold; color:#ff6496; margin-bottom:4px;">👨‍👩‍👧 FAMILY + FRIENDS</div>
+            <div style="font-size:0.9rem; line-height:1.5;">
+              Meals, chats, games — <strong>1-2 hours</strong> a day
+              of screen-free time together.
+            </div>
+          </div>
+
+          <div style="padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:6px;">
+            <div style="font-weight:bold; color:#c864ff; margin-bottom:4px;">📱 FUN SCREEN TIME</div>
+            <div style="font-size:0.9rem; line-height:1.5;">
+              A maximum of <strong>2 hours</strong> for fun
+              (TikTok, YouTube, games). With short breaks!
+            </div>
+          </div>
+
+          <div style="padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:6px;">
+            <div style="font-weight:bold; color:#00ffc8; margin-bottom:4px;">🎨 HOBBIES + READING</div>
+            <div style="font-size:0.9rem; line-height:1.5;">
+              Drawing, music, books, instruments —
+              <strong>30 min - 1 hour</strong> of creative time a day.
+            </div>
+          </div>
+
+        </div>
+
+        <div style="margin-top:14px; text-align:center; font-size:0.9rem; opacity:0.85; font-style:italic;">
+          This is just a suggestion. Everyone's day is different — but balance matters.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S22 — LV8 4/6 : GÜVENLİ İNTERNET ================= -->
+  <div class="slide" id="s22">
+    <div class="level-banner">
+      <div class="level-badge mint-badge">LEVEL 8</div>
+      <div class="level-title mint-title">🛡 SAFE INTERNET</div>
+      <div class="page-tag">PAGE 4/6</div>
+    </div>
+    <div class="slide-sub">Your information is precious — learn how to protect it.</div>
+
+    <div class="smart-full">
+      <div class="sf-head"><div class="sf-emo">🛡</div><h3>YOUR PERSONAL INFORMATION IS YOUR SECRET TREASURE</h3></div>
+      <div class="sf-text"><strong style="color:var(--red)">NEVER SHARE:</strong> Your full name · Your school · Your home address · Your phone number · Family photos · Where your parents work</div>
+      <ul class="sf-list">
+        <li>💬 Don't chat with people you don't know in online games or chats</li>
+        <li>🚨 If something makes you uncomfortable → <strong>tell a parent/teacher RIGHT AWAY, DON'T HIDE IT!</strong></li>
+        <li>☎️ Turkey help lines: <strong>155</strong> (police) · <strong>183</strong> (social support)</li>
+        <li>🔗 Got a suspicious link? Show it to your family before clicking</li>
+      </ul>
+      <div class="pw-creator">
+        <div class="pw-lbl">🔐 TRY A STRONG PASSWORD (e.g. MyCat2024!loves)</div>
+        <input type="text" class="pw-input" id="pwInput" placeholder="Try a password..." maxlength="30">
+        <div class="pw-checks">
+          <div class="pw-check" id="pw-len">❔ At least 8 characters</div>
+          <div class="pw-check" id="pw-up">❔ Capital letter</div>
+          <div class="pw-check" id="pw-num">❔ Number</div>
+          <div class="pw-check" id="pw-sym">❔ Symbol (! ? @)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S23 — LV8 5/6 : ÜRET-TÜKET + DİJİTAL ZEKA ================= -->
+  <div class="slide" id="s23">
+    <div class="level-banner">
+      <div class="level-badge mint-badge">LEVEL 8</div>
+      <div class="level-title mint-title">🎯 CREATE-CONSUME + DIGITAL SMARTS</div>
+      <div class="page-tag">PAGE 5/6</div>
+    </div>
+    <div class="slide-sub">Don't just watch — be a maker! And don't believe everything you see.</div>
+
+    <div class="ai-split">
+      <div class="smart-full" style="max-width:none;">
+        <div class="sf-head"><div class="sf-emo">🎯</div><h3>THE CREATE-CONSUME BALANCE</h3></div>
+        <div class="sf-text"><strong style="color:var(--warm)">Passive consuming:</strong> watching TikTok, scrolling. <strong style="color:var(--success)">Active creating:</strong> coding, filming videos, making games!</div>
+        <div class="sf-text" style="color: var(--primary); font-weight: 600;">If you create 20%, you've earned the right to consume 80%!</div>
+        <ul class="sf-list">
+          <li>💻 <strong>Coding:</strong> Scratch, Code.org — free!</li>
+          <li>🎨 <strong>Art:</strong> Canva, Procreate</li>
+          <li>🎬 <strong>Video:</strong> iMovie, CapCut</li>
+          <li>🎮 <strong>Make games:</strong> Unity</li>
+        </ul>
+      </div>
+
+      <div class="smart-full" style="max-width:none;">
+        <div class="sf-head"><div class="sf-emo">🧠</div><h3>DIGITAL SMARTS — DON'T BELIEVE EVERYTHING YOU SEE!</h3></div>
+
+        <div class="sf-text">
+          You saw a video online: a famous actor saying something strange.
+          Is it real? <strong style="color:var(--red)">Maybe not.</strong>
+        </div>
+
+        <div style="margin-top:16px; padding:14px; background:rgba(255,100,100,0.1); border-left:3px solid #ff6464; border-radius:6px;">
+          <div style="font-weight:bold; color:#ff6464; margin-bottom:8px;">🎭 WHAT IS A DEEPFAKE?</div>
+          <div style="line-height:1.7; font-size:0.95rem;">
+            AI can copy a person's face and voice. That way, videos
+            are made that look like the person is saying things they
+            never said. These are called <strong>deepfakes</strong> —
+            it means "deep fake."
+            <br><br>
+            Example: a video where a celebrity says "send me this money
+            and I'll give you back 10 times more." In reality that
+            celebrity never said it — AI copied their face and voice.
+            Many people were fooled.
+          </div>
+        </div>
+
+        <div style="margin-top:12px; padding:14px; background:rgba(255,200,50,0.08); border-left:3px solid #ffc832; border-radius:6px;">
+          <div style="font-weight:bold; color:#ffc832; margin-bottom:8px;">🤖 AI IMAGES LOOK VERY REAL TOO</div>
+          <div style="line-height:1.7; font-size:0.95rem;">
+            You saw a photo: a giant octopus wrapping around a ship. Is it real?
+            No — AIs like ChatGPT or Midjourney can make this kind of picture
+            in 5 seconds. The rule "a photo = the truth" no longer holds.
+          </div>
+        </div>
+
+        <ul class="sf-list" style="margin-top:16px;">
+          <li>🔍 <strong>The 3-source rule:</strong> Saw a piece of news? Check it with 2-3 other trustworthy places too (like BBC, NTV, TRT)</li>
+          <li>🎥 <strong>Is a video suspicious?</strong> Check the celebrity's official account — if it isn't posted there, it could be fake</li>
+          <li>👀 <strong>Warning signs:</strong> Does the light on the face look odd? Does the mouth match the words exactly? Do the eyes look natural?</li>
+          <li>🚨 Any message <strong>asking for money, passwords or information</strong> is suspicious — ask your family!</li>
+          <li>🎭 Social media is everyone's best moments — not real life</li>
+          <li>❤️ Number of followers ≠ Happiness</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S24 — LV8 6/6 : 5 ALTIN KURAL ================= -->
+  <div class="slide" id="s24">
+    <div class="level-banner">
+      <div class="level-badge mint-badge">LEVEL 8</div>
+      <div class="level-title mint-title">💎 5 GOLDEN RULES</div>
+      <div class="page-tag">PAGE 6/6</div>
+    </div>
+    <div class="slide-sub">The Technology Hero's Code — remember it your whole life!</div>
+
+    <div class="golden-rules">
+      <div class="gr-card">
+        <div class="gr-num">01</div>
+        <div class="gr-icon">⏰</div>
+        <div class="gr-title">ONE HOUR CODING,<br>ONE HOUR PLAYING</div>
+        <div class="gr-desc">Don't create less than you consume!</div>
+      </div>
+      <div class="gr-card">
+        <div class="gr-num">02</div>
+        <div class="gr-icon">👁</div>
+        <div class="gr-title">THE 2-2-2 RULE</div>
+        <div class="gr-desc">Max 2 hours a day, a 20-second break every 20 minutes, screens off 2 hours before bed.</div>
+      </div>
+      <div class="gr-card">
+        <div class="gr-num">03</div>
+        <div class="gr-icon">🔍</div>
+        <div class="gr-title">TRUST BUT<br>VERIFY</div>
+        <div class="gr-desc">Check every piece of information; don't trust people you don't know.</div>
+      </div>
+      <div class="gr-card">
+        <div class="gr-num">04</div>
+        <div class="gr-icon">🎨</div>
+        <div class="gr-title">MAKE, CREATE,<br>EXPLORE</div>
+        <div class="gr-desc">Technology isn't a toy — it's a workshop!</div>
+      </div>
+      <div class="gr-card">
+        <div class="gr-num">05</div>
+        <div class="gr-icon">🌳</div>
+        <div class="gr-title">GO OUT INTO<br>REAL LIFE</div>
+        <div class="gr-desc">Friends, books, nature — screens are only 10% of your life!</div>
+      </div>
+    </div>
+
+    <button class="oath-btn" onclick="swearOath()">✋ I GIVE MY WORD — I AM A TECHNOLOGY HERO!</button>
+  </div>
+
+  <!-- ================= S25 — VICTORY ================= -->
+  <div class="slide" id="s25">
+    <div id="confettiContainer"></div>
+    <div class="victory-screen">
+      <div class="victory-trophy">🏆</div>
+      <div class="victory-title">CONGRATULATIONS!<br>GAME COMPLETE!</div>
+      <div class="final-xp">🌟 TOTAL XP: 1000 / 1000 — MAX LEVEL!</div>
+
+      <div class="achievement-row">
+        <div class="achievement"><div class="ach-icon">🌐</div><div class="ach-label">INTERNET<br>MASTER</div></div>
+        <div class="achievement"><div class="ach-icon">⚡</div><div class="ach-label">SPEED<br>CHAMPION</div></div>
+        <div class="achievement"><div class="ach-icon">🤖</div><div class="ach-label">AI<br>EXPLORER</div></div>
+        <div class="achievement"><div class="ach-icon">🚀</div><div class="ach-label">FUTURE<br>ARCHITECT</div></div>
+        <div class="achievement"><div class="ach-icon">🧭</div><div class="ach-label">SMART<br>USER</div></div>
+      </div>
+
+      <div class="quote-row">
+        <div class="quote-card">"Imagination is more important than knowledge."<span class="quote-author">— EINSTEIN</span></div>
+        <div class="quote-card">"Follow your heart and your intuition."<span class="quote-author">— STEVE JOBS</span></div>
+        <div class="quote-card">"What seems impossible isn't really impossible."<span class="quote-author">— ELON MUSK</span></div>
+      </div>
+
+      <div class="final-cta" onclick="goToQuiz()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goToQuiz();}">🎯 QUIZ IS NEXT — SHOW WHAT YOU KNOW!</div>
+      <div style="font-size:clamp(13px, 1.5vw, 16px); color:rgba(255,255,255,0.65); max-width:800px; text-align:center; line-height:1.55; font-style:italic;">
+        "There's no age limit for changing the world. You can start today too!"
+      </div>
+      <div class="press-start">PRESS THE RIGHT ARROW (→) TO GO TO THE QUIZ</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- === KONTROLLER === -->
+<button class="arrow-btn arrow-left"  onclick="changeSlide(-1)">◀</button>
+<button class="arrow-btn arrow-right" onclick="changeSlide(1)">▶</button>
+<div class="bottom-nav" id="bottomNav"></div>
+
+<script>
+  // === Level yapısı: her levelın kaç sub-sayfası var ===
+  const levels = [
+    { label: 'START', pages: 1 },   // s1
+    { label: 'LV1',   pages: 2 },   // s2-s3
+    { label: 'LV2',   pages: 3 },   // s4-s6
+    { label: 'LV3',   pages: 2 },   // s7-s8 (6G eklendi)
+    { label: 'LV4',   pages: 1 },   // s9
+    { label: 'LV5',   pages: 2 },   // s10-s11
+    { label: 'LV6',   pages: 4 },   // s12-s15
+    { label: 'LV7',   pages: 3 },   // s16-s18
+    { label: 'LV8',   pages: 6 },   // s19-s24
+    { label: 'MAX',   pages: 1 }    // s25
+  ];
+  const TOTAL = levels.reduce((a, l) => a + l.pages, 0);  // 33
+  let current = 0;
+
+  // === Her slayt için kümülatif XP ===
+  // Her level toplam 100 XP, sub-sayfa sayısına bölünür
+  const slideXP = (() => {
+    const arr = [];
+    let totalXP = 0;
+    levels.forEach((lvl, li) => {
+      const perPage = (li === 0 || li === levels.length - 1) ? 0 : 100 / lvl.pages;
+      for (let p = 0; p < lvl.pages; p++) {
+        if (li === levels.length - 1) {
+          arr.push(1000);   // MAX
+        } else {
+          totalXP += perPage;
+          arr.push(Math.round(totalXP));
+        }
+      }
+    });
+    return arr;
+  })();
+
+  // === Slide → level/page bilgi ===
+  function getLevelInfo(slideIdx) {
+    let idx = slideIdx, startIdx = 0;
+    for (let i = 0; i < levels.length; i++) {
+      if (idx < levels[i].pages) {
+        return {
+          levelIdx: i,
+          pageIdx: idx,
+          pages: levels[i].pages,
+          label: levels[i].label,
+          firstSlide: startIdx,
+          lastSlide: startIdx + levels[i].pages - 1
+        };
+      }
+      idx -= levels[i].pages;
+      startIdx += levels[i].pages;
+    }
+  }
+
+  // === Pip tıklayınca o levelın ilk sub-sayfasına atla ===
+  function goToLevel(levelIdx) {
+    let slideIdx = 0;
+    for (let i = 0; i < levelIdx; i++) slideIdx += levels[i].pages;
+    goTo(slideIdx);
+  }
+
+  // === Alt nav (11 pip) ===
+  const bn = document.getElementById('bottomNav');
+  levels.forEach((lvl, i) => {
+    const pip = document.createElement('div');
+    pip.className = 'level-pip' + (i === 0 ? ' active' : '');
+    pip.textContent = lvl.label;
+
+    // Alt noktalar (sub-sayfa göstergesi)
+    if (lvl.pages > 1) {
+      const dots = document.createElement('div');
+      dots.className = 'pip-dots';
+      for (let p = 0; p < lvl.pages; p++) {
+        const d = document.createElement('div');
+        d.className = 'pip-dot' + (i === 0 && p === 0 ? ' cur' : '');
+        dots.appendChild(d);
+      }
+      pip.appendChild(dots);
+    }
+
+    pip.onclick = () => goToLevel(i);
+    bn.appendChild(pip);
+  });
+
+  function updateHUD(n) {
+    const info = getLevelInfo(n);
+    const xp  = slideXP[n];
+    const pct = (xp / 1000) * 100;
+    document.getElementById('xpFill').style.width = pct + '%';
+    document.getElementById('xpCount').textContent = xp + ' / 1000';
+    document.getElementById('hudLevel').textContent =
+      info.levelIdx === 0 ? 'START' :
+      info.levelIdx === levels.length - 1 ? 'MAX' :
+      'LV.' + info.levelIdx;
+    document.getElementById('hudPage').textContent = (info.pageIdx + 1) + '/' + info.pages;
+
+    // Rozet: b[levelIdx-1] o levelın SON sub-sayfasına ulaşıldığında açılır
+    for (let i = 0; i < 8; i++) {
+      const badge = document.getElementById('b' + i);
+      // b[i] = LV(i+1). LV(i+1)'in son slayt indeksi?
+      let lastSlideOfLevel = 0;
+      for (let lv = 0; lv <= i + 1; lv++) lastSlideOfLevel += levels[lv].pages;
+      lastSlideOfLevel -= 1;
+      if (n > lastSlideOfLevel) badge.classList.add('earned');
+      else badge.classList.remove('earned');
+    }
+  }
+
+  function goTo(n) {
+    document.getElementById('s' + (current + 1)).classList.remove('active');
+    current = Math.max(0, Math.min(TOTAL - 1, n));
+    document.getElementById('s' + (current + 1)).classList.add('active');
+
+    const currentInfo = getLevelInfo(current);
+
+    // Pip state
+    document.querySelectorAll('.level-pip').forEach((p, i) => {
+      p.classList.remove('active', 'done');
+      const pipDots = p.querySelectorAll('.pip-dot');
+      pipDots.forEach(d => d.classList.remove('cur'));
+
+      if (i < currentInfo.levelIdx) {
+        p.classList.add('done');
+        pipDots.forEach(d => d.classList.add('cur'));
+      } else if (i === currentInfo.levelIdx) {
+        p.classList.add('active');
+        if (pipDots[currentInfo.pageIdx]) pipDots[currentInfo.pageIdx].classList.add('cur');
+      }
+    });
+
+    updateHUD(current);
+    if (current === TOTAL - 1) spawnConfetti();
+
+    // İnfografikler: sayfaya her girildiğinde SIFIRDAN başlasın
+    if (current === 7) restartDlRace();   // LV3 2/2 - indirme yarisi (s8)
+  }
+
+  // İndirme yarışını (LV3 SAYFA 2/3) sıfırlayıp yeniden oynat
+  function restartDlRace() {
+    const race = document.querySelector('#s8 .dl-race');
+    if (!race) return;
+    // 1) running class'ı kaldır → animation-name: none → barlar 0'a döner
+    race.classList.remove('running');
+    // 2) Her bar için SADECE animation-name'i reset et (duration'ı SİLME!)
+    //    `f.style.animation` shorthand tüm longhand'leri silerdi — duration dahil.
+    //    `animationName` longhand ise yalnızca adı override eder, duration inline kalır.
+    const fills = race.querySelectorAll('.dl-fill');
+    fills.forEach(f => {
+      f.style.animationName = 'none';   // inline override: animasyon durgun
+      void f.offsetWidth;                // reflow
+      f.style.animationName = '';        // override kaldır, CSS devreye girer
+    });
+    // 3) running class'ı ekle → CSS'te animation-name: dlMove aktif → 0'dan başlar
+    requestAnimationFrame(() => requestAnimationFrame(() => race.classList.add('running')));
+  }
+
+  function changeSlide(d) { goTo(current + d); }
+
+  // iframe içinden parent'ı /quiz sayfasına yönlendir
+  function goToQuiz() {
+    try {
+      if (window.top && window.top !== window.self) {
+        window.top.location.href = '/quiz';
+      } else {
+        window.location.href = '/quiz';
+      }
+    } catch (e) {
+      // cross-origin koruması olursa yeni sekmede aç
+      window.open('/quiz', '_top');
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') changeSlide(1);
+    if (e.key === 'ArrowLeft') changeSlide(-1);
+  });
+
+  // === Yıldızlar ===
+  const starsContainer = document.getElementById('starsContainer');
+  for (let i = 0; i < 70; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 2.5 + 0.8;
+    star.style.cssText =
+      `width:${size}px;height:${size}px;left:${Math.random() * 100}%;top:${Math.random() * 100}%;` +
+      `animation-delay:${Math.random() * 3}s;animation-duration:${Math.random() * 2 + 1.5}s`;
+    starsContainer.appendChild(star);
+  }
+
+  // === Parçacıklar ===
+  const pc = document.getElementById('particles');
+  const particleColors = ['#00cfff', '#A855F7', '#39ff14', '#FF6B35', '#ffe600'];
+  for (let i = 0; i < 36; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 3 + 1;
+    const drift = (Math.random() - 0.5) * 220;
+    const color = particleColors[Math.floor(Math.random() * particleColors.length)];
+    p.style.cssText =
+      `width:${size}px;height:${size}px;left:${Math.random() * 100}%;background:${color};` +
+      `animation-duration:${Math.random() * 8 + 7}s;animation-delay:${Math.random() * 10}s;` +
+      `--drift:${drift}px;opacity:0.55;box-shadow:0 0 6px currentColor`;
+    pc.appendChild(p);
+  }
+
+  // === Canlı sayaçlar (kapak) ===
+  // Global ve Türkiye verileri (DataReportal & TÜİK 2025 referans, tahmini)
+  // rate = saniyede artış miktarı
+  const counters = [
+    // GLOBAL
+    { el: 'lc1', base: 5_200_000_000,    rate: 60_000     }, // Google araması
+    { el: 'lc2', base: 100_000_000_000,  rate: 1_157_000  }, // WhatsApp mesajı
+    { el: 'lc3', base: 1_000_000_000,    rate: 11_574     }, // YouTube saati
+    // TÜRKİYE — günlük değerler (75M, 2B, 45M)
+    { el: 'lc4', base: 75_000_000,       rate: 868        }, // 75M / 86400
+    { el: 'lc5', base: 2_000_000_000,    rate: 23_148     }, // 2B / 86400
+    { el: 'lc6', base: 45_000_000,       rate: 521        }  // 45M / 86400
+  ];
+  function fmt(n) {
+    if (n >= 1e9) return (n/1e9).toFixed(2) + ' BILLION';
+    if (n >= 1e6) return (n/1e6).toFixed(1) + ' MILLION';
+    if (n >= 1e3) return Math.floor(n/1e3) + ' THOUSAND';
+    return Math.floor(n).toLocaleString('en-US');
+  }
+  counters.forEach(c => {
+    c.val = c.base + Math.random() * c.rate * 30;
+    const el = document.getElementById(c.el);
+    if (el) el.textContent = fmt(c.val);
+  });
+  setInterval(() => {
+    counters.forEach(c => {
+      c.val += c.rate / 2 + Math.random() * c.rate;
+      const el = document.getElementById(c.el);
+      if (el) el.textContent = fmt(c.val);
+    });
+  }, 500);
+
+  // === Ekran süresi slider (LV9 s1) ===
+  const ss = document.getElementById('screenSlider');
+  const sv = document.getElementById('screenVal');
+  const sm = document.getElementById('screenMsg');
+  if (ss) {
+    ss.addEventListener('input', () => {
+      const v = parseFloat(ss.value);
+      sv.textContent = v + ' hours';
+      let msg, color;
+      if (v <= 1)      { msg = '🌿 Great! Very balanced.';                  color = 'var(--success)'; }
+      else if (v <= 2) { msg = '✅ Ideal zone — best for ages 9-10!';       color = 'var(--success)'; }
+      else if (v <= 4) { msg = '⚠️ A bit too much — time to go outside!';   color = 'var(--primary)'; }
+      else if (v <= 6) { msg = '🚨 Careful! Your eyes and sleep suffer.';   color = 'var(--warm)'; }
+      else             { msg = '🛑 Way too much! Take a screen break now!'; color = 'var(--red)'; }
+      sm.textContent = msg; sm.style.color = color;
+    });
+  }
+
+  // === Şifre kontrol (LV9 s2) ===
+  const pw = document.getElementById('pwInput');
+  if (pw) {
+    pw.addEventListener('input', () => {
+      const v = pw.value;
+      toggleCheck('pw-len', v.length >= 8, 'At least 8 characters');
+      toggleCheck('pw-up',  /[A-ZÇĞİÖŞÜ]/.test(v), 'Capital letter');
+      toggleCheck('pw-num', /[0-9]/.test(v), 'Number');
+      toggleCheck('pw-sym', /[!?@#$%&*()_+\-=]/.test(v), 'Symbol (! ? @)');
+    });
+  }
+  function toggleCheck(id, ok, lbl) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (ok) { el.classList.add('ok'); el.textContent = '✅ ' + lbl; }
+    else    { el.classList.remove('ok'); el.textContent = '❔ ' + lbl; }
+  }
+
+  // === Meslek mini quiz (LV8 s3) ===
+  function cqPick(meslek) {
+    const r = document.getElementById('cqRes');
+    r.innerHTML = '🎯 <strong>The path suggested for you:</strong> ' + meslek + ' — You can start today!';
+    r.classList.add('show');
+  }
+
+  // === Söz verme (LV9 s4) ===
+  function swearOath() {
+    const container = document.createElement('div');
+    container.className = 'oath-stars';
+    document.body.appendChild(container);
+    const emojis = ['⭐','✨','🌟','💫','🎆'];
+    for (let i = 0; i < 30; i++) {
+      const s = document.createElement('div');
+      s.className = 'oath-star';
+      s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 200 + Math.random() * 300;
+      s.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+      s.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+      s.style.animationDelay = (Math.random() * 0.3) + 's';
+      container.appendChild(s);
+    }
+    setTimeout(() => container.remove(), 2000);
+  }
+
+  // === Konfetti (victory) ===
+  function spawnConfetti() {
+    const c = document.getElementById('confettiContainer');
+    if (!c) return;
+    c.innerHTML = '';
+    const colors = ['#ffe600','#FF6B35','#00cfff','#A855F7','#39ff14','#FF6B9D','#4ecdc4'];
+    for (let i = 0; i < 80; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      const isCircle = Math.random() > 0.5;
+      piece.style.cssText =
+        `left:${Math.random() * 100}%;top:-20px;background:${colors[Math.floor(Math.random() * colors.length)]};` +
+        `width:${Math.random() * 10 + 6}px;height:${Math.random() * 10 + 6}px;` +
+        `animation-duration:${Math.random() * 3 + 2.5}s;animation-delay:${Math.random() * 2}s;` +
+        `border-radius:${isCircle ? '50%' : '2px'}`;
+      c.appendChild(piece);
+    }
+  }
+
+  updateHUD(0);
+</script>
+</body>
+</html>

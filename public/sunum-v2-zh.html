@@ -1,0 +1,4345 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  TEKNO QUEST — Teknoloji Sunumu + Quiz Platformu
+  Copyright © 2026 Tayfun Telci. Tüm hakları saklıdır.
+  All Rights Reserved.
+
+  Bu dosyanın, içeriğinin, tasarımının veya kodunun izinsiz
+  kopyalanması, dağıtılması veya türev çalışma oluşturulması
+  5846 sayılı Fikir ve Sanat Eserleri Kanunu gereği YASAKTIR.
+
+  İmza: TK-TQ-2026-TAYFUN-TELCII-MKETUN9M
+  İletişim: t.telcii@gmail.com
+  Kaynak: https://github.com/tayfuntelci/tekno-quest
+  ============================================================
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Tayfun Telci">
+<meta name="copyright" content="© 2026 Tayfun Telci — Tüm hakları saklıdır">
+<title>科技探索 — 课堂版</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Exo+2:wght@300;400;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TEKNO QUEST — CLASSROOM EDITION
+   Her level birden fazla sayfadan oluşur (projeksiyon için büyük puntolar)
+   ============================================================ */
+
+:root {
+  --bg:        #0d0d1a;
+  --bg-soft:   #12122b;
+  --text:      #f0f0ff;
+  --dim:       rgba(255,255,255,0.06);
+  --primary:   #ffe600;
+  --success:   #39ff14;
+  --info:      #00cfff;
+  --purple:    #A855F7;
+  --warm:      #FF6B35;
+  --pink:      #FF6B9D;
+  --mint:      #4ecdc4;
+  --red:       #ff3131;
+  --holo-bg:     rgba(0,30,60,0.55);
+  --holo-border: rgba(0,245,255,0.3);
+  --grid:        rgba(0,245,255,0.05);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  font-family: 'Exo 2', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  width: 100%;
+  height: 100%;
+  color: var(--text);
+  user-select: none;
+  overflow: hidden;
+}
+html { height: 100%; }
+body { height: 100dvh; }
+
+/* ======================== ARKA PLAN KATMANLARI ========================= */
+.grid-bg {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none; z-index: 0;
+}
+.scanline {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--info), transparent);
+  animation: scan 5s linear infinite;
+  z-index: 1; opacity: 0.35; pointer-events: none;
+}
+@keyframes scan { 0%{top:-3px} 100%{top:100vh} }
+.stars-bg { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 0; }
+.star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2.5s ease-in-out infinite; }
+@keyframes twinkle { 0%,100%{opacity:0.15} 50%{opacity:0.9} }
+.particles-container { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 0; }
+.particle { position: absolute; border-radius: 50%; animation: particleDrift linear infinite; }
+@keyframes particleDrift {
+  0%   { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.4; }
+  100% { transform: translateY(-20px) translateX(var(--drift)) scale(1); opacity: 0; }
+}
+.pixel-corner { position: fixed; width: 14px; height: 14px; z-index: 300; pointer-events: none; }
+.pc-tl { top:56px;    left:0;  border-top:2px solid var(--primary); border-left:2px solid var(--primary); }
+.pc-tr { top:56px;    right:0; border-top:2px solid var(--primary); border-right:2px solid var(--primary); }
+.pc-bl { bottom:48px; left:0;  border-bottom:2px solid var(--primary); border-left:2px solid var(--primary); }
+.pc-br { bottom:48px; right:0; border-bottom:2px solid var(--primary); border-right:2px solid var(--primary); }
+
+/* ============================= ÜST HUD ================================= */
+.hud {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 56px;
+  background: #0a0a19;
+  border-bottom: 2px solid var(--primary);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; z-index: 200;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.85), 0 4px 30px rgba(255,230,0,0.1);
+}
+.bottom-nav { background: #0a0a19 !important; box-shadow: 0 -6px 24px rgba(0,0,0,0.85); }
+.hud-left  { display:flex; align-items:center; gap:10px; }
+.hud-logo {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700; font-size: 12px;
+  color: var(--primary);
+  text-shadow: 0 0 10px rgba(255,230,0,0.6);
+  letter-spacing: 1.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 100%;
+}
+.hud-left, .hud-right { min-width: 0; flex-shrink: 1; }
+.hud-right { overflow: hidden; }
+.hud { gap: 6px; overflow: hidden; }
+.hud-level {
+  background: var(--primary); color: #000;
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700; font-size: 11px;
+  padding: 4px 10px; border-radius: 4px; letter-spacing: 1px;
+}
+.hud-page {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700; font-size: 10px;
+  color: var(--info);
+  padding: 3px 8px; border-radius: 4px;
+  border: 1px solid rgba(0,207,255,0.4);
+  background: rgba(0,207,255,0.1);
+  letter-spacing: 0.5px;
+  min-width: 40px; text-align: center;
+}
+.hud-center { display:flex; align-items:center; gap:10px; }
+.xp-label { font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 9px; color: var(--success); letter-spacing: 1px; }
+.xp-bar-wrap {
+  width: 200px; height: 14px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(57,255,20,0.3);
+  border-radius: 3px; overflow: hidden; position: relative;
+}
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--success), #a8ff3e);
+  border-radius: 3px; transition: width 0.8s ease; position: relative;
+}
+.xp-bar-fill::after {
+  content:''; position: absolute; top:0; left:0; right:0; bottom:0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
+  animation: shimmer 2s linear infinite;
+}
+@keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+.xp-count { font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 10px; color: var(--success); min-width: 90px; letter-spacing: 0.5px; }
+.hud-right { display:flex; gap:8px; align-items:center; }
+.badge-item { font-size: 20px; filter: grayscale(1) opacity(0.3); transition: all 0.4s; cursor: default; }
+.badge-item.earned { filter: drop-shadow(0 0 8px rgba(255,230,0,0.8)); animation: badgePop 0.5s ease; }
+@keyframes badgePop { 0% { transform: scale(0.5); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
+
+/* ============================ ALT NAV ================================== */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 48px;
+  background: rgba(10,10,25,0.95);
+  border-top: 2px solid var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; z-index: 200; backdrop-filter: blur(8px);
+  padding: 0 8px;
+}
+.level-pip {
+  width: 42px; height: 32px;
+  border: 2px solid rgba(255,230,0,0.2); border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700; font-size: 9px;
+  color: rgba(255,255,255,0.35); cursor: pointer;
+  transition: all 0.3s;
+  background: rgba(255,255,255,0.03); letter-spacing: 0.5px;
+  position: relative;
+}
+.level-pip .pip-dots {
+  position: absolute; bottom: -2px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 2px;
+}
+.level-pip .pip-dot {
+  width: 3px; height: 3px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+}
+.level-pip.done .pip-dot { background: var(--success); }
+.level-pip.active .pip-dot.cur { background: var(--primary); box-shadow: 0 0 4px var(--primary); }
+.level-pip.done {
+  border-color: var(--success); color: var(--success);
+  background: rgba(57,255,20,0.08); box-shadow: 0 0 10px rgba(57,255,20,0.2);
+}
+.level-pip.active {
+  border-color: var(--primary); color: var(--primary);
+  background: rgba(255,230,0,0.12); box-shadow: 0 0 14px rgba(255,230,0,0.4);
+  transform: scale(1.12);
+}
+
+/* ============================ OKLAR =================================== */
+.arrow-btn {
+  position: fixed; top: 50%; transform: translateY(-50%);
+  background: rgba(255,230,0,0.08);
+  border: 2px solid rgba(255,230,0,0.3);
+  color: var(--primary);
+  width: 48px; height: 48px; border-radius: 8px;
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 18px;
+  cursor: pointer; z-index: 200; transition: all 0.2s;
+}
+.arrow-btn:hover {
+  background: rgba(255,230,0,0.22);
+  box-shadow: 0 0 22px rgba(255,230,0,0.35);
+  transform: translateY(-50%) scale(1.08);
+}
+.arrow-left  { left: 14px; }
+.arrow-right { right: 14px; }
+
+/* ============================ SLAYT ZEMİNİ ============================= */
+.presentation {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+.slide {
+  position: absolute; top:0; left:0; width:100%;
+  height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.45s ease;
+  padding: 72px 60px 62px;
+  gap: 18px;
+  overflow-y: scroll;            /* scroll her zaman var */
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+.slide > * { flex-shrink: 0; }   /* hiçbir öğe sıkışmasın, scroll devreye girsin */
+.slide.active { opacity: 1; pointer-events: all; }
+/* İnce scrollbar — kullanıcı scroll edebileceğini görsün */
+.slide::-webkit-scrollbar { width: 8px; }
+.slide::-webkit-scrollbar-track { background: rgba(30,58,138,0.06); }
+.slide::-webkit-scrollbar-thumb {
+  background: rgba(249,115,22,0.45);
+  border-radius: 4px;
+}
+.slide::-webkit-scrollbar-thumb:hover { background: rgba(249,115,22,0.7); }
+.slide { scrollbar-width: thin; scrollbar-color: rgba(249,115,22,0.5) transparent; }
+
+/* ======================== ORTAK BİLEŞENLER ============================= */
+.level-banner {
+  display: flex; align-items: center; justify-content: center;
+  column-gap: 14px; row-gap: 6px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+.level-title {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  flex-basis: 100%;        /* uzun title'lar tam satır kaplasın */
+  flex-grow: 0;
+}
+@media (min-width: 821px) {
+  /* Geniş ekranda title yan yana kalabilir ama overflow olursa wrap eder */
+  .level-title { flex-basis: auto; }
+}
+.level-badge {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700; font-size: 12px;
+  background: var(--primary); color: #000;
+  padding: 6px 16px; border-radius: 4px; letter-spacing: 1px;
+}
+.level-title {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(26px, 3.5vw, 42px);
+  color: var(--primary);
+  text-shadow: 0 0 24px rgba(255,230,0,0.5);
+  text-align: center; letter-spacing: 2px;
+  line-height: 1.15;
+}
+.slide-sub {
+  font-size: clamp(16px, 1.8vw, 22px);
+  color: rgba(240,240,255,0.75);
+  text-align: center; margin-bottom: 12px;
+  font-weight: 400; letter-spacing: 0.5px;
+  max-width: 1100px;
+  line-height: 1.45;
+}
+.page-tag {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700; font-size: 11px;
+  color: var(--info); background: rgba(0,207,255,0.12);
+  border: 1px solid rgba(0,207,255,0.35);
+  padding: 4px 12px; border-radius: 4px; letter-spacing: 1px;
+}
+
+.holo-card {
+  background: var(--holo-bg);
+  border: 1px solid var(--holo-border);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  position: relative; overflow: visible;
+  transition: all 0.3s;
+  padding: 22px 28px;
+}
+/* Default (game-card OLMAYAN) holo-card içeriği için stiller */
+.holo-card > .gc-title {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(16px, 1.9vw, 22px);
+  color: var(--primary);
+  margin-bottom: 10px; letter-spacing: 1px; line-height: 1.3;
+}
+.holo-card > .gc-text {
+  font-size: clamp(14px, 1.6vw, 17px);
+  color: rgba(240,240,255,0.9);
+  line-height: 1.6; font-weight: 400;
+}
+.holo-card::before {
+  content:''; position:absolute; top:0; left:0;
+  width:100%; height:2px;
+  background: linear-gradient(90deg, transparent, var(--info), transparent);
+}
+.holo-card::after {
+  content:''; position:absolute; top:0; left:0;
+  width:5px; height:100%;
+  background: var(--info); opacity: 0.85;
+}
+.holo-card:hover {
+  border-color: var(--info);
+  box-shadow: 0 0 28px rgba(0,245,255,0.2), inset 0 0 28px rgba(0,245,255,0.04);
+  transform: translateY(-3px);
+}
+.accent-warm::after   { background: var(--warm);    }
+.accent-pink::after   { background: var(--pink);    }
+.accent-purple::after { background: var(--purple);  }
+.accent-green::after  { background: var(--success); }
+.accent-yellow::after { background: var(--primary); }
+.accent-cyan::after   { background: var(--info);    }
+.accent-mint::after   { background: var(--mint);    }
+.accent-red::after    { background: var(--red);     }
+
+.fact-box {
+  background: rgba(255,230,0,0.1);
+  border: 1px solid rgba(255,230,0,0.35);
+  border-radius: 10px;
+  padding: 16px 26px;
+  max-width: 1000px;
+  text-align: center;
+  font-size: clamp(15px, 1.7vw, 20px);
+  color: rgba(240,240,255,0.95);
+  line-height: 1.5;
+}
+
+/* ====================== SLAYT 1 — KAPAK ================================= */
+.orbit-container { position: relative; width: 180px; height: 180px; margin-bottom: 24px; flex-shrink: 0; }
+.planet {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); font-size: 78px;
+  animation: planetPulse 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(0,245,255,0.8));
+}
+@media (max-width: 640px) {
+  .orbit-container { width: 120px; height: 120px; margin-bottom: 28px; }
+  .planet { font-size: 56px; }
+  .orbit-ring-1 { width: 96px !important; height: 96px !important; }
+  .orbit-ring-2 { width: 130px !important; height: 130px !important; }
+  @keyframes moonOrbit { to { transform: rotate(360deg) translateX(55px) rotate(-360deg); } }
+  .orbit-moon { font-size: 18px !important; }
+}
+@media (max-width: 360px) {
+  .orbit-container { width: 96px; height: 96px; margin-bottom: 22px; }
+  .planet { font-size: 44px; }
+  .orbit-ring-1 { width: 76px !important; height: 76px !important; }
+  .orbit-ring-2 { width: 106px !important; height: 106px !important; }
+}
+@keyframes planetPulse {
+  0%,100% { transform: translate(-50%,-50%) scale(1); }
+  50%     { transform: translate(-50%,-50%) scale(1.08); }
+}
+.orbit-ring {
+  position: absolute; top:50%; left:50%;
+  border-radius: 50%;
+  border: 1px solid rgba(0,245,255,0.3);
+  transform: translate(-50%,-50%) rotateX(70deg);
+}
+.orbit-ring-1 { width: 140px; height: 140px; animation: ringRotate 6s linear infinite; }
+.orbit-ring-2 { width: 200px; height: 200px; animation: ringRotate 10s linear infinite reverse; border-color: rgba(191,95,255,0.35); }
+@keyframes ringRotate { to { transform: translate(-50%,-50%) rotateX(70deg) rotateZ(360deg); } }
+.orbit-moon {
+  position: absolute; font-size: 22px;
+  top: 50%; left: 50%;
+  transform-origin: 0 0;
+  animation: moonOrbit 6s linear infinite;
+}
+@keyframes moonOrbit { to { transform: rotate(360deg) translateX(80px) rotate(-360deg); } }
+
+.s1-title {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(44px, 7vw, 82px);
+  color: var(--primary);
+  text-align: center; line-height: 1;
+  text-shadow:
+    5px 5px 0 rgba(0,0,0,0.5),
+    0 0 45px rgba(255,230,0,0.65),
+    0 0 85px rgba(255,230,0,0.3);
+  letter-spacing: 4px;
+}
+.s1-tagline {
+  font-size: clamp(15px, 1.8vw, 20px);
+  color: var(--info); text-align: center;
+  margin-top: 12px; letter-spacing: 3px;
+  font-weight: 400;
+  text-shadow: 0 0 12px rgba(0,245,255,0.4);
+}
+
+.live-counters-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px; width: 100%; max-width: 900px;
+}
+.live-counters {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 14px; max-width: 900px; width: 100%;
+}
+.counter-group-label {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(11px, 1.15vw, 14px);
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 2.5px;
+  text-align: center;
+  margin-top: 6px;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.counter-group-label.tr-label { margin-top: 18px; }
+.tr-flag {
+  width: 22px; height: 14px;
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+.counter-source {
+  font-size: clamp(10px, 0.95vw, 12px);
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  font-style: italic;
+  line-height: 1.5;
+  max-width: 900px;
+  margin-top: 4px;
+  padding: 0 12px;
+}
+.lc-box {
+  background: rgba(57,255,20,0.07);
+  border: 1px solid rgba(57,255,20,0.3);
+  border-radius: 10px; padding: 14px 18px; text-align: center;
+}
+.lc-num {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(20px, 2.6vw, 30px);
+  color: var(--success);
+  text-shadow: 0 0 14px rgba(57,255,20,0.5);
+  line-height: 1;
+}
+.lc-label { font-size: clamp(13px, 1.4vw, 16px); color: rgba(255,255,255,0.7); margin-top: 6px; letter-spacing: 0.5px; }
+
+.health-bars { display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; }
+.hbar { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.hbar-label { font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700; font-size: 10px; color: rgba(255,255,255,0.65); letter-spacing: 1.5px; }
+.hbar-track {
+  width: 140px; height: 11px;
+  background: rgba(255,255,255,0.08); border-radius: 3px;
+  overflow: hidden; border: 1px solid rgba(255,255,255,0.18);
+}
+.hbar-fill { height:100%; border-radius:3px; }
+.intro-start {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(14px, 1.8vw, 18px);
+  color: var(--success); border: 2px solid var(--success);
+  padding: 12px 32px; border-radius: 6px;
+  background: rgba(57,255,20,0.08);
+  animation: glowGreen 2s ease-in-out infinite;
+  letter-spacing: 2.5px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.intro-start:hover { background: rgba(57,255,20,0.18); transform: translateY(-2px) scale(1.03); }
+.intro-start:active { transform: translateY(0) scale(0.98); }
+@keyframes glowGreen {
+  0%,100% { box-shadow: 0 0 12px rgba(57,255,20,0.35); }
+  50%     { box-shadow: 0 0 28px rgba(57,255,20,0.7); }
+}
+.keyboard-hint { font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1.5px; }
+
+/* ====================== GAME GRID (BÜYÜK) ============================= */
+.game-grid { display: grid; gap: 18px; width: 100%; max-width: 1200px; }
+.g2 { grid-template-columns: repeat(2, 1fr); }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g4 { grid-template-columns: repeat(4, 1fr); }
+
+.game-card { padding: 26px 22px; text-align: center; }
+.game-card .gc-icon {
+  font-size: clamp(52px, 5.5vw, 72px);
+  margin-bottom: 12px; display: block;
+  filter: drop-shadow(0 0 14px rgba(0,245,255,0.5));
+}
+.game-card .gc-title {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(16px, 1.9vw, 22px);
+  color: var(--primary);
+  margin-bottom: 10px; letter-spacing: 1.5px; line-height: 1.25;
+}
+.game-card .gc-text {
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: rgba(240,240,255,0.85);
+  line-height: 1.55; font-weight: 400;
+}
+
+/* XP tag — bigger */
+.xp-tag {
+  position: absolute; top: 12px; right: 14px;
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700; font-size: 10px;
+  color: var(--success);
+  background: rgba(57,255,20,0.12);
+  border: 1px solid rgba(57,255,20,0.4);
+  padding: 4px 9px; border-radius: 4px;
+  letter-spacing: 0.5px; z-index: 3;
+}
+
+/* =================== MESAJ HARİTASI (LV1 S2) ========================== */
+.msg-map {
+  position: relative;
+  background: rgba(0,30,60,0.6);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 14px;
+  padding: 24px 30px 18px;
+  width: 100%; max-width: 1100px;
+  overflow: hidden;
+  flex-shrink: 0;        /* flex container içinde içerik çökmesin */
+}
+.msg-map-svg { flex-shrink: 0; }
+.msg-map-title {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(13px, 1.9vw, 22px);
+  color: var(--info); letter-spacing: 1px; margin-bottom: 14px;
+  text-align: center;
+  text-shadow: 0 0 12px rgba(0,245,255,0.35);
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+.msg-map-svg {
+  width: 100%;
+  height: auto;
+  max-height: 280px;
+  aspect-ratio: 950 / 280;
+  display: block;
+}
+@media (max-width: 640px) {
+  .msg-map-svg { aspect-ratio: 600 / 280; }
+  .msg-map { padding: 14px 14px 12px; }
+  .city-label { font-size: 28px !important; }
+}
+@media (max-width: 360px) {
+  .msg-map-svg { aspect-ratio: 480 / 280; }
+  .city-label { font-size: 34px !important; }
+}
+.msg-packet {
+  fill: var(--primary);
+  filter: drop-shadow(0 0 8px var(--primary));
+  offset-path: path('M 80 180 Q 450 30 870 150');
+  offset-distance: 0;
+  animation: packetMove 3s linear infinite;
+}
+.msg-packet.p2 { animation-delay: 0.6s; fill: var(--warm); filter: drop-shadow(0 0 8px var(--warm)); }
+.msg-packet.p3 { animation-delay: 1.2s; fill: var(--success); filter: drop-shadow(0 0 8px var(--success)); }
+.msg-packet.p4 { animation-delay: 1.8s; fill: var(--pink); filter: drop-shadow(0 0 8px var(--pink)); }
+@keyframes packetMove { to { offset-distance: 100%; } }
+.city-label {
+  fill: var(--info); font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 18px; font-weight: 700; letter-spacing: 1.5px;
+}
+.msg-legend {
+  font-size: clamp(14px, 1.6vw, 17px);
+  color: rgba(255,255,255,0.75);
+  margin-top: 10px; text-align: center;
+}
+
+/* 1 saniye paneli (LV1 S2) */
+.one-second-panel {
+  background: rgba(0,30,60,0.6);
+  border: 1px solid rgba(255,107,53,0.35);
+  border-radius: 14px; padding: 20px 26px;
+  width: 100%; max-width: 900px;
+}
+.one-second-title {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(16px, 1.9vw, 22px);
+  color: var(--warm); letter-spacing: 1.5px;
+  margin-bottom: 12px; text-align: center;
+  text-shadow: 0 0 12px rgba(255,107,53,0.35);
+}
+.os-row {
+  display: grid; grid-template-columns: 44px 1fr auto;
+  align-items: center; gap: 14px;
+  padding: 10px 12px; border-bottom: 1px dashed rgba(255,255,255,0.1);
+}
+.os-row:last-child { border-bottom: 0; }
+.os-icon { font-size: 30px; }
+.os-label { font-size: clamp(14px, 1.6vw, 18px); color: rgba(255,255,255,0.85); }
+.os-num {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(18px, 2vw, 24px);
+  color: var(--primary);
+}
+
+/* Sayfa yolculuğu (LV1 S3) */
+.page-journey {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px; width: 100%; max-width: 1200px;
+}
+.pj-step {
+  background: rgba(0,30,60,0.6);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 12px; padding: 22px 16px; text-align: center;
+  position: relative;
+}
+.pj-arrow {
+  position: absolute; top: 50%; right: -12px;
+  transform: translateY(-50%);
+  color: var(--info); font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: 24px;
+  filter: drop-shadow(0 0 8px var(--info));
+  z-index: 1;
+}
+.pj-step:last-child .pj-arrow { display: none; }
+.pj-icon { font-size: 54px; margin-bottom: 8px; }
+.pj-num {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700; font-size: 11px;
+  color: var(--warm); letter-spacing: 1.5px;
+}
+.pj-title {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(15px, 1.7vw, 19px);
+  color: var(--primary); margin: 8px 0 6px;
+  letter-spacing: 1px;
+}
+.pj-desc { font-size: clamp(13px, 1.5vw, 16px); color: rgba(255,255,255,0.8); line-height: 1.5; }
+
+.mini-cards {
+  display: grid; gap: 14px; width: 100%; max-width: 1200px;
+}
+.mini-cards.mc4 { grid-template-columns: repeat(4, 1fr); }
+.mini-cards.mc2 { grid-template-columns: repeat(2, 1fr); }
+.mini-card {
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.28);
+  border-radius: 10px; padding: 18px 20px;
+  border-left: 4px solid var(--info);
+}
+.mini-card.purple { border-left-color: var(--purple); }
+.mini-card.warm   { border-left-color: var(--warm); }
+.mini-card.mint   { border-left-color: var(--mint); }
+.mini-card.pink   { border-left-color: var(--pink); }
+.mc-label {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: var(--info);
+  letter-spacing: 1px; margin-bottom: 6px;
+}
+.mini-card.purple .mc-label { color: var(--purple); }
+.mini-card.warm .mc-label   { color: var(--warm); }
+.mini-card.mint .mc-label   { color: var(--mint); }
+.mini-card.pink .mc-label   { color: var(--pink); }
+.mc-text { font-size: clamp(13px, 1.5vw, 17px); color: rgba(255,255,255,0.85); line-height: 1.55; }
+
+/* =================== TÜRKİYE QUEST TIMELINE (LV2) ====================== */
+.quest-list { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 1100px; position: relative; }
+.quest-list::before {
+  content:''; position: absolute;
+  left: 160px; top: 20px; bottom: 20px; width: 3px;
+  background: linear-gradient(to bottom, transparent, var(--info), var(--purple), transparent);
+}
+.quest-item { display: flex; align-items: center; gap: 18px; padding: 18px 26px; position: relative; }
+.quest-item:hover { transform: translateX(6px); }
+.quest-item .q-dot {
+  position: absolute; left: 156px; top: 50%;
+  transform: translateY(-50%);
+  width: 12px; height: 12px; background: var(--info);
+  border-radius: 50%; box-shadow: 0 0 14px var(--info);
+  z-index: 2;
+}
+.quest-item.active .q-dot {
+  background: var(--primary); box-shadow: 0 0 16px var(--primary);
+  animation: dotBlink 1.2s step-end infinite;
+}
+@keyframes dotBlink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.quest-year {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(22px, 2.6vw, 32px);
+  color: var(--primary); min-width: 110px;
+  text-shadow: 0 0 12px rgba(255,230,0,0.4);
+  position: relative; z-index: 3;
+}
+.q-spacer { width: 30px; flex-shrink: 0; }
+.quest-icon { font-size: 44px; flex-shrink: 0; }
+.quest-text { flex: 1; }
+.quest-text > strong {
+  display: block;
+  font-size: clamp(17px, 2vw, 22px);
+  color: var(--text); font-weight: 700; margin-bottom: 4px;
+}
+.q-know strong {
+  display: inline;
+  font-size: inherit;
+  color: inherit;
+  font-weight: 700;
+  margin: 0;
+}
+.quest-text span {
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: rgba(240,240,255,0.75); font-weight: 300;
+  line-height: 1.5;
+}
+.q-know {
+  display: block; margin-top: 8px; padding: 8px 14px;
+  background: rgba(255,230,0,0.1);
+  border-left: 3px solid var(--primary);
+  border-radius: 4px;
+  font-size: clamp(13px, 1.5vw, 16px);
+  color: var(--primary);
+  font-style: italic;
+  line-height: 1.5;
+}
+.quest-badge {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700; font-size: 10px;
+  padding: 6px 10px; border-radius: 4px; white-space: nowrap; letter-spacing: 1px;
+}
+.qb-done   { background: rgba(57,255,20,0.15); color: var(--success);  border: 1px solid var(--success); }
+.qb-active { background: rgba(255,230,0,0.15); color: var(--primary);  border: 1px solid var(--primary); animation: badgeBlink 1.2s step-end infinite; }
+@keyframes badgeBlink { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+/* Büyüme grafiği (LV2 S3) */
+.growth-chart {
+  width: 100%; max-width: 1100px;
+  background: rgba(0,30,60,0.6);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 14px; padding: 22px 28px;
+}
+.growth-title {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(16px, 1.9vw, 22px);
+  color: var(--info); letter-spacing: 1.5px; margin-bottom: 14px;
+  text-align: center;
+}
+.growth-row {
+  display: grid; grid-template-columns: 100px 1fr 160px;
+  gap: 14px; align-items: center; padding: 10px 0;
+}
+.growth-year {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(18px, 2vw, 24px);
+  color: var(--primary);
+}
+.growth-bar { height: 22px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; }
+.growth-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--info), var(--primary));
+  border-radius: 4px; transition: width 1s ease;
+}
+.growth-val {
+  font-size: clamp(14px, 1.7vw, 18px);
+  color: var(--success);
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  text-align: right;
+}
+
+/* =================== HIZ GRAFİĞİ (LV3 S1) ============================== */
+.speed-chart {
+  display: flex; gap: 22px;
+  width: 100%; max-width: 1100px;
+  align-items: flex-end; height: 420px;
+  padding-bottom: 6px;
+}
+.sc-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; gap: 6px; }
+.sc-gen {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(30px, 4vw, 48px);
+}
+.sc-speed {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: var(--info);
+  margin-bottom: 4px; letter-spacing: 0.5px;
+}
+.sc-stars { font-size: clamp(16px, 1.9vw, 22px); margin-bottom: 4px; letter-spacing: 1px; }
+.sc-can {
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.05); border-radius: 5px;
+  padding: 6px 10px; margin-bottom: 6px; text-align: center;
+  max-width: 100%; line-height: 1.4;
+}
+.sc-bar {
+  width: 100%; border-radius: 8px 8px 0 0;
+  transition: height 1s ease;
+  position: relative;
+  flex-shrink: 0;   /* yükseklikler ezilmesin — kademeler net görünsün */
+}
+.sc-bar-label {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: -4px; right: -4px;
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(11px, 1.3vw, 15px);
+  color: rgba(255,255,255,0.95);
+  letter-spacing: 0.3px;
+  text-align: center;
+  padding: 6px 4px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+/* ===== Responsive — dar ekranlarda hız grafiği ===== */
+@media (max-width: 960px) {
+  .speed-chart {
+    height: auto;
+    min-height: 340px;
+    gap: 10px;
+    padding: 0 4px 36px;
+  }
+  .sc-gen    { font-size: clamp(20px, 3.8vw, 30px); }
+  .sc-speed  { font-size: clamp(10px, 1.4vw, 12px); }
+  .sc-stars  { font-size: clamp(12px, 1.8vw, 16px); }
+  .sc-can    { font-size: clamp(10px, 1.5vw, 13px); padding: 4px 5px; }
+  .sc-bar-label {
+    font-size: clamp(9px, 1.4vw, 12px);
+    padding: 4px 2px;
+    letter-spacing: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .speed-chart {
+    gap: 5px; min-height: 300px;
+    padding-bottom: 40px;
+  }
+  .sc-wrap { gap: 3px; }
+  .sc-gen    { font-size: clamp(16px, 4vw, 22px); }
+  .sc-speed  { font-size: 9px; }
+  .sc-stars  { font-size: 10px; letter-spacing: 0; }
+  .sc-can    { font-size: 9px; padding: 3px 2px; line-height: 1.2; }
+  .sc-bar-label {
+    font-size: 9px;
+    padding: 3px 1px;
+    white-space: normal;
+    letter-spacing: 0;
+    top: calc(100% + 3px);
+  }
+}
+
+/* İndirme yarışı (LV3 S2) */
+.dl-race {
+  width: 100%; max-width: 1100px;
+  background: rgba(0,30,60,0.6);
+  border: 1px solid rgba(255,107,53,0.35);
+  border-radius: 14px; padding: 24px 30px;
+}
+.dl-title {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(18px, 2.2vw, 26px);
+  color: var(--warm); letter-spacing: 1.5px;
+  margin-bottom: 16px; text-align: center;
+}
+.dl-row {
+  display: grid; grid-template-columns: 60px 1fr 150px;
+  gap: 16px; align-items: center; padding: 10px 0;
+}
+.dl-gen {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(18px, 2vw, 24px);
+  color: var(--primary);
+}
+.dl-track { height: 22px; background: rgba(255,255,255,0.06); border-radius: 4px; position: relative; overflow: hidden; }
+.dl-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--warm), var(--primary));
+  border-radius: 4px;
+  width: 0;
+  animation-name: none;               /* varsayılan: animasyon durgun, bar boş */
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+  /* animation-duration inline style ile gelir (1G = 90s, 5G = 1s vb.) */
+}
+.dl-race.running .dl-fill {
+  animation-name: dlMove;             /* sadece sayfa aktif olduğunda oynat */
+}
+@keyframes dlMove { 0%{width:0%} 100%{width:100%} }
+.dl-time {
+  font-size: clamp(14px, 1.7vw, 18px);
+  color: var(--success);
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  text-align: right;
+}
+
+/* ====================== YZ BOSS FIGHT (LV4 S1) ======================== */
+.boss-fight { display: flex; gap: 32px; width: 100%; max-width: 1100px; align-items: center; }
+.boss-icon-wrap { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.boss-icon {
+  font-size: clamp(110px, 12vw, 150px);
+  animation: bossPulse 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 32px rgba(191,95,255,0.8));
+}
+@keyframes bossPulse {
+  0%,100% { transform: scale(1) rotate(-2deg); }
+  50%     { transform: scale(1.08) rotate(2deg); }
+}
+.boss-name {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(13px, 1.5vw, 16px);
+  color: var(--purple); text-align: center;
+  letter-spacing: 2px; line-height: 1.4;
+}
+.boss-cards { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+.bc { display: flex; gap: 16px; align-items: flex-start; padding: 16px 22px; }
+.bc:hover { transform: translateX(6px); }
+.bc .bc-icon {
+  font-size: 44px; flex-shrink: 0;
+  filter: drop-shadow(0 0 10px var(--purple));
+}
+.bc strong {
+  display: block;
+  font-size: clamp(16px, 1.9vw, 22px);
+  color: var(--purple); font-weight: 700;
+  margin-bottom: 4px; letter-spacing: 1px;
+}
+.bc span {
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: rgba(240,240,255,0.82);
+  line-height: 1.5;
+}
+
+/* YZ tarih şeridi (LV4 S2) */
+.ai-timeline {
+  width: 100%; max-width: 1200px;
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+.ai-tl-cell {
+  background: rgba(168,85,247,0.1);
+  border: 1px solid rgba(168,85,247,0.4);
+  border-radius: 12px; padding: 22px 14px;
+  text-align: center;
+  position: relative;
+}
+.ai-tl-year {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(26px, 3vw, 36px);
+  color: var(--purple);
+  text-shadow: 0 0 12px rgba(168,85,247,0.5);
+}
+.ai-tl-ev {
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: rgba(255,255,255,0.85);
+  margin-top: 8px; line-height: 1.45;
+}
+
+/* YZ türler/günlük (LV4 S3) */
+.ai-split {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 18px; width: 100%; max-width: 1200px;
+}
+@media (max-width: 1100px) { .ai-split { grid-template-columns: 1fr; } }
+.ai-types, .ai-life {
+  background: rgba(0,30,60,0.55);
+  border-radius: 12px; padding: 22px 26px;
+}
+.ai-types { border: 1px solid rgba(168,85,247,0.4); }
+.ai-life  { border: 1px solid rgba(255,107,53,0.4); }
+.ai-h {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(16px, 1.9vw, 22px);
+  letter-spacing: 1.5px; margin-bottom: 12px;
+}
+.ai-types .ai-h { color: var(--purple); }
+.ai-life  .ai-h { color: var(--warm); }
+.ai-types ul, .ai-life ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.ai-types li, .ai-life li {
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: rgba(255,255,255,0.85);
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px; line-height: 1.5;
+}
+.ai-types li strong { color: var(--purple); }
+.ai-life li strong  { color: var(--warm); }
+
+/* ====================== 2030 GÜN (LV5 S2) ============================== */
+.day-2030 {
+  background: rgba(0,30,60,0.6);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 14px; padding: 24px 28px;
+  width: 100%; max-width: 1200px;
+}
+.d30-title {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(18px, 2.1vw, 24px);
+  color: var(--info); letter-spacing: 1.5px;
+  margin-bottom: 16px; text-align: center;
+}
+.d30-steps {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+}
+.d30-step {
+  background: rgba(0,245,255,0.07);
+  border: 1px solid rgba(0,245,255,0.28);
+  border-radius: 10px; padding: 14px 8px; text-align: center;
+}
+.d30-time {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: var(--primary); letter-spacing: 0.5px;
+}
+.d30-icon {
+  font-size: clamp(40px, 4.5vw, 56px);
+  display: block; margin: 6px 0;
+}
+.d30-desc {
+  font-size: clamp(11px, 1.3vw, 14px);
+  color: rgba(255,255,255,0.8);
+  line-height: 1.45;
+}
+
+/* YZ araçları (LV5 S3) */
+.ai-tools {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 14px; width: 100%; max-width: 1100px;
+}
+.ai-tool {
+  background: rgba(168,85,247,0.1);
+  border: 1px solid rgba(168,85,247,0.4);
+  border-radius: 10px; padding: 18px 10px; text-align: center;
+}
+.ai-tool .at-emoji { font-size: 42px; }
+.at-name {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: var(--purple); letter-spacing: 1px;
+  margin-top: 6px;
+}
+.at-do {
+  font-size: clamp(11px, 1.3vw, 14px);
+  color: rgba(255,255,255,0.78);
+  margin-top: 5px; line-height: 1.45;
+}
+
+/* ====================== SCIFI KARŞILAŞTIRMA (LV6 S3) ==================== */
+.scifi-flow {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 18px; width: 100%; max-width: 1200px;
+}
+.sf-col {
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 12px; padding: 22px 26px;
+}
+.sf-col.real { border-color: rgba(57,255,20,0.4); }
+.sf-col.fic  { border-color: rgba(255,107,157,0.4); }
+.sf-col h4 {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(17px, 2vw, 22px);
+  letter-spacing: 1.5px; margin-bottom: 12px;
+}
+.sf-col.real h4 { color: var(--success); }
+.sf-col.fic  h4 { color: var(--pink); }
+.sf-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.sf-col li {
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: rgba(255,255,255,0.85);
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px; line-height: 1.5;
+}
+
+/* TR teknoloji (LV6 S3) */
+.tr-tech {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 14px; width: 100%; max-width: 1200px;
+}
+.tr-tech-card {
+  background: rgba(255,107,53,0.1);
+  border: 1px solid rgba(255,107,53,0.4);
+  border-radius: 12px; padding: 20px 12px; text-align: center;
+}
+.trt-emoji { font-size: clamp(42px, 5vw, 56px); }
+.trt-name {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: var(--warm); letter-spacing: 1px;
+  margin-top: 8px;
+}
+.trt-sub {
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: rgba(255,255,255,0.78);
+  margin-top: 5px; line-height: 1.4;
+}
+
+/* ====================== TİCARET (LV7) ================================== */
+.trade-board {
+  display: grid; grid-template-columns: 1fr 70px 1fr;
+  gap: 16px; width: 100%; max-width: 1100px; align-items: stretch;
+}
+.tb-col { padding: 24px 26px; }
+.tb-col h3 {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(18px, 2.2vw, 26px);
+  margin-bottom: 14px; text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  letter-spacing: 1.5px;
+}
+.tb-col.old h3 { color: var(--info); }
+.tb-col.new h3 { color: var(--success); }
+.tb-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.tb-col li {
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: rgba(240,240,255,0.9);
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 7px;
+  border-left: 3px solid rgba(0,245,255,0.4);
+}
+.tb-arrow {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 44px; color: var(--primary);
+  filter: drop-shadow(0 0 12px var(--primary));
+  animation: arrowBlink 1.5s ease-in-out infinite;
+}
+@keyframes arrowBlink {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%     { opacity: 0.55; transform: scale(1.18); }
+}
+
+/* Ürün yolculuğu (LV7 S2) */
+.journey {
+  width: 100%; max-width: 1200px;
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+}
+.jrn-step {
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 10px; padding: 16px 8px; text-align: center;
+  position: relative;
+}
+.jrn-step::after {
+  content: '→';
+  position: absolute; right: -10px; top: 50%; transform: translateY(-50%);
+  color: var(--primary); font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: 22px;
+  filter: drop-shadow(0 0 8px var(--primary)); z-index: 2;
+}
+.jrn-step:last-child::after { display: none; }
+.jrn-icon { font-size: clamp(44px, 4.8vw, 58px); }
+.jrn-label {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(11px, 1.3vw, 14px);
+  color: var(--info); letter-spacing: 1px;
+  margin-top: 6px;
+}
+
+.ecom-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 14px; width: 100%; max-width: 1100px;
+}
+.ecom-card {
+  background: rgba(57,255,20,0.08);
+  border: 1px solid rgba(57,255,20,0.35);
+  border-radius: 10px; padding: 16px 18px;
+  text-align: center;
+}
+.ecom-card .e-emoji { font-size: 40px; }
+.ec-name {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: var(--success); letter-spacing: 1px;
+  margin-top: 6px;
+}
+.ec-meta {
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: rgba(255,255,255,0.78);
+  margin-top: 4px; line-height: 1.4;
+}
+
+.crypto-money {
+  display: grid; grid-template-columns: 1.15fr 1fr;
+  gap: 18px; width: 100%; max-width: 1200px;
+}
+.crypto-box, .money-box {
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(255,230,0,0.35);
+  border-radius: 12px; padding: 20px 24px;
+}
+.cm-title {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(16px, 1.9vw, 22px);
+  color: var(--primary); letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.cm-text {
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: rgba(255,255,255,0.85); line-height: 1.55;
+}
+.money-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.money-chip {
+  font-size: clamp(12px, 1.4vw, 15px);
+  padding: 7px 14px; border-radius: 20px;
+  background: rgba(255,230,0,0.1);
+  border: 1px solid rgba(255,230,0,0.4);
+  color: var(--primary);
+}
+
+/* ==================== KARİYER (LV8) ===================================== */
+.career-rpg {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; width: 100%; max-width: 1200px;
+}
+.crpg { padding: 22px 16px; text-align: center; position: relative; }
+.crpg .c-level {
+  position: absolute; top: 12px; right: 14px;
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700; font-size: 9px;
+  color: rgba(255,230,0,0.75); letter-spacing: 0.5px;
+}
+.crpg .c-icon {
+  font-size: clamp(56px, 6vw, 72px);
+  margin-bottom: 8px; display: block;
+  filter: drop-shadow(0 0 14px rgba(57,255,20,0.5));
+}
+.crpg .c-class {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(15px, 1.7vw, 19px);
+  color: var(--success); margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+.crpg .c-routine {
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: rgba(255,255,255,0.8); line-height: 1.55;
+  margin-bottom: 6px;
+}
+.crpg .c-role-model {
+  font-size: clamp(11px, 1.3vw, 14px);
+  color: var(--primary); font-style: italic;
+  letter-spacing: 0.5px;
+}
+
+.people-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; width: 100%; max-width: 1200px;
+}
+.person-card {
+  background: rgba(255,230,0,0.08);
+  border: 1px solid rgba(255,230,0,0.35);
+  border-radius: 12px; padding: 18px 22px;
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.person-icon { font-size: 52px; flex-shrink: 0; }
+.person-name {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(15px, 1.7vw, 19px);
+  color: var(--primary);
+}
+.person-role {
+  font-size: clamp(11px, 1.3vw, 14px);
+  color: var(--info); margin: 4px 0;
+  letter-spacing: 0.5px;
+}
+.person-do {
+  font-size: clamp(12px, 1.4vw, 16px);
+  color: rgba(255,255,255,0.85);
+  line-height: 1.5;
+}
+
+.extras-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 18px; width: 100%; max-width: 1200px;
+}
+.extras-col {
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 12px; padding: 22px 26px;
+}
+.ext-title {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(16px, 1.9vw, 22px);
+  letter-spacing: 1.5px; margin-bottom: 12px;
+}
+.extras-col.new-jobs .ext-title  { color: var(--pink); }
+.extras-col.study    .ext-title  { color: var(--mint); }
+.extras-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.extras-col li {
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: rgba(255,255,255,0.85);
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px; line-height: 1.5;
+}
+
+.career-quiz {
+  width: 100%; max-width: 1100px;
+  background: rgba(168,85,247,0.1);
+  border: 1px solid rgba(168,85,247,0.4);
+  border-radius: 12px; padding: 22px 28px;
+}
+.cq-title {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(17px, 2vw, 22px);
+  color: var(--purple); letter-spacing: 1.5px;
+  margin-bottom: 10px; text-align: center;
+}
+.cq-question {
+  font-size: clamp(15px, 1.7vw, 20px);
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 12px; text-align: center;
+}
+.cq-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.cq-opt {
+  font-size: clamp(13px, 1.5vw, 17px);
+  padding: 12px 18px; border-radius: 8px;
+  background: rgba(168,85,247,0.12);
+  border: 2px solid rgba(168,85,247,0.4);
+  color: rgba(255,255,255,0.9);
+  cursor: pointer; transition: all 0.2s;
+  text-align: left; font-family: 'Exo 2', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+.cq-opt:hover { background: rgba(168,85,247,0.3); border-color: var(--purple); transform: translateY(-2px); }
+.cq-result {
+  margin-top: 12px; padding: 12px 18px; border-radius: 8px;
+  background: rgba(57,255,20,0.1);
+  border: 1px solid rgba(57,255,20,0.4);
+  color: var(--success);
+  font-size: clamp(14px, 1.6vw, 17px);
+  display: none;
+  text-align: center;
+}
+.cq-result.show { display: block; animation: pop 0.4s ease; }
+@keyframes pop { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+/* ===================== AKILLI KULLANIM (LV9) ============================ */
+.mint-badge { background: var(--mint) !important; color: #002a28 !important; }
+.mint-title { color: var(--mint) !important; text-shadow: 0 0 24px rgba(78,205,196,0.5) !important; }
+
+.smart-full {
+  background: rgba(78,205,196,0.08);
+  border: 1px solid rgba(78,205,196,0.4);
+  border-radius: 14px;
+  padding: 26px 32px;
+  width: 100%; max-width: 1100px;
+  position: relative; overflow: hidden;
+}
+@media (max-width: 640px) { .smart-full { padding: 18px 16px; } }
+@media (max-width: 360px) { .smart-full { padding: 14px 12px; } }
+.smart-full::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--mint), transparent);
+}
+.sf-head { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+.sf-emo { font-size: clamp(40px, 5vw, 56px); }
+.sf-head h3 {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(20px, 2.4vw, 28px);
+  color: var(--mint); letter-spacing: 1.5px;
+}
+.sf-text {
+  font-size: clamp(15px, 1.8vw, 20px);
+  color: rgba(255,255,255,0.9);
+  line-height: 1.55; margin-bottom: 10px;
+}
+.sf-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.sf-list li {
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: rgba(255,255,255,0.85);
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px;
+  border-left: 3px solid var(--mint);
+  line-height: 1.55;
+}
+
+/* Ekran süresi slider */
+.screen-slider-wrap {
+  margin-top: 14px;
+  padding: 16px 18px;
+  background: rgba(78,205,196,0.1);
+  border: 1px solid rgba(78,205,196,0.4);
+  border-radius: 10px;
+}
+.sslider-label {
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: var(--mint);
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  letter-spacing: 1px;
+}
+.sslider-row { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
+input[type=range].sslider {
+  flex: 1; -webkit-appearance: none; appearance: none;
+  height: 10px; border-radius: 5px;
+  background: linear-gradient(to right, var(--success) 0%, var(--success) 25%, var(--primary) 25%, var(--primary) 50%, var(--warm) 50%, var(--warm) 75%, var(--red) 75%);
+  outline: none;
+}
+input[type=range].sslider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--primary); cursor: pointer;
+  border: 3px solid #000;
+  box-shadow: 0 0 10px var(--primary);
+}
+.sslider-val {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(15px, 1.8vw, 20px);
+  color: var(--primary); min-width: 100px; text-align: right;
+}
+.sslider-msg {
+  font-size: clamp(13px, 1.5vw, 17px);
+  margin-top: 8px; line-height: 1.5;
+  text-align: center;
+}
+
+/* Şifre oluşturucu */
+.pw-creator {
+  margin-top: 14px;
+  padding: 16px 18px;
+  background: rgba(78,205,196,0.1);
+  border: 1px solid rgba(78,205,196,0.4);
+  border-radius: 10px;
+}
+.pw-lbl {
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: var(--mint);
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  letter-spacing: 1px;
+}
+.pw-input {
+  width: 100%; margin-top: 10px;
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.35);
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 6px;
+  font-family: 'Exo 2', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: clamp(16px, 1.9vw, 20px);
+  color: var(--text);
+}
+.pw-input:focus { border-color: var(--mint); outline: none; box-shadow: 0 0 14px rgba(78,205,196,0.4); }
+.pw-checks {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px; margin-top: 10px;
+}
+.pw-check {
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: rgba(255,255,255,0.5);
+  padding: 8px 12px; border-radius: 5px;
+  background: rgba(255,255,255,0.04);
+  text-align: center;
+}
+.pw-check.ok {
+  color: var(--success);
+  background: rgba(57,255,20,0.1);
+  border: 1px solid rgba(57,255,20,0.4);
+}
+
+/* 5 altın kural */
+.golden-rules {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 14px; width: 100%; max-width: 1200px;
+}
+.gr-card {
+  background: linear-gradient(180deg, rgba(255,230,0,0.15), rgba(78,205,196,0.08));
+  border: 2px solid rgba(255,230,0,0.45);
+  border-radius: 12px; padding: 20px 14px; text-align: center;
+  position: relative; cursor: pointer;
+  transition: all 0.3s;
+}
+.gr-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(255,230,0,0.3);
+  border-color: var(--primary);
+}
+.gr-num {
+  position: absolute; top: 6px; left: 10px;
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: 12px; color: var(--primary);
+}
+.gr-icon {
+  font-size: clamp(48px, 5vw, 60px);
+  margin-bottom: 6px; display: block;
+}
+.gr-title {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: var(--primary); letter-spacing: 0.5px;
+  line-height: 1.3; margin-bottom: 6px;
+}
+.gr-desc {
+  font-size: clamp(11px, 1.3vw, 14px);
+  color: rgba(255,255,255,0.85);
+  line-height: 1.5;
+}
+
+.oath-btn {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(14px, 1.8vw, 18px);
+  letter-spacing: 2px;
+  color: var(--mint); border: 3px solid var(--mint);
+  padding: 14px 32px; border-radius: 8px;
+  background: rgba(78,205,196,0.1);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.oath-btn:hover {
+  background: var(--mint); color: #002a28;
+  box-shadow: 0 0 26px rgba(78,205,196,0.7);
+  transform: scale(1.03);
+}
+.oath-stars {
+  position: fixed; pointer-events: none;
+  top: 50%; left: 50%; z-index: 150;
+}
+.oath-star {
+  position: absolute; font-size: 28px;
+  animation: oathBurst 1.5s ease-out forwards;
+}
+@keyframes oathBurst {
+  0%   { transform: translate(0,0) scale(0); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(1.5); opacity: 0; }
+}
+
+/* ===================== VICTORY (S30) =================================== */
+.victory-screen { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.victory-trophy {
+  font-size: clamp(90px, 10vw, 120px);
+  filter: drop-shadow(0 0 30px rgba(255,230,0,0.85));
+  animation: trophyFloat 2.4s ease-in-out infinite;
+}
+@keyframes trophyFloat {
+  0%,100% { transform: translateY(0) rotate(-3deg); }
+  50%     { transform: translateY(-12px) rotate(3deg); }
+}
+.victory-title {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(32px, 5vw, 56px);
+  color: var(--primary);
+  text-shadow:
+    5px 5px 0 rgba(0,0,0,0.5),
+    0 0 45px rgba(255,230,0,0.85);
+  animation: victoryFlicker 3s ease-in-out infinite;
+  line-height: 1.15; letter-spacing: 3px;
+}
+@keyframes victoryFlicker {
+  0%,100% { text-shadow: 5px 5px 0 rgba(0,0,0,0.5), 0 0 45px rgba(255,230,0,0.85); }
+  50%     { text-shadow: 5px 5px 0 rgba(0,0,0,0.5), 0 0 75px rgba(255,230,0,1), 0 0 140px rgba(255,230,0,0.5); }
+}
+.final-xp {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(16px, 2vw, 22px);
+  color: var(--success);
+  background: rgba(57,255,20,0.12);
+  border: 2px solid var(--success);
+  padding: 12px 28px; border-radius: 8px;
+  box-shadow: 0 0 22px rgba(57,255,20,0.35); letter-spacing: 1px;
+}
+
+.achievement-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.achievement {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 12px 16px;
+  background: var(--dim);
+  border: 1px solid rgba(255,230,0,0.35);
+  border-radius: 10px; min-width: 96px;
+  animation: achieveFloat 3s ease-in-out infinite;
+}
+.achievement:nth-child(2) { animation-delay: 0.2s; }
+.achievement:nth-child(3) { animation-delay: 0.4s; }
+.achievement:nth-child(4) { animation-delay: 0.6s; }
+.achievement:nth-child(5) { animation-delay: 0.8s; }
+@keyframes achieveFloat {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-7px); }
+}
+.ach-icon { font-size: 36px; filter: drop-shadow(0 0 12px rgba(255,230,0,0.7)); }
+.ach-label {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700; font-size: 9px;
+  color: var(--primary); text-align: center;
+  line-height: 1.4; letter-spacing: 0.5px;
+}
+
+.quote-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 12px; width: 100%; max-width: 900px;
+  margin: 0 auto;
+}
+.quote-card {
+  background: rgba(0,30,60,0.55);
+  border: 1px solid rgba(0,245,255,0.35);
+  border-radius: 8px; padding: 14px 16px;
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: rgba(255,255,255,0.85);
+  line-height: 1.5; font-style: italic;
+}
+.quote-author {
+  display: block; margin-top: 6px;
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(10px, 1.2vw, 13px);
+  color: var(--info); font-style: normal;
+  letter-spacing: 0.5px;
+}
+
+.final-cta {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 700;
+  font-size: clamp(14px, 1.8vw, 18px);
+  color: var(--mint); letter-spacing: 1.5px;
+  padding: 12px 22px;
+  border: 2px solid var(--mint);
+  border-radius: 8px;
+  background: rgba(78,205,196,0.08);
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.final-cta:hover {
+  background: rgba(78,205,196,0.18);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 24px rgba(78,205,196,0.45);
+}
+.final-cta:active { transform: translateY(0) scale(0.98); }
+.press-start {
+  font-family: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 11px;
+  color: rgba(240,240,255,0.45);
+  animation: pressBlink 1.2s step-end infinite;
+  letter-spacing: 1.5px;
+}
+@keyframes pressBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* Konfetti */
+.confetti-piece {
+  position: absolute; width: 10px; height: 10px;
+  border-radius: 2px; animation: confettiFall linear infinite;
+  z-index: 150;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0.3; }
+}
+
+/* ============================================================
+   GENEL RESPONSIVE DÜZENLEMELER (tablet / telefon)
+   ============================================================ */
+@media (max-width: 1100px) {
+  .slide { padding: 72px 28px 58px; gap: 14px; }
+  .preview-9 { grid-template-columns: repeat(5, 1fr); }
+  .preview-chip .pl { font-size: 9px; }
+  .live-counters { gap: 10px; }
+  .g4 { grid-template-columns: repeat(2, 1fr); }
+  .page-journey { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .pj-step:nth-child(2) .pj-arrow { display: none; }
+  .journey { grid-template-columns: repeat(3, 1fr); }
+  .jrn-step:nth-child(3n)::after { display: none; }
+  .mini-cards.mc4 { grid-template-columns: repeat(2, 1fr); }
+  .tr-tech { grid-template-columns: repeat(3, 1fr); }
+  .ai-tools { grid-template-columns: repeat(3, 1fr); }
+  .golden-rules { grid-template-columns: repeat(3, 1fr); }
+  .ecom-row { grid-template-columns: repeat(2, 1fr); }
+  .d30-steps { grid-template-columns: repeat(3, 1fr); }
+  .ai-timeline { grid-template-columns: repeat(3, 1fr); }
+  .career-rpg { grid-template-columns: repeat(2, 1fr); }
+  .hud-center { width: 280px; }
+  .xp-bar-wrap { width: 160px; }
+}
+
+@media (max-width: 780px) {
+  .slide { padding: 64px 20px 54px; gap: 10px; }
+  .level-title { font-size: clamp(20px, 4vw, 28px); letter-spacing: 1px; }
+  .slide-sub { font-size: clamp(13px, 2.2vw, 16px); margin-bottom: 6px; }
+  .level-banner { flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .preview-9 { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  .live-counters { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .lc-box { padding: 8px 10px; }
+  .lc-num { font-size: clamp(14px, 3.2vw, 20px); }
+  .lc-label { font-size: 10px; }
+  .g3, .g4 { grid-template-columns: repeat(2, 1fr); }
+  .game-card { padding: 16px 12px; }
+  .internet-split { grid-template-columns: 1fr; gap: 10px; }
+  .one-second-panel { max-width: 100%; }
+  .page-journey { grid-template-columns: repeat(2, 1fr); }
+  .mini-cards.mc4, .mini-cards.mc2 { grid-template-columns: repeat(2, 1fr); }
+  .quest-list::before { left: 120px; }
+  .q-dot { left: 116px; }
+  .quest-year { min-width: 80px; font-size: clamp(18px, 3.5vw, 24px); }
+  .q-spacer { width: 16px; }
+  .quest-icon { font-size: 30px; }
+  .quest-item { padding: 14px 16px; gap: 10px; }
+  .quest-badge { display: none; }
+  .trade-board { grid-template-columns: 1fr; }
+  .tb-arrow { transform: rotate(90deg); padding: 0; min-height: auto; font-size: 32px; }
+  .journey { grid-template-columns: repeat(2, 1fr); }
+  .jrn-step::after { display: none; }
+  .crypto-money { grid-template-columns: 1fr; }
+  .ai-split { grid-template-columns: 1fr; }
+  .ai-timeline { grid-template-columns: repeat(2, 1fr); }
+  .ai-tools { grid-template-columns: repeat(2, 1fr); }
+  .d30-steps { grid-template-columns: repeat(2, 1fr); }
+  .scifi-flow { grid-template-columns: 1fr; }
+  .tr-tech { grid-template-columns: repeat(2, 1fr); }
+  .boss-fight { flex-direction: column; gap: 14px; }
+  .career-rpg { grid-template-columns: repeat(2, 1fr); }
+  .people-row { grid-template-columns: 1fr; }
+  .extras-grid { grid-template-columns: 1fr; }
+  .golden-rules { grid-template-columns: repeat(2, 1fr); }
+  .gr-card { padding: 14px 10px; }
+  .quote-row { grid-template-columns: 1fr; }
+  .achievement-row { gap: 6px; }
+  .achievement { min-width: 78px; padding: 8px 10px; }
+  /* HUD sıkıştır */
+  .hud { padding: 0 12px; }
+  .hud-logo { font-size: 10px; }
+  .hud-center { display: none; }
+  .hud-right .badge-item { font-size: 16px; }
+  .hud-right .badge-item:nth-child(n+7) { display: none; }
+  .level-pip { width: 34px; height: 28px; font-size: 8px; }
+}
+
+@media (max-width: 500px) {
+  .slide { padding: 58px 12px 52px; gap: 8px; }
+  .level-title { font-size: 18px; letter-spacing: 0.5px; }
+  .level-badge, .page-tag { font-size: 9px; padding: 3px 8px; }
+  .s1-title { font-size: clamp(32px, 9vw, 48px); letter-spacing: 2px; }
+  .s1-tagline { font-size: 11px; letter-spacing: 1.5px; }
+  .preview-9 { grid-template-columns: repeat(3, 1fr); }
+  .live-counters { grid-template-columns: 1fr; }
+  .g3, .g4 { grid-template-columns: 1fr; }
+  .gc-icon { font-size: clamp(40px, 9vw, 54px); }
+  .page-journey, .mini-cards.mc4, .mini-cards.mc2 { grid-template-columns: 1fr; }
+  .journey { grid-template-columns: repeat(2, 1fr); }
+  /* Dar ekranda timeline çizgisi ve dot'ları gizle — sadece sade kart görünümü */
+  .quest-list::before { display: none; }
+  .q-dot { display: none; }
+  .q-spacer { display: none; }
+  .quest-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 12px 14px;
+  }
+  .quest-year {
+    min-width: auto;
+    font-size: 18px;
+    margin-bottom: 2px;
+  }
+  .quest-icon { font-size: 26px; position: absolute; top: 12px; right: 14px; }
+  .quest-text { width: 100%; }
+  .q-know { font-size: 11px; padding: 6px 8px; }
+  .speed-chart { min-height: 260px; }
+  .growth-row { grid-template-columns: 60px 1fr 80px; gap: 8px; }
+  .growth-year { font-size: 14px; }
+  .growth-val { font-size: 11px; }
+  .dl-row { grid-template-columns: 36px 1fr 80px; gap: 8px; }
+  .dl-gen { font-size: 14px; }
+  .dl-time { font-size: 11px; }
+  .ai-timeline, .ai-tools, .tr-tech, .golden-rules, .career-rpg, .d30-steps { grid-template-columns: 1fr 1fr; }
+  .quote-row { grid-template-columns: 1fr; }
+  .bottom-nav { gap: 3px; padding: 0 4px; height: 42px; }
+  .level-pip { width: 28px; height: 24px; font-size: 7px; }
+  .level-pip .pip-dots { bottom: -1px; }
+  .level-pip .pip-dot { width: 2px; height: 2px; }
+  /* ≤500px — okları ALTA taşı + HUD'u sıkıştır */
+  .arrow-btn {
+    top: auto;
+    bottom: 50px; /* 42px bottom-nav + 8px gap */
+    transform: none;
+    width: 38px;
+    height: 34px;
+    font-size: 12px;
+    background: rgba(10,10,25,0.92);
+    border-width: 1.5px;
+    box-shadow: 0 0 0 8px rgba(10,10,25,0.55), 0 4px 14px rgba(0,0,0,0.6);
+    backdrop-filter: blur(6px);
+  }
+  .arrow-btn:hover { transform: scale(1.08); background: rgba(255,230,0,0.25); }
+  .arrow-left  { left: 6px; }
+  .arrow-right { right: 6px; }
+  .hud { height: 48px; padding: 0 10px; gap: 4px; }
+  .hud-logo { font-size: 9px; letter-spacing: 0.5px; max-width: 90px; }
+  .hud-level { font-size: 10px; padding: 3px 6px; }
+  .hud-page { font-size: 9px; padding: 2px 5px; min-width: 30px; }
+  .pc-tl, .pc-tr { top: 48px; }
+  .pc-bl, .pc-br { bottom: 42px; }
+  .slide { justify-content: flex-start; padding-top: 60px; padding-bottom: 100px; }
+}
+
+/* ===== Ultra-dar ekranlar: iPhone SE 1st gen, küçük Android (≤360px) ===== */
+@media (max-width: 360px) {
+  .slide { padding: 48px 10px 92px; gap: 6px; }
+  .arrow-btn { width: 34px; height: 30px; font-size: 10px; bottom: 46px; }
+  .arrow-left { left: 4px; }
+  .arrow-right { right: 4px; }
+  .hud { padding: 0 6px; height: 42px; gap: 3px; }
+  .hud-logo { display: none; }  /* TEKNO QUEST yazısı tamamen gizlensin */
+  .hud-level { font-size: 9px; padding: 2px 5px; }
+  .hud-page { font-size: 8px; padding: 2px 4px; min-width: 26px; }
+  .pc-tl, .pc-tr { top: 42px; }
+  .pc-bl, .pc-br { bottom: 42px; }
+  .s1-title { font-size: clamp(26px, 8vw, 36px); letter-spacing: 1px; }
+  .s1-tagline { font-size: 10px; letter-spacing: 1px; }
+  .level-title { font-size: 15px; }
+  .level-badge, .page-tag { font-size: 8px; padding: 2px 6px; }
+  .live-counters { grid-template-columns: 1fr; gap: 4px; }
+  .g3, .g4, .mini-cards, .mini-cards.mc2, .mini-cards.mc4,
+  .page-journey, .journey, .ai-timeline, .ai-tools,
+  .tr-tech, .golden-rules, .career-rpg, .d30-steps,
+  .ecom-row, .preview-9, .quote-row { grid-template-columns: 1fr !important; }
+  .game-card, .gr-card, .lc-box { padding: 10px 8px; }
+  .quest-icon { font-size: 20px; top: 10px; right: 10px; }
+  .quest-item { padding: 10px 10px; gap: 4px; }
+  .quest-year { min-width: auto; font-size: 14px; }
+  .growth-row { grid-template-columns: 44px 1fr 56px; gap: 5px; }
+  .growth-val { font-size: 10px; }
+  .dl-row { grid-template-columns: 28px 1fr 56px; gap: 5px; }
+  .dl-time { font-size: 10px; }
+  .bottom-nav { height: 38px; gap: 2px; padding: 0 3px; }
+  .level-pip { width: 24px; height: 22px; font-size: 6px; }
+  .hud-right .badge-item:nth-child(n+5) { display: none; }
+  .hud-right .badge-item { font-size: 14px; }
+  .achievement-row { gap: 4px; }
+  .achievement { min-width: 64px; padding: 6px 8px; font-size: 10px; }
+}
+
+/* ===== Samsung Fold (katlanmış ≤320px) ===== */
+@media (max-width: 320px) {
+  .slide { padding: 46px 6px 88px; }
+  .arrow-btn { width: 30px; height: 28px; font-size: 9px; bottom: 42px; }
+  .s1-title { font-size: clamp(22px, 7vw, 28px); letter-spacing: 0.5px; }
+  .hud-right .badge-item:nth-child(n+4) { display: none; }
+  .bottom-nav { height: 34px; }
+  .level-pip { width: 20px; height: 20px; font-size: 5px; }
+  .level-title { font-size: 13px; }
+}
+
+/* ===== Fold açık / Küçük tablet (501-820px) — arada kalmış aralık ===== */
+@media (min-width: 501px) and (max-width: 820px) {
+  /* Oklar yanlarda kalsın ama yumuşak halo'lu */
+  .arrow-btn {
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 42px;
+    background: rgba(10,10,25,0.92);
+    box-shadow: 0 0 0 10px rgba(10,10,25,0.4), 0 4px 16px rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+  }
+  .arrow-btn:hover { transform: translateY(-50%) scale(1.08); }
+  .arrow-left  { left: 8px; }
+  .arrow-right { right: 8px; }
+  /* Slide padding'i arrow genişliği için güvenli */
+  .slide { padding-left: 62px; padding-right: 62px; padding-bottom: 60px; justify-content: flex-start; padding-top: 74px; }
+  /* HUD'u rahatla */
+  .hud { padding: 0 10px; gap: 6px; }
+  .hud-logo { font-size: 11px; max-width: 120px; letter-spacing: 0.5px; }
+  .hud-level { font-size: 10px; padding: 3px 7px; }
+  .hud-page { font-size: 9px; padding: 2px 6px; min-width: 32px; }
+  .hud-center { display: none; } /* XP barı HUD'dan kaldır, slide içinde görünsün */
+  .hud-right { gap: 4px; }
+  .hud-right .badge-item { font-size: 14px; }
+  .hud-right .badge-item:nth-child(n+7) { display: none; }
+}
+/* 701-820px arası biraz daha nefes */
+@media (min-width: 701px) and (max-width: 820px) {
+  .slide { padding-left: 70px; padding-right: 70px; padding-top: 74px; padding-bottom: 70px; justify-content: flex-start; }
+  .arrow-btn { width: 44px; height: 44px; }
+  .hud-logo { max-width: 160px; font-size: 12px; }
+  .hud-right .badge-item:nth-child(n+7) { display: inline-block; }
+  .hud-right .badge-item:nth-child(n+9) { display: none; }
+}
+
+/* ==================================================================== */
+/* MOBİL SCROLL REFACTOR (≤820px) — iframe/iOS scroll bug'ını at:        */
+/* Slide artık position:static, body scroll eder, sadece .active görünür */
+/* ==================================================================== */
+@media (max-width: 820px) {
+  html, body {
+    height: auto;
+    min-height: 100dvh;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .presentation {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+  .slide {
+    position: static;
+    display: none;         /* Sadece .active göster */
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+    opacity: 1;
+    pointer-events: auto;
+    transition: none;
+    overflow: visible;     /* Body scroll etsin */
+    touch-action: auto;
+  }
+  .slide.active {
+    display: flex;
+  }
+  /* HUD ve bottom-nav zaten position:fixed — onlar ekrana yapışık kalır */
+  /* Ama iframe içinde alt nav yerine arrows ve pips yine fixed'de kalsın */
+  .bottom-nav { position: fixed; }
+  .arrow-btn {
+    position: fixed;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+  }
+  .pixel-corner { position: fixed; }
+  .pc-tl, .pc-tr { top: 38px; }
+  .pc-bl, .pc-br { bottom: 34px; }
+  .level-title { font-size: 16px; }
+  .level-banner { gap: 8px; }
+}
+
+/* Güvenli alan — iPhone notch + home indicator */
+@supports (padding: env(safe-area-inset-top)) {
+  .hud { padding-top: env(safe-area-inset-top); height: calc(52px + env(safe-area-inset-top)); }
+  .bottom-nav { padding-bottom: env(safe-area-inset-bottom); height: calc(48px + env(safe-area-inset-bottom)); }
+  .pc-tl, .pc-tr { top: calc(52px + env(safe-area-inset-top)); }
+  .pc-bl, .pc-br { bottom: calc(48px + env(safe-area-inset-bottom)); }
+}
+
+/* ============================================================
+   TEKNO QUEST · V2 — GÖKYÜZÜ TEMASI
+   Çocuk psikoloğu önerilerine göre yeniden tasarım:
+   - Açık mavi gökyüzü arkaplan (koyu/yorucu değil)
+   - Lacivert yazı (okunaklı, kontrast)
+   - Turuncu vurgular (sıcak, dikkat çekici)
+   - Yumuşak yeşil/sarı ikonlar
+   - NEON yok, parlama yok
+   - Animasyonlar daha yavaş
+   ============================================================ */
+:root {
+  --bg:        #e0f2fe;   /* açık gökyüzü mavisi */
+  --bg-soft:   #f0f9ff;
+  --text:      #1e3a8a;   /* lacivert */
+  --dim:       rgba(30,58,138,0.08);
+  --primary:   #f97316;   /* turuncu vurgu */
+  --success:   #16a34a;   /* yumuşak yeşil */
+  --info:      #0284c7;   /* gök mavisi */
+  --purple:    #7c3aed;
+  --warm:      #f97316;
+  --pink:      #ec4899;
+  --mint:      #14b8a6;
+  --red:       #dc2626;
+  --holo-bg:     rgba(255,255,255,0.75);
+  --holo-border: rgba(249,115,22,0.3);
+  --grid:        rgba(30,58,138,0.035);
+}
+
+html, body {
+  background:
+    radial-gradient(ellipse at 20% 15%, rgba(255,255,255,0.85) 0%, transparent 45%),
+    radial-gradient(ellipse at 80% 85%, rgba(255,255,255,0.7) 0%, transparent 50%),
+    linear-gradient(180deg, #bae6fd 0%, #e0f2fe 50%, #f0f9ff 100%);
+  color: var(--text);
+}
+
+/* Arka plan katmanları — V2: yumuşat */
+.grid-bg { opacity: 0.4; }
+.scanline { display: none; }           /* tarayıcı çizgisi yok */
+.star { background: rgba(255,255,255,0.85); box-shadow: 0 0 4px rgba(255,255,255,0.6); }
+@keyframes twinkle { 0%,100%{opacity:0.4} 50%{opacity:0.9} }  /* daha yumuşak */
+
+/* Particles (kar tanesi gibi hafif bulutcuklar) */
+.particle { background: rgba(255,255,255,0.6) !important; filter: blur(0.5px); }
+
+/* Pixel köşeler — turuncu */
+.pc-tl, .pc-tr, .pc-bl, .pc-br {
+  border-color: var(--primary) !important;
+}
+
+/* ====== V2: NEON METİN GÖLGELERİNİ KALDIR ====== */
+[class*="neon"],
+.title, .subtitle, .big-text, .mega-title,
+.level-title, .level-label,
+.intro-title, .intro-subtitle,
+.final-title, .final-cta {
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+}
+
+/* Genel "glow" efektlerini sıfırla */
+* {
+  --glow: none;
+}
+
+/* ====== V2: Sadece ANA CTA butonları turuncu ====== */
+.intro-start, .final-cta, .oath-btn, .btn-primary {
+  background: #f97316 !important;
+  color: #ffffff !important;
+  border: 2px solid #ea580c !important;
+  box-shadow: 0 2px 8px rgba(249,115,22,0.25) !important;
+  text-shadow: none !important;
+}
+.intro-start:hover, .final-cta:hover, .oath-btn:hover, .btn-primary:hover {
+  background: #ea580c !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(249,115,22,0.35) !important;
+}
+
+/* Kişilik testi seçenekleri — beyaz kart + lacivert yazı (ayırt edilebilir) */
+.cq-opt {
+  background: rgba(255,255,255,0.92) !important;
+  color: #1e3a8a !important;
+  border: 2px solid rgba(249,115,22,0.35) !important;
+  text-shadow: none !important;
+  font-weight: 600;
+}
+.cq-opt:hover {
+  background: rgba(255,237,213,0.95) !important;
+  border-color: #f97316 !important;
+  color: #ea580c !important;
+}
+.cq-opt.selected, .cq-opt:active {
+  background: #f97316 !important;
+  color: #fff !important;
+  border-color: #ea580c !important;
+}
+
+/* Navigasyon okları — yumuşak turuncu daire */
+.arrow-btn {
+  background: rgba(255,255,255,0.9) !important;
+  color: #f97316 !important;
+  border: 2px solid #f97316 !important;
+  box-shadow: 0 2px 6px rgba(30,58,138,0.08) !important;
+  text-shadow: none !important;
+}
+.arrow-btn:hover {
+  background: #f97316 !important;
+  color: #fff !important;
+}
+
+/* ====== V2: Kartlar / Panolar ====== */
+.card, .quest-card, .info-box, .holo-panel, .fact-card,
+.stat-card, .timeline-card, .profession-card,
+.q-know, .q-box, .quest-text, .level-banner {
+  background: rgba(255,255,255,0.85) !important;
+  border: 1px solid rgba(30,58,138,0.15) !important;
+  color: var(--text) !important;
+  box-shadow: 0 2px 10px rgba(30,58,138,0.06) !important;
+  backdrop-filter: blur(4px);
+}
+
+/* Vurgulu (strong) yazılar: turuncu */
+strong, b, .highlight, .accent {
+  color: #ea580c !important;
+}
+
+/* Başlık renkleri */
+h1, h2, h3, .title, .big-title, .mega-title {
+  color: var(--text) !important;
+  text-shadow: none !important;
+}
+
+/* HUD barı */
+.hud, .bottom-nav {
+  background: rgba(255,255,255,0.85) !important;
+  border-color: rgba(30,58,138,0.12) !important;
+  color: var(--text) !important;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 0 rgba(30,58,138,0.06) !important;
+}
+.hud *, .bottom-nav * {
+  color: var(--text) !important;
+  text-shadow: none !important;
+}
+
+/* XP barı: turuncu */
+.xp-fill, .progress-fill {
+  background: linear-gradient(90deg, #f97316 0%, #fb923c 100%) !important;
+  box-shadow: 0 0 6px rgba(249,115,22,0.4) !important;
+}
+
+/* ====== V2: Sadece V1 neon-pulse / flash / shake türü rahatsız edici animasyonlar yavaşlatılsın ====== */
+[class*="pulse"], [class*="flash"], [class*="shake"], [class*="blink"],
+.neon-pulse, .badge-blink {
+  animation-duration: 2.4s !important;
+}
+.star { animation-duration: 4s !important; }
+
+/* Pulse / glow animasyonları iptal */
+@keyframes neonPulse { 0%,100%{filter: none} }
+@keyframes glowBox   { 0%,100%{box-shadow: 0 2px 10px rgba(30,58,138,0.06)} }
+
+/* V2'de aşırı parlak sarı neon kullanımı temizlensin */
+.neon-yellow, [style*="color: #ffe600"], [style*="color:#ffe600"] {
+  color: #ea580c !important;
+  text-shadow: none !important;
+}
+.neon-green {
+  color: var(--success) !important;
+  text-shadow: none !important;
+}
+.neon-blue, .neon-info {
+  color: var(--info) !important;
+  text-shadow: none !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   V2 METİN REHABİLİTASYONU — Beyaz/açık tonlu metinler okunmuyordu.
+   Açık gökyüzü arkaplanda tüm metinleri lacivert'e zorla;
+   yalnızca özel accent renkleri istisna (strong, success, info).
+   ════════════════════════════════════════════════════════════ */
+body h1, body h2, body h3, body h4, body h5, body h6,
+body p, body li, body span, body div,
+body .slide-title, body .slide-sub,
+body .intro-title, body .intro-subtitle,
+body .final-title, body .final-sub, body .final-tag,
+body .gc-text, body .gc-title,
+body .quest-text, body .q-know, body .q-title, body .q-desc,
+body .mc-text, body .mc-label,
+body .pj-desc, body .pj-title,
+body .pr-by, body .pr-name, body .pr-year, body .pr-desc,
+body .ai-details, body .ai-desc,
+body .ai-life li, body .ai-types li,
+body .sc-desc, body .sc-can, body .sc-cant, body .sc-title,
+body .cm-text, body .cm-title,
+body .sf-text, body .sf-col h4,
+body .fb-text, body .fb-title,
+body .tb-text, body .tb-col h3,
+body .level-title, body .level-label, body .level-banner,
+body .keyboard-hint, body .hbar-label,
+body .os-label, body .lc-label, body .lc-num,
+body .counter-group-label, body .counter-source,
+body .orbit-label, body .orbit-num,
+body .timeline-text, body .timeline-year,
+body .profession-title, body .profession-desc,
+body .fact-title, body .fact-text,
+body .stat-title, body .stat-value,
+body .pixel-title, body .pixel-text,
+body .blue-text, body .white-text, body .light-text,
+body .data-label, body .data-value,
+body .step-title, body .step-desc,
+body .hud *, body .bottom-nav * {
+  color: #1e3a8a !important;
+  text-shadow: none !important;
+}
+
+/* İstisnalar — vurgu renkleri korunur */
+body strong, body b { color: #ea580c !important; }
+body .neon-green, body .xp-label, body .xp-count,
+body .sf-col.real h4, body .tb-col.new h3 { color: #16a34a !important; }
+body .neon-blue, body .info-text,
+body .sf-col.fic h4, body .tb-col.old h3 { color: #0284c7 !important; }
+body .mini-card.warm .mc-label, body .warm-label { color: #ea580c !important; }
+body .mini-card.purple .mc-label { color: #7c3aed !important; }
+body .mini-card.mint .mc-label { color: #14b8a6 !important; }
+body .mini-card.pink .mc-label { color: #ec4899 !important; }
+
+/* Kart arkaplanları beyaz-şeffaf → okunaklı */
+body .mini-card, body .timeline-card, body .fact-card,
+body .stat-card, body .os-card, body .pj-card, body .pr-card,
+body .sf-col, body .tb-col, body .sc-card, body .cm-card,
+body .fb-card, body .step-card, body .profession-card,
+/* Ek olarak bulunan koyu-lacivert kartlar */
+body .msg-map, body .one-second-panel, body .growth-chart, body .dl-race,
+body .jrn-step, body .pj-step, body .quote-card, body .extras-col,
+body .ai-tool, body .ai-tl-cell, body .ai-types, body .ai-life, body .career-quiz,
+body .day-2030, body .crypto-box, body .money-box, body .new-jobs, body .study {
+  background: rgba(255,255,255,0.88) !important;
+  border: 1px solid rgba(30,58,138,0.15) !important;
+  box-shadow: 0 2px 10px rgba(30,58,138,0.06) !important;
+  color: #1e3a8a !important;
+}
+
+/* Şifre girdisi gibi siyah inputlar */
+body .pw-input {
+  background: rgba(255,255,255,0.9) !important;
+  color: #1e3a8a !important;
+  border: 1px solid rgba(30,58,138,0.25) !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   V2 GÖKYÜZÜ ATMOSFERİ — güneş + kayan bulutlar
+   V1'deki "uzay hissi"nin gündüz versiyonu
+   ════════════════════════════════════════════════════════════ */
+
+/* Güneş (sağ üstte) */
+body::before {
+  content: '';
+  position: fixed;
+  top: -80px;
+  right: -80px;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(254,240,138,0.9) 0%, rgba(253,186,116,0.5) 35%, transparent 70%);
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  animation: sunGlow 8s ease-in-out infinite;
+  filter: blur(2px);
+}
+@keyframes sunGlow {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50%      { transform: scale(1.08); opacity: 1; }
+}
+
+/* Bulut katmanı 1 — yavaş, büyük bulutlar (stars-bg'yi dönüştür) */
+.stars-bg {
+  background-image:
+    radial-gradient(ellipse 120px 50px at 10% 30%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(ellipse 160px 55px at 35% 70%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 65%),
+    radial-gradient(ellipse 140px 50px at 65% 20%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(ellipse 180px 60px at 85% 55%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 65%),
+    radial-gradient(ellipse 100px 40px at 15% 85%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 60%);
+  background-size: 100% 100%;
+  animation: cloudDriftSlow 80s linear infinite;
+  opacity: 0.9 !important;
+}
+.stars-bg .star { display: none; }  /* eski yıldızları gizle */
+
+@keyframes cloudDriftSlow {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100vw); }
+}
+
+/* Bulut katmanı 2 — daha hızlı, küçük bulutlar (particles-container'ı dönüştür) */
+.particles-container {
+  background-image:
+    radial-gradient(ellipse 70px 25px at 20% 15%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(ellipse 90px 30px at 60% 45%, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0) 65%),
+    radial-gradient(ellipse 60px 22px at 40% 80%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(ellipse 80px 28px at 90% 25%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 65%);
+  background-size: 100% 100%;
+  animation: cloudDriftFast 50s linear infinite;
+  opacity: 0.75 !important;
+}
+.particles-container .particle { display: none; }
+
+@keyframes cloudDriftFast {
+  0%   { transform: translateX(100vw); }
+  100% { transform: translateX(0); }
+}
+
+/* Grid-bg tamamen kapatılsın — gökyüzü hissini bozuyor */
+.grid-bg { display: none; }
+
+/* HUD arkaplanı belirginleştir (yazılar görünsün) */
+body .hud, body .bottom-nav {
+  background: rgba(255,255,255,0.92) !important;
+  border-bottom: 1px solid rgba(30,58,138,0.12) !important;
+  color: #1e3a8a !important;
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="scanline"></div>
+<div class="stars-bg" id="starsContainer"></div>
+<div class="particles-container" id="particles"></div>
+<div class="pixel-corner pc-tl"></div>
+<div class="pixel-corner pc-tr"></div>
+<div class="pixel-corner pc-bl"></div>
+<div class="pixel-corner pc-br"></div>
+
+<!-- === ÜST HUD === -->
+<div class="hud">
+  <div class="hud-left">
+    <div class="hud-logo">TEKNO QUEST</div>
+    <div class="hud-level" id="hudLevel">LV.1</div>
+    <div class="hud-page" id="hudPage">1/1</div>
+  </div>
+  <div class="hud-center">
+    <div class="xp-label">XP</div>
+    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xpFill" style="width:0%"></div></div>
+    <div class="xp-count" id="xpCount">0 / 1000</div>
+  </div>
+  <div class="hud-right">
+    <div class="badge-item" id="b0" title="互联网大师">🌐</div>
+    <div class="badge-item" id="b1" title="历史探险家">📜</div>
+    <div class="badge-item" id="b2" title="速度冠军">⚡</div>
+    <div class="badge-item" id="b3" title="人工智能探险家">🤖</div>
+    <div class="badge-item" id="b4" title="未来建筑师">🔮</div>
+    <div class="badge-item" id="b5" title="科技达人">💡</div>
+    <div class="badge-item" id="b6" title="职业传奇">🏆</div>
+    <div class="badge-item" id="b7" title="聪明使用者">🧭</div>
+  </div>
+</div>
+
+<div class="presentation" id="pres">
+
+  <!-- ================= S1 — KAPAK ================= -->
+  <div class="slide active" id="s1">
+    <div class="orbit-container">
+      <div class="orbit-ring orbit-ring-1"></div>
+      <div class="orbit-ring orbit-ring-2"></div>
+      <div class="planet">🌍</div>
+      <div class="orbit-moon">🛸</div>
+    </div>
+    <div class="s1-title">科技探索</div>
+    <div class="s1-tagline">从互联网到人工智能 — 通往未来的密码</div>
+
+    <div class="live-counters-wrap">
+      <div class="counter-group-label" aria-label="全球统计">🌍 全球</div>
+      <div class="live-counters" role="group" aria-label="全世界每日统计">
+        <div class="lc-box">
+          <div class="lc-num" id="lc1" aria-live="polite">0</div>
+          <div class="lc-label">🔍 Google 搜索 / 天</div>
+        </div>
+        <div class="lc-box">
+          <div class="lc-num" id="lc2" aria-live="polite">0</div>
+          <div class="lc-label">💬 WhatsApp 消息 / 天</div>
+        </div>
+        <div class="lc-box">
+          <div class="lc-num" id="lc3" aria-live="polite">0</div>
+          <div class="lc-label">📺 YouTube 观看小时 / 天</div>
+        </div>
+      </div>
+
+      <div class="counter-group-label tr-label" aria-label="土耳其统计">
+        <svg class="tr-flag" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="30" height="20" fill="#E30A17"/>
+          <circle cx="11" cy="10" r="5" fill="#fff"/>
+          <circle cx="12.5" cy="10" r="4" fill="#E30A17"/>
+          <polygon fill="#fff" points="17.6,10 21.1,8.86 18.94,11.83 18.94,8.17 21.1,11.14"/>
+        </svg>
+        土耳其
+      </div>
+      <div class="live-counters" role="group" aria-label="土耳其每日统计">
+        <div class="lc-box">
+          <div class="lc-num" id="lc4" aria-live="polite">0</div>
+          <div class="lc-label">🔍 Google 搜索 / 天</div>
+        </div>
+        <div class="lc-box">
+          <div class="lc-num" id="lc5" aria-live="polite">0</div>
+          <div class="lc-label">💬 WhatsApp 消息 / 天</div>
+        </div>
+        <div class="lc-box">
+          <div class="lc-num" id="lc6" aria-live="polite">0</div>
+          <div class="lc-label">📺 YouTube 观看小时 / 天</div>
+        </div>
+      </div>
+      <div class="counter-source">* 估算值 • 来源：DataReportal &amp; TÜİK 2025 • 土耳其有 7730 万互联网用户</div>
+    </div>
+
+    <div class="health-bars">
+      <div class="hbar">
+        <div class="hbar-label">好奇心</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:90%;background:linear-gradient(90deg,var(--success),#a8ff3e)"></div></div>
+      </div>
+      <div class="hbar">
+        <div class="hbar-label">想象力</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:100%;background:linear-gradient(90deg,var(--info),var(--purple))"></div></div>
+      </div>
+      <div class="hbar">
+        <div class="hbar-label">勇气</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:85%;background:linear-gradient(90deg,var(--warm),var(--primary))"></div></div>
+      </div>
+    </div>
+
+    <div class="intro-start" onclick="changeSlide(1)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();changeSlide(1);}">▶ 开始游戏</div>
+    <div class="keyboard-hint">用 ← → 方向键浏览</div>
+  </div>
+
+  <!-- ================= S2 — LV1 1/2 : MESAJIN YOLCULUĞU ================= -->
+  <div class="slide" id="s2">
+    <div class="level-banner">
+      <div class="level-badge">关卡 1</div>
+      <div class="level-title">一条消息的旅程</div>
+      <div class="page-tag">第 1/2 页</div>
+    </div>
+    <div class="slide-sub">一条消息能在不到一秒内到达地球的另一端。是怎么做到的呢？</div>
+
+    <div class="msg-map">
+      <div class="msg-map-title">📡 伊斯坦布尔 → 纽约 · 9,500 公里</div>
+      <svg class="msg-map-svg" viewBox="0 0 950 280">
+        <path d="M 80 180 Q 450 30 870 150" stroke="rgba(0,245,255,0.35)" stroke-width="3" stroke-dasharray="8 6" fill="none"/>
+        <circle cx="80" cy="180" r="12" fill="var(--info)" filter="drop-shadow(0 0 12px var(--info))"/>
+        <text x="80" y="230" class="city-label" text-anchor="middle">伊斯坦布尔</text>
+        <circle cx="870" cy="150" r="12" fill="var(--warm)" filter="drop-shadow(0 0 12px var(--warm))"/>
+        <text x="870" y="200" class="city-label" text-anchor="middle">纽约</text>
+        <circle class="msg-packet" r="7"/>
+        <circle class="msg-packet p2" r="7"/>
+        <circle class="msg-packet p3" r="7"/>
+        <circle class="msg-packet p4" r="7"/>
+      </svg>
+      <div class="msg-legend">🚀 数据包用十分之一秒就走完这 9,500 公里的路程 — 跟光一样快！</div>
+    </div>
+
+    <div class="holo-card" style="max-width:1000px; margin: 30px auto 0;">
+      <div class="gc-title" style="text-align:center; margin-bottom:16px;">
+        ⚡ 那么光到底有多快呢？
+      </div>
+      <div class="gc-text" style="line-height: 1.9;">
+        想一想：你在伊斯坦布尔，你的朋友在纽约。
+        你打出 "你好！"。
+        <br><br>
+        • 如果你走着去：<strong>约 2,000 天</strong>（超过 5 年！）<br>
+        • 如果你坐飞机去：<strong>约 10 小时</strong><br>
+        • 如果消息靠声音传过去：<strong>约 7 小时 45 分钟</strong><br>
+        • 你的消息以光速传送：<strong>0.1 秒</strong> — 比眨一下眼睛还快！
+        <br><br>
+        光每秒能走 <strong>300,000 公里</strong>。也就是说，它能在
+        1 秒内绕地球 <strong>7.5 圈</strong>！
+      </div>
+    </div>
+
+    <div class="one-second-panel">
+      <div class="one-second-title">⏱ 1 秒钟内互联网上会发生什么？</div>
+      <div class="os-row"><span class="os-icon">✉️</span><span class="os-label">发送电子邮件</span><span class="os-num">300 万封</span></div>
+      <div class="os-row"><span class="os-icon">🎵</span><span class="os-label">播放 Spotify 歌曲</span><span class="os-num">5,500 首</span></div>
+      <div class="os-row"><span class="os-icon">🎬</span><span class="os-label">观看 TikTok 视频</span><span class="os-num">167,000 次</span></div>
+      <div class="os-row"><span class="os-icon">📦</span><span class="os-label">传输数据包</span><span class="os-num">30 亿个</span></div>
+    </div>
+  </div>
+
+  <!-- ================= S3 — LV1 2/2 : İNTERNET NEREDEN GELİYOR? ================= -->
+  <div class="slide" id="s3">
+    <div class="level-banner">
+      <div class="level-badge">关卡 1</div>
+      <div class="level-title">🌊 互联网从哪里来？</div>
+      <div class="page-tag">第 2/2 页</div>
+    </div>
+    <div class="slide-sub">提示：别看天上，要看海底！互联网的 99% 来自铺在海洋里的电缆。</div>
+
+    <div class="page-journey">
+      <div class="pj-step">
+        <div class="pj-icon">📱</div>
+        <div class="pj-num">第 1 步</div>
+        <div class="pj-title">你的手机</div>
+        <div class="pj-desc">发出 "请求视频！" 的指令。</div>
+        <div class="pj-arrow">→</div>
+      </div>
+      <div class="pj-step">
+        <div class="pj-icon">📡</div>
+        <div class="pj-num">第 2 步</div>
+        <div class="pj-title">调制解调器</div>
+        <div class="pj-desc">把 WiFi 转换成电缆信号。</div>
+        <div class="pj-arrow">→</div>
+      </div>
+      <div class="pj-step">
+        <div class="pj-icon">🌊</div>
+        <div class="pj-num">第 3 步</div>
+        <div class="pj-title">海底电缆</div>
+        <div class="pj-desc">从地中海海底通到美国！</div>
+        <div class="pj-arrow">→</div>
+      </div>
+      <div class="pj-step">
+        <div class="pj-icon">🎬</div>
+        <div class="pj-num">第 4 步</div>
+        <div class="pj-title">视频到达</div>
+        <div class="pj-desc">视频在 0.2 秒内到达你的手机。</div>
+      </div>
+    </div>
+
+    <div class="holo-card" style="max-width:1100px; margin: 30px auto 0;">
+      <div class="gc-title" style="text-align:center; margin-bottom:20px;">
+        🌊 海底的巨大网络
+      </div>
+
+      <svg viewBox="0 0 4378 2435" style="width:100%; max-height:520px; margin-bottom:20px; border-radius:12px;" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <!-- Okyanus zemini -->
+        <defs>
+          <radialGradient id="oceanBg" cx="50%" cy="50%" r="75%">
+            <stop offset="0%" stop-color="#1e3a8a"/>
+            <stop offset="60%" stop-color="#172554"/>
+            <stop offset="100%" stop-color="#0c1a3e"/>
+          </radialGradient>
+          <pattern id="oceanGrid" width="120" height="120" patternUnits="userSpaceOnUse">
+            <path d="M 120 0 L 0 0 0 120" fill="none" stroke="rgba(147,197,253,0.07)" stroke-width="1.5"/>
+          </pattern>
+        </defs>
+        <rect width="4378" height="2435" fill="url(#oceanBg)"/>
+        <rect width="4378" height="2435" fill="url(#oceanGrid)"/>
+
+        <!-- GERÇEK DETAYLI DÜNYA HARİTASI (Wikimedia public domain — yeşile boyandı) -->
+        <image href="/world-map.svg" x="0" y="0" width="4378" height="2435" opacity="0.95"/>
+
+        <!-- TÜRKİYE TURUNCU VURGU (Anadolu yarımadası — daha sola/yukarı, doğru pozisyona) -->
+        <g>
+          <ellipse cx="2470" cy="640" rx="190" ry="80" fill="#f97316" opacity="0.4"/>
+          <ellipse cx="2470" cy="640" rx="190" ry="80" fill="none" stroke="#ea580c" stroke-width="6" opacity="0.75"/>
+        </g>
+
+        <!-- GERÇEK DENİZALTI KABLO AĞI (kaynak: TeleGeography Submarine Cable Map) -->
+        <!-- ~55 ana kablo, gerçek koridorlardan, farklı renkler ile yoğun ağ görünümü -->
+
+        <!-- ═══════════ ATLANTİK KUZEY (NYC bölgesi ↔ Avrupa) — sarı, çok yoğun ═══════════ -->
+        <g stroke="#fbbf24" stroke-width="3.5" fill="none" opacity="0.75" stroke-linecap="round">
+          <!-- NYC → İngiltere (Bude) — TAT-14, AEC-1, AEC-2 -->
+          <path d="M 1289,663 C 1500,560 1850,510 2128,542"/>
+          <path d="M 1289,663 C 1500,545 1830,500 2120,540"/>
+          <path d="M 1289,663 C 1480,575 1820,525 2125,545"/>
+          <!-- NYC → İrlanda (AEConnect, Hibernia, Apollo) -->
+          <path d="M 1325,649 C 1580,540 1830,500 2095,548"/>
+          <path d="M 1325,649 C 1600,555 1830,520 2090,553"/>
+          <!-- NYC → Fransa (Dunant, Amitié) -->
+          <path d="M 1289,663 C 1550,680 1900,650 2200,605"/>
+          <path d="M 1289,663 C 1560,690 1910,675 2210,615"/>
+          <!-- NYC → İspanya (MAREA, Grace Hopper) -->
+          <path d="M 1289,663 C 1500,720 1850,720 2154,636"/>
+          <path d="M 1289,663 C 1480,710 1830,710 2150,640"/>
+          <!-- NYC → Portekiz (EllaLink Atlantic) -->
+          <path d="M 1289,663 C 1500,755 1830,775 2079,703"/>
+          <!-- Miami → İngiltere (TGN-Atlantic) -->
+          <path d="M 1216,879 C 1450,800 1800,650 2128,542"/>
+          <!-- Miami → İspanya -->
+          <path d="M 1216,879 C 1500,820 1850,720 2154,636"/>
+        </g>
+
+        <!-- ═══════════ ATLANTİK GÜNEY (Karayip + G. Amerika ↔ Afrika/Avrupa) — sarı ═══════════ -->
+        <g stroke="#fbbf24" stroke-width="3.5" fill="none" opacity="0.7" stroke-linecap="round">
+          <!-- Miami → Karayip → Brezilya (BRUSA, GlobeNet) -->
+          <path d="M 1216,879 C 1300,1000 1500,1100 1715,1272"/>
+          <!-- Brezilya → Portekiz (EllaLink) -->
+          <path d="M 1763,1326 C 1900,1100 2000,900 2079,703"/>
+          <!-- Brezilya (Fortaleza) → Angola (SACS) -->
+          <path d="M 1715,1272 C 1900,1290 2100,1260 2280,1240"/>
+          <!-- Brezilya → Güney Afrika (SAEx-2, Atlantis-2) -->
+          <path d="M 1763,1326 C 1900,1500 2200,1650 2408,1678"/>
+          <!-- Buenos Aires → Cape Town -->
+          <path d="M 1485,1678 C 1800,1750 2150,1750 2408,1678"/>
+        </g>
+
+        <!-- ═══════════ AKDENİZ + SÜVEYŞ — turkuaz (gerçek deniz rotaları, kıta kesmez) ═══════════ -->
+        <!-- Akdeniz tabanı yaklaşık y=720-820. Kablolar İtalya/Yunan adalarının ALTINDAN geçer -->
+        <g stroke="#06b6d4" stroke-width="3.5" fill="none" opacity="0.8" stroke-linecap="round">
+          <!-- Marsilya → İstanbul: İtalya/Yunan adalarının güneyinden, Çanakkale boğazı üzerinden -->
+          <path d="M 2249,636 C 2280,760 2360,810 2410,790 C 2415,720 2418,650 2420,610"/>
+          <!-- Marsilya → Süveyş (SEA-ME-WE-5/AAE-1/IMEWE): Akdeniz orta hat -->
+          <path d="M 2249,636 C 2300,780 2430,820 2566,812"/>
+          <path d="M 2249,636 C 2310,790 2440,820 2570,810"/>
+          <path d="M 2249,636 C 2295,775 2425,815 2562,808"/>
+          <!-- İtalya (Sicilya) → Süveyş (Italia 1, Mediterraneo) -->
+          <path d="M 2400,720 C 2470,790 2540,810 2566,812"/>
+          <path d="M 2410,725 C 2480,790 2545,805 2570,810"/>
+          <!-- İspanya → Cezayir kıyısı → Süveyş (Med Cable) -->
+          <path d="M 2154,636 C 2230,750 2350,800 2470,810 C 2530,815 2566,812 2566,812"/>
+          <!-- TÜRKİYE: İstanbul → Ege → Doğu Akdeniz → Mısır (TURCYOS, KEDI) -->
+          <path d="M 2420,610 C 2440,720 2510,800 2566,812"/>
+          <path d="M 2420,610 C 2450,725 2520,800 2570,810"/>
+          <!-- Yunanistan adaları → Mısır -->
+          <path d="M 2380,680 C 2430,740 2510,800 2562,810"/>
+          <!-- Türkiye güney kıyısı → Kıbrıs → İsrail/Mısır -->
+          <path d="M 2470,650 C 2510,720 2540,790 2566,812"/>
+        </g>
+
+        <!-- ═══════════ KARADENİZ — turuncu (Türkiye'ye özel) ═══════════ -->
+        <g stroke="#fb923c" stroke-width="3.5" fill="none" opacity="0.85" stroke-linecap="round">
+          <!-- KAFOS: İstanbul → Köstence (Romanya) -->
+          <path d="M 2420,610 C 2410,580 2410,560 2440,558"/>
+          <!-- İstanbul → Ukrayna -->
+          <path d="M 2420,610 C 2430,575 2470,555 2510,545"/>
+        </g>
+
+        <!-- ═══════════ HİNT OKYANUSU — pembe (gerçek deniz rotaları) ═══════════ -->
+        <!-- Süveyş → Mumbai: Kızıldeniz boyunca güney → Aden Körfezi → Hint Okyanusu (Arabistan'ı KESMEZ) -->
+        <g stroke="#ec4899" stroke-width="3.5" fill="none" opacity="0.75" stroke-linecap="round">
+          <!-- Süveyş → Aden → Mumbai (AAE-1, SEA-ME-WE-5, IMEWE, FALCON) -->
+          <path d="M 2566,812 C 2620,950 2680,1050 2740,1080 C 2880,1080 2980,1020 3065,961"/>
+          <path d="M 2570,810 C 2625,955 2685,1055 2745,1085 C 2885,1085 2985,1025 3070,963"/>
+          <path d="M 2562,808 C 2615,945 2675,1045 2735,1075 C 2875,1075 2975,1015 3060,958"/>
+          <!-- Mumbai → Singapur: Sri Lanka güneyinden, Bengal Körfezi'nden geçer -->
+          <path d="M 3065,961 C 3150,1080 3280,1180 3454,1204"/>
+          <path d="M 3070,963 C 3155,1085 3285,1185 3460,1210"/>
+          <path d="M 3060,958 C 3145,1075 3275,1175 3450,1200"/>
+          <!-- Mumbai → Doğu Afrika (Mombasa) — Hint Okyanusu boyunca -->
+          <path d="M 3065,961 C 2950,1100 2800,1200 2675,1272"/>
+          <!-- Hindistan güney → Bengal Körfezi → Tayland → Hong Kong (Burma kıyısı) -->
+          <path d="M 3065,961 C 3200,1080 3400,1050 3576,920"/>
+          <!-- Singapur → Avustralya batı (Endonezya batısından, Hint Okyanusu) -->
+          <path d="M 3454,1204 C 3470,1380 3520,1530 3588,1651"/>
+          <path d="M 3454,1204 C 3460,1385 3515,1535 3588,1651"/>
+          <!-- Singapur → Avustralya doğu (Endonezya kuzeyinden Java Denizi) -->
+          <path d="M 3454,1204 C 3700,1300 3900,1500 4025,1678"/>
+        </g>
+
+        <!-- ═══════════ AFRİKA ÇEVRESİ — yeşil ═══════════ -->
+        <g stroke="#10b981" stroke-width="3.5" fill="none" opacity="0.75" stroke-linecap="round">
+          <!-- 2Africa: Avrupa → Batı Afrika → Cape Town → Doğu Afrika → Mumbai (büyük halka) -->
+          <path d="M 2079,703 C 2080,900 2150,1100 2225,1280 C 2280,1500 2350,1650 2408,1700 C 2500,1720 2600,1550 2675,1272 C 2800,1100 2950,1000 3065,961"/>
+          <!-- WACS: Avrupa → Batı Afrika ülkeleri (Lagos) -->
+          <path d="M 2079,703 C 2100,900 2160,1080 2225,1137"/>
+          <!-- ACE: Fransa → Batı Afrika kıyısı boyunca -->
+          <path d="M 2200,615 C 2200,800 2200,1000 2220,1140"/>
+          <!-- METISS: Doğu Afrika → Madagaskar → Mauritius -->
+          <path d="M 2675,1272 C 2720,1370 2740,1430 2761,1475"/>
+          <!-- EASSy / SEACOM: Cape Town → Doğu Afrika kıyısı -->
+          <path d="M 2408,1678 C 2500,1500 2620,1380 2675,1272"/>
+          <!-- Lagos → Cape Town (batı Afrika güney rotası) -->
+          <path d="M 2225,1137 C 2280,1300 2350,1500 2408,1678"/>
+        </g>
+
+        <!-- ═══════════ PASİFİK KUZEY (Tokyo/HK ↔ ABD batı) — mor ═══════════ -->
+        <!-- DİKKAT: Pasifik bizim haritada wrap-around oluyor (Avrupa merkezli). -->
+        <!-- Her kablo İKİ parçaya bölündü: doğudan sağ kenara, sonra sol kenardan ABD'ye -->
+        <!-- Hawaii (268, 933) sol tarafta, Pasifik orta -->
+        <g stroke="#a855f7" stroke-width="3.5" fill="none" opacity="0.7" stroke-linecap="round">
+
+          <!-- Tokyo → sağ kenar (Pasifik kuzey çıkışı) -->
+          <path d="M 3892,731 C 4080,720 4250,750 4378,800"/>
+          <path d="M 3892,731 C 4090,725 4260,755 4378,810"/>
+          <path d="M 3892,731 C 4070,740 4230,770 4378,830"/>
+
+          <!-- Sol kenardan → Hawaii → Oregon (Pasifik kuzey, JUPITER/FASTER) -->
+          <path d="M 0,810 C 80,830 180,900 268,933"/>
+          <path d="M 0,820 C 90,835 190,910 268,933"/>
+          <path d="M 268,933 C 380,820 540,690 693,622"/>
+          <path d="M 268,933 C 390,815 545,685 695,625"/>
+
+          <!-- Hong Kong → sağ kenar (Pasifik orta) -->
+          <path d="M 3576,920 C 3900,920 4150,925 4378,930"/>
+          <path d="M 3576,920 C 3920,925 4170,930 4378,940"/>
+
+          <!-- Sol kenardan → Hawaii → LA (PLCN, HKA) -->
+          <path d="M 0,940 C 90,945 180,940 268,933"/>
+          <path d="M 268,933 C 400,870 600,820 754,758"/>
+          <path d="M 268,933 C 410,880 610,815 760,762"/>
+
+          <!-- Manila → sağ kenar (SEA-US) -->
+          <path d="M 3661,1015 C 3950,1010 4170,990 4378,980"/>
+          <!-- Sol kenar → Hawaii → ABD batı -->
+          <path d="M 0,980 C 100,970 200,950 268,933"/>
+
+          <!-- Tayvan → sağ kenar -->
+          <path d="M 3680,870 C 3950,875 4180,885 4378,890"/>
+          <!-- Sol kenar → Hawaii üzerinden ABD -->
+          <path d="M 0,890 C 100,910 180,925 268,933"/>
+        </g>
+
+        <!-- ═══════════ PASİFİK GÜNEY (Sydney/Auckland ↔ Hawaii/ABD) — mor ═══════════ -->
+        <g stroke="#a855f7" stroke-width="3.5" fill="none" opacity="0.7" stroke-linecap="round">
+          <!-- Sydney → sağ kenar (Pasifik güney) -->
+          <path d="M 4025,1678 C 4180,1500 4300,1300 4378,1100"/>
+          <!-- Auckland → sağ kenar -->
+          <path d="M 4317,1719 C 4350,1500 4378,1300 4378,1150"/>
+          <!-- Sol kenar → Hawaii (Hawaiki, Southern Cross) -->
+          <path d="M 0,1080 C 100,1050 180,990 268,933"/>
+          <path d="M 0,1100 C 90,1060 180,1000 268,933"/>
+          <!-- Sydney → Auckland (Tasman Denizi) -->
+          <path d="M 4025,1678 C 4150,1700 4250,1715 4317,1719"/>
+          <!-- Endonezya → Avustralya (Java Denizi/Timor) -->
+          <path d="M 3454,1204 C 3550,1400 3700,1550 4025,1678"/>
+        </g>
+
+        <!-- ═══════════ ASYA İÇİ (Çin/Japonya/Kore/SE Asya) — kırmızı ═══════════ -->
+        <g stroke="#ef4444" stroke-width="3.5" fill="none" opacity="0.7" stroke-linecap="round">
+          <!-- APG: Hong Kong → Şanghay → Japonya -->
+          <path d="M 3576,920 C 3700,840 3800,780 3892,731"/>
+          <!-- Singapur → Hong Kong -->
+          <path d="M 3454,1204 C 3500,1100 3550,1000 3576,920"/>
+          <path d="M 3454,1204 C 3505,1095 3555,990 3580,920"/>
+          <!-- Hong Kong → Manila -->
+          <path d="M 3576,920 C 3620,960 3650,990 3661,1015"/>
+          <!-- Singapur → Manila → Tokyo -->
+          <path d="M 3454,1204 C 3580,1100 3700,950 3892,731"/>
+          <!-- Kore → Japonya -->
+          <path d="M 3795,790 C 3830,770 3870,750 3892,731"/>
+          <!-- Tokyo → Vladivostok (Rus uzakdoğusu) -->
+          <path d="M 3892,731 C 3850,690 3820,660 3795,640"/>
+          <!-- Hong Kong → Tayvan -->
+          <path d="M 3576,920 C 3620,895 3660,880 3680,870"/>
+        </g>
+
+        <!-- Tüm kablolarda animasyon (akış efekti) -->
+        <g stroke-dasharray="22 14" fill="none">
+          <!-- Animasyon overlay tüm kablolarda görünür şekilde — global animation -->
+        </g>
+
+        <!-- Tüm dashed kablolar için scroll animasyonu -->
+        <style>
+          @keyframes cableFlow {
+            from { stroke-dashoffset: 0; }
+            to { stroke-dashoffset: -72; }
+          }
+          svg g[stroke="#fbbf24"], svg g[stroke="#06b6d4"], svg g[stroke="#ec4899"],
+          svg g[stroke="#a855f7"], svg g[stroke="#10b981"], svg g[stroke="#ef4444"],
+          svg g[stroke="#fb923c"] {
+            stroke-dasharray: 22 14;
+            animation: cableFlow 2.4s linear infinite;
+          }
+        </style>
+
+        <!-- Veri merkezleri / büyük şehirler + hub'lar -->
+        <g>
+          <!-- ═══ ANA ŞEHİRLER (büyük, animasyonlu) ═══ -->
+          <!-- NYC -->
+          <circle cx="1289" cy="663" r="16" fill="#ef4444"/>
+          <circle cx="1289" cy="663" r="32" fill="none" stroke="#ef4444" stroke-width="5" opacity="0.7">
+            <animate attributeName="r" values="16;48;16" dur="2.2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.8;0;0.8" dur="2.2s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Londra -->
+          <circle cx="2189" cy="528" r="16" fill="#ef4444"/>
+          <circle cx="2189" cy="528" r="32" fill="none" stroke="#ef4444" stroke-width="5" opacity="0.6">
+            <animate attributeName="r" values="16;42;16" dur="2.4s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.7;0;0.7" dur="2.4s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Marsilya -->
+          <circle cx="2249" cy="636" r="14" fill="#ef4444"/>
+          <!-- İSTANBUL — BÜYÜK SARI VURGU -->
+          <circle cx="2420" cy="610" r="28" fill="#fbbf24" stroke="#92400e" stroke-width="6"/>
+          <circle cx="2420" cy="610" r="50" fill="none" stroke="#fbbf24" stroke-width="8" opacity="0.7">
+            <animate attributeName="r" values="28;75;28" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.9;0;0.9" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Mumbai -->
+          <circle cx="3065" cy="961" r="16" fill="#ef4444"/>
+          <circle cx="3065" cy="961" r="32" fill="none" stroke="#ef4444" stroke-width="5" opacity="0.6">
+            <animate attributeName="r" values="16;42;16" dur="2.4s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.7;0;0.7" dur="2.4s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Singapur -->
+          <circle cx="3454" cy="1204" r="16" fill="#ef4444"/>
+          <!-- Tokyo -->
+          <circle cx="3892" cy="731" r="16" fill="#ef4444"/>
+          <circle cx="3892" cy="731" r="32" fill="none" stroke="#ef4444" stroke-width="5" opacity="0.7">
+            <animate attributeName="r" values="16;48;16" dur="2.2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.8;0;0.8" dur="2.2s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Sydney -->
+          <circle cx="4025" cy="1678" r="16" fill="#ef4444"/>
+
+          <!-- ═══ EK HUB ŞEHİRLER (küçük, etiketsiz) ═══ -->
+          <!-- Mısır / Süveyş (kritik geçiş noktası) -->
+          <circle cx="2566" cy="812" r="11" fill="#06b6d4"/>
+          <circle cx="2566" cy="812" r="20" fill="none" stroke="#06b6d4" stroke-width="3" opacity="0.6">
+            <animate attributeName="r" values="11;28;11" dur="2.6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.7;0;0.7" dur="2.6s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Hong Kong (Asya hub) -->
+          <circle cx="3576" cy="920" r="11" fill="#ef4444"/>
+          <!-- Manila (Filipinler) -->
+          <circle cx="3661" cy="1015" r="9" fill="#ef4444"/>
+          <!-- Cape Town (Afrika güney hub) -->
+          <circle cx="2408" cy="1678" r="11" fill="#10b981"/>
+          <!-- Lagos (Batı Afrika hub) -->
+          <circle cx="2225" cy="1137" r="9" fill="#10b981"/>
+          <!-- Hawaii Honolulu (Pasifik hub — sol-orta'da, Pasifik içinde) -->
+          <circle cx="268" cy="933" r="11" fill="#a855f7"/>
+          <circle cx="268" cy="933" r="20" fill="none" stroke="#a855f7" stroke-width="3" opacity="0.6">
+            <animate attributeName="r" values="11;28;11" dur="2.6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.7;0;0.7" dur="2.6s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Bude İngiltere (Atlantik landing point) -->
+          <circle cx="2128" cy="542" r="9" fill="#fbbf24"/>
+          <!-- Lizbon (Atlantik güney landing) -->
+          <circle cx="2079" cy="703" r="9" fill="#fbbf24"/>
+          <!-- Miami (Karayip hub) -->
+          <circle cx="1216" cy="879" r="9" fill="#fbbf24"/>
+          <!-- Brezilya (Fortaleza/Recife) -->
+          <circle cx="1715" cy="1272" r="9" fill="#fbbf24"/>
+          <!-- Mombasa (Doğu Afrika) -->
+          <circle cx="2675" cy="1272" r="9" fill="#10b981"/>
+          <!-- Oregon ABD batı (Pasifik landing) -->
+          <circle cx="693" cy="622" r="9" fill="#a855f7"/>
+          <!-- LA -->
+          <circle cx="754" cy="758" r="9" fill="#a855f7" opacity="0.8"/>
+          <!-- Auckland Yeni Zelanda -->
+          <circle cx="4317" cy="1719" r="9" fill="#a855f7"/>
+        </g>
+
+        <!-- Şehir etiketleri (Wikimedia SVG koordinat sisteminde) -->
+        <g font-family="Exo 2, Arial, sans-serif" font-weight="800" text-anchor="middle">
+          <g fill="#fef3c7" stroke="#0c1a3e" stroke-width="9" paint-order="stroke" font-size="62">
+            <text x="1289" y="630">纽约</text>
+            <text x="2189" y="495">伦敦</text>
+            <text x="2249" y="605">马赛</text>
+            <text x="3065" y="930">孟买</text>
+            <text x="3454" y="1255">新加坡</text>
+            <text x="3892" y="700">东京</text>
+            <text x="4025" y="1740">悉尼</text>
+          </g>
+          <!-- İSTANBUL etiketi: noktanın SAĞ ÜSTÜNDE (Marsilya etiketini örtmesin) -->
+          <text x="2475" y="555" fill="#fff7ed" stroke="#7c2d12" stroke-width="11" paint-order="stroke" font-size="82" font-weight="900" text-anchor="start">伊斯坦布尔</text>
+          <!-- İstanbul'dan etiketin yanına ince çizgi (gösterge) -->
+          <line x1="2445" y1="595" x2="2475" y2="565" stroke="#92400e" stroke-width="3" opacity="0.7"/>
+        </g>
+      </svg>
+
+      <!-- Türkiye'nin denizaltı kablo bağlantısı (gerçek bilgi) -->
+      <div style="margin-top:18px; padding:14px 18px; background:rgba(255,230,0,0.08); border:1px solid rgba(255,230,0,0.35); border-radius:10px; max-width:1000px; margin-left:auto; margin-right:auto;">
+        <div style="font-family:'Chakra Petch'; font-weight:700; font-size:1rem; color:var(--primary); margin-bottom:6px; text-align:center;">
+          <svg class="tr-flag" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:26px;height:18px;vertical-align:middle;margin-right:6px;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.15);"><rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.5" cy="10" r="4" fill="#E30A17"/><polygon fill="#fff" points="17.6,10 21.1,8.86 18.94,11.83 18.94,8.17 21.1,11.14"/></svg>土耳其是怎么连接的？
+        </div>
+        <div style="font-size:0.95rem; line-height:1.55; color:rgba(255,255,255,0.88); text-align:center;">
+          伊斯坦布尔是全球互联网最重要的中转站之一。电缆从黑海海底通到罗马尼亚，又从地中海海底通到埃及，再从那里延伸到印度。
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-top:10px;">
+        <div style="text-align:center; padding:14px; background:rgba(0,255,200,0.08); border:1px solid rgba(0,255,200,0.3); border-radius:8px;">
+          <div style="font-size:1.8rem; margin-bottom:6px;">🌐</div>
+          <div style="font-size:1.4rem; color:#00ffc8; font-weight:bold;">140 万公里</div>
+          <div style="font-size:0.9rem; opacity:0.85;">海底电缆的总长度</div>
+        </div>
+        <div style="text-align:center; padding:14px; background:rgba(255,230,0,0.08); border:1px solid rgba(255,230,0,0.3); border-radius:8px;">
+          <div style="font-size:1.8rem; margin-bottom:6px;">🏊</div>
+          <div style="font-size:1.4rem; color:#ffe600; font-weight:bold;">深达 8 公里</div>
+          <div style="font-size:0.9rem; opacity:0.85;">有些电缆铺在大洋最深处</div>
+        </div>
+        <div style="text-align:center; padding:14px; background:rgba(255,100,150,0.08); border:1px solid rgba(255,100,150,0.3); border-radius:8px;">
+          <div style="font-size:1.8rem; margin-bottom:6px;">🦈</div>
+          <div style="font-size:1.4rem; color:#ff6496; font-weight:bold;">每年约 100 次故障</div>
+          <div style="font-size:0.9rem; opacity:0.85;">由鲨鱼咬或船锚造成</div>
+        </div>
+      </div>
+
+      <div class="gc-text" style="text-align:center; margin-top:18px; font-style:italic;">
+        把这些电缆首尾相接，能绕地球 <strong>35 圈</strong>！
+        （地球周长是 40,075 公里）
+      </div>
+    </div>
+
+    <div class="mini-cards mc4">
+      <div class="mini-card"><div class="mc-label">🌐 550+ 条电缆</div><div class="mc-text">全球海洋里有 550 多条电缆 — 每一条都长达数千公里！</div></div>
+      <div class="mini-card mint"><div class="mc-label">📏 140 万公里</div><div class="mc-text">把所有电缆首尾相接，能绕地球 35 圈！</div></div>
+      <div class="mini-card warm"><div class="mc-label">💡 惊人的速度</div><div class="mc-text">信息以光速穿过这些电缆。你还没眨眼，它就到美国了！</div></div>
+      <div class="mini-card purple"><div class="mc-label">🦈 防鲨鱼保护</div><div class="mc-text">有时鲨鱼会咬电缆！所以电缆外面包着结实的钢铠甲。</div></div>
+    </div>
+  </div>
+
+  <!-- ================= S4 — LV2 1/3 : TÜRKİYE QUEST TARİHİ (1993 → 2026) ================= -->
+  <div class="slide" id="s4">
+    <div class="level-banner">
+      <div class="level-badge">关卡 2</div>
+      <div class="level-title"><svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:32px;height:22px;vertical-align:middle;margin-right:10px;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.2);"><rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.5" cy="10" r="4" fill="#E30A17"/><polygon fill="#fff" points="17.6,10 21.1,8.86 18.94,11.83 18.94,8.17 21.1,11.14"/></svg>土耳其探索 — 历史</div>
+      <div class="page-tag">第 1/3 页</div>
+    </div>
+    <div class="slide-sub">互联网是怎么来到土耳其、又是怎么发展的？从 1993 年到今天的一段大旅程……</div>
+
+    <div class="quest-list">
+      <div class="quest-item holo-card accent-cyan">
+        <div class="quest-year">1993</div>
+        <div class="q-spacer"></div>
+        <div class="q-dot"></div>
+        <div class="quest-icon">🔌</div>
+        <div class="quest-text">
+          <strong>✅ 第一次连接 — 中东技术大学(ODTÜ)，安卡拉</strong>
+          <span>土耳其第一次接入互联网 — 速度只有 64 kbps。一张图片要花 5 分钟才能加载出来！</span>
+          <em class="q-know">💡 你知道吗？发送土耳其第一封电子邮件的人是 <strong>穆斯塔法·阿克居尔教授</strong>。他被称为 "土耳其互联网之父"。</em>
+        </div>
+        <div class="quest-badge qb-done">已完成</div>
+      </div>
+
+      <div class="quest-item holo-card accent-green">
+        <div class="quest-year">1996</div>
+        <div class="q-spacer"></div>
+        <div class="q-dot"></div>
+        <div class="quest-icon">🏠</div>
+        <div class="quest-text">
+          <strong>✅ 互联网进了家门</strong>
+          <span>Türk Telekom 把拨号上网带进了家里。调制解调器会发出 "嘀嘀嗒嗒" 的声音来连接！</span>
+          <em class="q-know">💡 你知道吗？那些年下载一首歌要花 <strong>大约 20 分钟</strong>。而且只要有人拿起电话，网络连接就会立刻断掉！</em>
+        </div>
+        <div class="quest-badge qb-done">已完成</div>
+      </div>
+
+      <div class="quest-item holo-card accent-purple">
+        <div class="quest-year">2000s</div>
+        <div class="q-spacer"></div>
+        <div class="q-dot"></div>
+        <div class="quest-icon">⚡</div>
+        <div class="quest-text">
+          <strong>✅ ADSL 与提速</strong>
+          <span>宽带来了！第一批土耳其网站诞生了：Mynet、Hürriyet Online、<strong>Ekşi Sözlük（1999）</strong>。</span>
+          <em class="q-know">💡 最早的土耳其网站是：<code>itu.edu.tr</code> 和 <code>tubitak.gov.tr</code>。</em>
+        </div>
+        <div class="quest-badge qb-done">已完成</div>
+      </div>
+
+      <div class="quest-item holo-card accent-pink">
+        <div class="quest-year">2010s</div>
+        <div class="q-spacer"></div>
+        <div class="q-dot"></div>
+        <div class="quest-icon">📱</div>
+        <div class="quest-text">
+          <strong>✅ 智能手机革命</strong>
+          <span>2009 年 iPhone 3G 来到土耳其。口袋里的互联网时代 — WhatsApp、Instagram、YouTube 进入了我们的生活！</span>
+          <em class="q-know">💡 今天在土耳其，每人平均每天上网 <strong>7 个小时</strong>！</em>
+        </div>
+        <div class="quest-badge qb-done">已完成</div>
+      </div>
+
+      <div class="quest-item holo-card accent-yellow active">
+        <div class="quest-year">2026</div>
+        <div class="q-spacer"></div>
+        <div class="q-dot"></div>
+        <div class="quest-icon">🚀</div>
+        <div class="quest-text">
+          <strong>🔥 进行中的任务 — 光纤与 5G 时代</strong>
+          <span>超过 6000 万用户，光纤互联网无处不在。5G 来到了土耳其 — 手机现在快如闪电！</span>
+          <em class="q-know">💡 土耳其是全世界社交媒体使用最多的 <strong>第 5 个国家</strong>！</em>
+        </div>
+        <div class="quest-badge qb-active">进行中</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S5 — LV2 2/3 : RAKAMLARLA TÜRKİYE ================= -->
+  <div class="slide" id="s5">
+    <div class="level-banner">
+      <div class="level-badge">关卡 2</div>
+      <div class="level-title"><svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:32px;height:22px;vertical-align:middle;margin-right:10px;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.2);"><rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.5" cy="10" r="4" fill="#E30A17"/><polygon fill="#fff" points="17.6,10 21.1,8.86 18.94,11.83 18.94,8.17 21.1,11.14"/></svg>数字里的土耳其</div>
+      <div class="page-tag">第 2/3 页</div>
+    </div>
+    <div class="slide-sub">30 年里从 <strong>3 个人变成 7000 万人</strong> — 一个奇迹的故事</div>
+
+    <div class="growth-chart">
+      <div class="growth-title">📊 互联网用户数量 — 土耳其</div>
+      <div class="growth-row"><div class="growth-year">1993</div><div class="growth-bar"><div class="growth-fill" style="width:0.5%"></div></div><div class="growth-val">约 3 人 👤</div></div>
+      <div class="growth-row"><div class="growth-year">1996</div><div class="growth-bar"><div class="growth-fill" style="width:2%"></div></div><div class="growth-val">约 30,000</div></div>
+      <div class="growth-row"><div class="growth-year">2000</div><div class="growth-bar"><div class="growth-fill" style="width:8%"></div></div><div class="growth-val">200 万</div></div>
+      <div class="growth-row"><div class="growth-year">2010</div><div class="growth-bar"><div class="growth-fill" style="width:40%"></div></div><div class="growth-val">2500 万</div></div>
+      <div class="growth-row"><div class="growth-year">2024</div><div class="growth-bar"><div class="growth-fill" style="width:100%"></div></div><div class="growth-val">7000 万+ 🚀</div></div>
+    </div>
+
+    <div class="fact-box">
+      ⏳ <strong style="color:var(--primary)">30 年里</strong>从 3 个人变成了 <strong style="color:var(--success)">7000 万人</strong>！连一代人都还没过去，土耳其就变成了完全不同的国家。你能想象吗 — 你爷爷小时候连互联网都还没有！
+    </div>
+  </div>
+
+  <!-- ================= S6 — LV2 3/3 : İNTERNETİN EVRİMİ ================= -->
+  <div class="slide" id="s6">
+    <div class="level-banner">
+      <div class="level-badge">关卡 2</div>
+      <div class="level-title">🌐 互联网的进化</div>
+      <div class="page-tag">第 3/3 页</div>
+    </div>
+    <div class="slide-sub">互联网自己也在成长 — 从过去到现在，从现在到未来</div>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:16px; max-width:1300px; margin:0 auto;">
+
+      <div class="holo-card" style="border-left:4px solid #888;">
+        <div class="xp-tag">+8 XP</div>
+        <div style="font-size:2rem; margin-bottom:8px;">📖</div>
+        <div class="gc-title" style="color:#aaa;">WEB 1.0 — "阅读"</div>
+        <div style="font-size:0.85rem; opacity:0.7; margin-bottom:8px;">1990 年代</div>
+        <div class="gc-text">
+          最早的互联网。只有文字和图片。你打开一个网站，
+          读一读，然后关掉。你什么都不能写，也不能分享。
+          没有任何互动。
+        </div>
+      </div>
+
+      <div class="holo-card" style="border-left:4px solid #00c8ff;">
+        <div class="xp-tag">+10 XP</div>
+        <div style="font-size:2rem; margin-bottom:8px;">💬</div>
+        <div class="gc-title" style="color:#00c8ff;">WEB 2.0 — "分享"</div>
+        <div style="font-size:0.85rem; opacity:0.7; margin-bottom:8px;">2000 年代 — 现在</div>
+        <div class="gc-text">
+          YouTube、Instagram、TikTok 的时代。现在你也可以拍视频、
+          分享、写评论、点赞了。互联网以前只是一个读信息的地方，
+          现在是每个人都能表达自己的大舞台。
+        </div>
+      </div>
+
+      <div class="holo-card" style="border-left:4px solid #c864ff;">
+        <div class="xp-tag">+10 XP</div>
+        <div style="font-size:2rem; margin-bottom:8px;">🪙</div>
+        <div class="gc-title" style="color:#c864ff;">WEB 3.0 — "拥有"</div>
+        <div style="font-size:0.85rem; opacity:0.7; margin-bottom:8px;">即将到来</div>
+        <div class="gc-text">
+          数字所有权的时代。你画的一幅画、你创造的一个游戏角色、
+          你写的一首歌 — 你可以在互联网上证明它是你的。
+          别人不能复制后说 "这是我的"。加密货币也是在这个系统上运行的。
+        </div>
+      </div>
+
+      <div class="holo-card" style="border-left:4px solid #ffc832;">
+        <div class="xp-tag">+12 XP</div>
+        <div style="font-size:2rem; margin-bottom:8px;">🧠</div>
+        <div class="gc-title" style="color:#ffc832;">WEB 4.0 — "理解你"</div>
+        <div style="font-size:0.85rem; opacity:0.7; margin-bottom:8px;">不久之后</div>
+        <div class="gc-text">
+          人工智能、眼镜和电脑也许会变成一个整体。互联网会更懂你：
+          它可能会问 "你今天看起来有点难过，要不要给你放一首你喜欢的歌？"
+          在街上，你的眼镜可以帮你找路，还能显示商店的菜单。
+          互联网可能不再只是一个网站，而像一个每天都陪在你身边的朋友。
+        </div>
+      </div>
+
+    </div>
+
+    <div style="text-align:center; margin-top:24px; padding:16px; background:rgba(255,230,0,0.08); border:1px solid rgba(255,230,0,0.3); border-radius:10px; max-width:900px; margin-left:auto; margin-right:auto;">
+      <div style="font-size:1.05rem; line-height:1.7;">
+        💫 互联网的下一个版本，会由 <strong>今天的孩子们</strong>
+        来书写。也许 <strong>Web 5.0</strong> 就是你创造出来的！
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S7 — LV3 1/2 : 1G → 6G GRAFİĞİ ================= -->
+  <div class="slide" id="s7">
+    <div class="level-banner">
+      <div class="level-badge">关卡 3</div>
+      <div class="level-title">移动网速：1G → 6G</div>
+      <div class="page-tag">第 1/2 页</div>
+    </div>
+    <div class="slide-sub">每个 "G" 都是一代 — 从 1G 到 6G，手机的本领是怎么进步的？</div>
+
+
+    <div class="speed-chart">
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:#888">1G</div>
+        <div class="sc-speed">~2 kb/s</div>
+        <div class="sc-stars">⭐☆☆☆☆</div>
+        <div class="sc-can">你可以打电话 📞</div>
+        <div class="sc-bar" style="height:14px; background:rgba(150,150,150,0.3); border:1px solid rgba(150,150,150,0.5);"><div class="sc-bar-label">只有语音</div></div>
+      </div>
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:#4aa">2G</div>
+        <div class="sc-speed">~64 kb/s</div>
+        <div class="sc-stars">⭐⭐☆☆☆</div>
+        <div class="sc-can">"晚安" 短信 ✉️</div>
+        <div class="sc-bar" style="height:36px; background:rgba(100,200,200,0.22); border:1px solid rgba(100,200,200,0.5);"><div class="sc-bar-label">短信</div></div>
+      </div>
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:#00b4ff">3G</div>
+        <div class="sc-speed">~2 Mb/s</div>
+        <div class="sc-stars">⭐⭐⭐☆☆</div>
+        <div class="sc-can">视频通话 🎥</div>
+        <div class="sc-bar" style="height:68px; background:rgba(0,180,255,0.22); border:1px solid rgba(0,180,255,0.5);"><div class="sc-bar-label">视频通话</div></div>
+      </div>
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:var(--info)">4G</div>
+        <div class="sc-speed" style="color:var(--info)">~100 Mb/s</div>
+        <div class="sc-stars">⭐⭐⭐⭐☆</div>
+        <div class="sc-can">在公交车上看 Netflix 🎬</div>
+        <div class="sc-bar" style="height:110px; background:rgba(0,245,255,0.18); border:1px solid rgba(0,245,255,0.55); box-shadow:0 0 22px rgba(0,245,255,0.2);"><div class="sc-bar-label" style="color:var(--info)">Netflix 高清</div></div>
+      </div>
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:var(--primary)">5G</div>
+        <div class="sc-speed" style="color:var(--primary)">~10 Gb/s</div>
+        <div class="sc-stars">⭐⭐⭐⭐⭐</div>
+        <div class="sc-can">远程手术 🏥</div>
+        <div class="sc-bar" style="height:160px; background:rgba(255,230,0,0.18); border:1px solid rgba(255,230,0,0.6); box-shadow:0 0 30px rgba(255,230,0,0.25);"><div class="sc-bar-label" style="color:var(--primary)">机器人 & VR</div></div>
+      </div>
+      <div class="sc-wrap">
+        <div class="sc-gen" style="color:#c084fc">6G</div>
+        <div class="sc-speed" style="color:#c084fc">~1 Tb/s</div>
+        <div class="sc-stars">🌟🌟🌟🌟🌟</div>
+        <div class="sc-can">全息通话 🌐</div>
+        <div class="sc-bar" style="height:215px; background:rgba(192,132,252,0.2); border:1px solid rgba(192,132,252,0.65); box-shadow:0 0 36px rgba(192,132,252,0.35);"><div class="sc-bar-label" style="color:#c084fc">全息影像 & XR</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S8 — LV3 2/2 : İNDİRME YARIŞI ================= -->
+  <div class="slide" id="s8">
+    <div class="level-banner">
+      <div class="level-badge">关卡 3</div>
+      <div class="level-title">下载大赛</div>
+      <div class="page-tag">第 2/2 页</div>
+    </div>
+    <div class="slide-sub">同一部 <strong>1 GB 的电影</strong> 要几秒才能下载完？来看看各代网速的比赛吧！</div>
+
+    <div class="dl-race">
+      <div class="dl-title">🏁 同一部电影，6 个不同的世代</div>
+      <div class="dl-row"><div class="dl-gen" style="color:#888">1G</div><div class="dl-track"><div class="dl-fill" style="background:#888; animation-duration:90s"></div></div><div class="dl-time" style="color:#888">约 90 小时！</div></div>
+      <div class="dl-row"><div class="dl-gen" style="color:#4aa">2G</div><div class="dl-track"><div class="dl-fill" style="background:#4aa; animation-duration:30s"></div></div><div class="dl-time" style="color:#4aa">约 35 小时</div></div>
+      <div class="dl-row"><div class="dl-gen" style="color:#00b4ff">3G</div><div class="dl-track"><div class="dl-fill" style="background:#00b4ff; animation-duration:12s"></div></div><div class="dl-time" style="color:#00b4ff">约 70 分钟</div></div>
+      <div class="dl-row"><div class="dl-gen" style="color:var(--info)">4G</div><div class="dl-track"><div class="dl-fill" style="background:var(--info); animation-duration:4s"></div></div><div class="dl-time" style="color:var(--info)">约 80 秒</div></div>
+      <div class="dl-row"><div class="dl-gen" style="color:var(--primary)">5G</div><div class="dl-track"><div class="dl-fill" style="background:var(--primary); animation-duration:1s"></div></div><div class="dl-time" style="color:var(--primary)">约 1 秒 ⚡</div></div>
+      <div class="dl-row"><div class="dl-gen" style="color:#c084fc">6G</div><div class="dl-track"><div class="dl-fill" style="background:linear-gradient(90deg,#c084fc,#39ff14); animation-duration:0.5s"></div></div><div class="dl-time" style="color:#c084fc">约 0.01 秒 ⚡⚡</div></div>
+    </div>
+
+    <div class="fact-box">
+      🤯 <strong style="color:var(--primary)">同一部电影：</strong>用 1G 要 <strong>90 小时</strong>（4 天！），用 5G 只要 <strong style="color:var(--success)">1 秒</strong>，不久之后用 <strong style="color:#c084fc">6G</strong> 一眨眼就好了！你看到科技变得多快了吗？
+    </div>
+  </div>
+
+  <!-- ================= S9 — LV4 1/1 : GÜNLÜK HAYATTA YZ ================= -->
+  <div class="slide" id="s9">
+    <div class="level-banner">
+      <div class="level-badge">关卡 4</div>
+      <div class="level-title">人工智能在生活中的哪里？</div>
+      <div class="page-tag">第 1/1 页</div>
+    </div>
+    <div class="slide-sub">其实我们已经开始在生活的方方面面使用人工智能了。</div>
+
+    <div class="ai-split">
+      <div class="ai-types">
+        <div class="ai-h">🧬 人工智能的种类</div>
+        <div><strong>生成式人工智能（Generative AI）：</strong>ChatGPT、Gemini、会生成图像的 AI — 它们能创作文字、图片和声音。今天有几百万人每天都在使用。</div>
+        <div style="margin-top:10px;"><strong>通用人工智能（AGI）：</strong>像人一样能理解任何话题、会思考的 AI。现在还没有 — 但科学家们正在研究。</div>
+        <div style="margin-top:10px;"><strong>超级人工智能（ASI）：</strong>目标是比人类更聪明的人工智能。科学家们正在为这类项目持续努力。</div>
+      </div>
+      <div class="ai-life">
+        <div class="ai-h">👁 日常生活中的人工智能</div>
+        <ul>
+          <li>📱 <strong>手机：</strong>用人脸识别帮你解锁手机。</li>
+          <li>📷 <strong>相册：</strong>能分辨出猫和人，认出每一张面孔。</li>
+          <li>▶ <strong>YouTube 推荐：</strong>为你推荐你喜欢的内容。</li>
+          <li>🗺️ <strong>导航：</strong>预测交通情况，给你推荐最快到达的路线。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S10 — LV5 1/2 : YZ 6 GELECEK ================= -->
+  <div class="slide" id="s10">
+    <div class="level-banner">
+      <div class="level-badge">关卡 5</div>
+      <div class="level-title">未来地图</div>
+      <div class="page-tag">第 1/2 页</div>
+    </div>
+    <div class="slide-sub">人工智能在未来几年里会给我们的生活带来什么？</div>
+
+    <div class="game-grid g3">
+      <div class="holo-card game-card accent-cyan"><div class="xp-tag">+8 XP</div><span class="gc-icon">🚗</span><div class="gc-title">无人驾驶汽车</div><div class="gc-text">没有方向盘，没有踏板！AI 会读懂路况，安全行驶。</div></div>
+      <div class="holo-card game-card accent-purple"><div class="xp-tag">+8 XP</div><span class="gc-icon">🏫</span><div class="gc-title">私人老师</div><div class="gc-text">为你量身定制的课程。它知道你哪些地方比较弱！</div></div>
+      <div class="holo-card game-card accent-green"><div class="xp-tag">+10 XP</div><span class="gc-icon">💊</span><div class="gc-title">个性化药物</div><div class="gc-text">为你专门制作的药 — 很多疾病都能被治好！</div></div>
+      <div class="holo-card game-card accent-warm"><div class="xp-tag">+10 XP</div><span class="gc-icon">🌍</span><div class="gc-title">地球守护者</div><div class="gc-text">AI 会为气候危机算出最好的解决办法！</div></div>
+      <div class="holo-card game-card accent-pink"><div class="xp-tag">+12 XP</div><span class="gc-icon">🎮</span><div class="gc-title">活的游戏</div><div class="gc-text">角色会思考，每一局游戏都不一样！</div></div>
+      <div class="holo-card game-card accent-yellow"><div class="xp-tag">+12 XP</div><span class="gc-icon">🤝</span><div class="gc-title">机器人助手</div><div class="gc-text">家里、医院、工厂里的聪明机器人！</div></div>
+    </div>
+  </div>
+
+  <!-- ================= S11 — LV5 2/2 : 2030'DA BİR GÜN ================= -->
+  <div class="slide" id="s11">
+    <div class="level-banner">
+      <div class="level-badge">关卡 5</div>
+      <div class="level-title">2030 年的一天</div>
+      <div class="page-tag">第 2/2 页</div>
+    </div>
+    <div class="slide-sub">6 年后，一个孩子的一天会是什么样？来看看真实的场景：</div>
+
+    <div class="day-2030">
+      <div class="d30-title">📅 你的未来 — 24 小时的一天</div>
+      <div class="d30-steps">
+        <div class="d30-step"><div class="d30-time">07:00</div><div class="d30-icon">☀️</div><div class="d30-desc">AI 用音乐叫你起床</div></div>
+        <div class="d30-step"><div class="d30-time">08:00</div><div class="d30-icon">🍳</div><div class="d30-desc">智能冰箱准备好早餐</div></div>
+        <div class="d30-step"><div class="d30-time">08:30</div><div class="d30-icon">🚙</div><div class="d30-desc">无人驾驶汽车送你去学校</div></div>
+        <div class="d30-step"><div class="d30-time">11:00</div><div class="d30-icon">📚</div><div class="d30-desc">AI 老师给你讲课</div></div>
+        <div class="d30-step"><div class="d30-time">18:00</div><div class="d30-icon">🥽</div><div class="d30-desc">和朋友们在 VR 演唱会上</div></div>
+        <div class="d30-step"><div class="d30-time">22:00</div><div class="d30-icon">🌙</div><div class="d30-desc">AI 给你讲睡前故事</div></div>
+      </div>
+    </div>
+
+    <div class="fact-box">
+      ✨ 这离梦想并不遥远 — 大部分技术今天就已经有了！只是还需要普及。
+    </div>
+  </div>
+
+  <!-- ================= S12 — LV6 1/4 : ZATEN HAYATIMIZDA ================= -->
+  <div class="slide" id="s12">
+    <div class="level-banner">
+      <div class="level-badge">关卡 6</div>
+      <div class="level-title">早就在我们生活中了</div>
+      <div class="page-tag">第 1/4 页</div>
+    </div>
+    <div class="slide-sub">科技的未来其实早就开始了 — 你也在用呢！</div>
+
+    <div class="game-grid g4" style="max-width:1200px;">
+      <div class="holo-card game-card accent-cyan">
+        <div class="xp-tag">+8 XP</div>
+        <span class="gc-icon">🥽</span>
+        <div class="gc-title">虚拟现实（VR）</div>
+        <div class="gc-text">
+          戴上 VR 眼镜，你不用出门就能游览海底、太空
+          或者另一座城市。玩游戏时，你会感觉自己就在
+          游戏里面一样。
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-green">
+        <div class="xp-tag">+10 XP</div>
+        <span class="gc-icon">⌚</span>
+        <div class="gc-title">智能物品</div>
+        <div class="gc-text">
+          智能手表会测量你的心跳，关注你的健康。智能电视
+          会为你推荐内容。智能灯光可以用声音来控制。
+          手机、手表、冰箱 — 每一样都能连在一起，互相控制。
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-warm">
+        <div class="xp-tag">+10 XP</div>
+        <span class="gc-icon">🌱</span>
+        <div class="gc-title">绿色能源</div>
+        <div class="gc-text">
+          你见过屋顶上的太阳能板、田野里的风力发电机吗？
+          它们用阳光和风来发电。不像石油那样会用完，
+          也不会污染空气。
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-pink">
+        <div class="xp-tag">+12 XP</div>
+        <span class="gc-icon">🧬</span>
+        <div class="gc-title">基因治疗</div>
+        <div class="gc-text">
+          科学家们学会了修复有病的基因。
+          有些种类的癌症和遗传病现在已经能治疗了。
+          一种叫 "CRISPR" 的特殊技术，能像剪刀一样剪开基因，
+          再把正确的那段贴上去。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S13 — LV6 2/4 : DÜNYADA YENİ TEKNOLOJİLER ================= -->
+  <div class="slide" id="s13">
+    <div class="level-banner">
+      <div class="level-badge">关卡 6</div>
+      <div class="level-title">世界上的新科技</div>
+      <div class="page-tag">第 2/4 页</div>
+    </div>
+    <div class="slide-sub">有些国家已经开始使用了 — 在全世界普及可能还需要一些时间。</div>
+
+    <div class="game-grid g4" style="max-width:1200px;">
+      <div class="holo-card game-card accent-cyan">
+        <div class="xp-tag">+8 XP</div>
+        <span class="gc-icon">🕶️</span>
+        <div class="gc-title">AR 眼镜</div>
+        <div class="gc-text">
+          这种特殊的眼镜现在已经在卖了。走在街上时，
+          你能看到商店上方显示的信息；上历史课时看着课本，
+          就能看到图片像活了一样动起来。
+          数字信息被叠加在真实世界上面。
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-purple">
+        <div class="xp-tag">+10 XP</div>
+        <span class="gc-icon">🚗</span>
+        <div class="gc-title">无人驾驶汽车</div>
+        <div class="gc-text">
+          在美国的一些城市，已经有不需要司机的出租车在运营了。
+          靠着摄像头和传感器，它能看见红绿灯，
+          注意到行人，安全地停车。
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-pink">
+        <div class="xp-tag">+10 XP</div>
+        <span class="gc-icon">🤖</span>
+        <div class="gc-title">家用机器人</div>
+        <div class="gc-text">
+          扫地机器人已经在很多家庭里使用了。
+          而能收拾碗筷、叠衣服、摆桌子的人形机器人，
+          正在世界各地接受测试 — 不久后也许就会
+          走进我们的家里。
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-yellow">
+        <div class="xp-tag">+12 XP</div>
+        <span class="gc-icon">🧠</span>
+        <div class="gc-title">思想的互联网</div>
+        <div class="gc-text">
+          科学家们把一块像米粒一样小的芯片，植入了一位
+          病人的大脑。这块芯片能读取大脑里的信号 —
+          病人只靠思考就能在电脑上玩游戏。
+          这个领域的研究还在继续。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S14 — LV6 3/4 : UZAK GELECEK ================= -->
+  <div class="slide" id="s14">
+    <div class="level-banner">
+      <div class="level-badge">关卡 6</div>
+      <div class="level-title">遥远的未来</div>
+      <div class="page-tag">第 3/4 页</div>
+    </div>
+    <div class="slide-sub">15 到 25 年内可能走进我们生活的厉害科技</div>
+
+    <div class="game-grid g4" style="max-width:1200px;">
+      <div class="holo-card game-card accent-pink">
+        <div class="xp-tag">+8 XP</div>
+        <span class="gc-icon">⚛️</span>
+        <div class="gc-title">量子计算机</div>
+        <div class="gc-text">
+          普通电脑要算好几年的题目，它能在几秒钟内解出来。
+          它能提前 1 个月准确预测天气，还能发现新的药物。
+          现在它只存在于实验室里，要在非常冷的房间里
+          才能工作。
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-warm">
+        <div class="xp-tag">+10 XP</div>
+        <span class="gc-icon">🛰️</span>
+        <div class="gc-title">太空经济</div>
+        <div class="gc-text">
+          在太空里太阳永远不落 — 24 小时都有阳光，
+          一片云都没有。人类正把巨大的太阳能板送上太空：
+          它们在那里收集的电会被送回地球。
+          电脑服务器也可以搬到太空。因为太空非常冷，
+          就不用花电去给服务器降温了。
+          视频、游戏、人工智能的服务器，
+          将来都会在太空里运行！
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-yellow">
+        <div class="xp-tag">+10 XP</div>
+        <span class="gc-icon">🦾</span>
+        <div class="gc-title">仿生身体</div>
+        <div class="gc-text">
+          因为事故而无法使用手臂的人，现在可以装上机械手臂了。
+          这只手臂能感知大脑传来的信号：当你想着 "抬起来"，
+          它就会抬起来。指尖上有传感器 —
+          它能感觉到碰到的东西是热的还是冷的！
+          科学家也在为失去视力的人研发仿生眼睛。
+          将来，障碍会更容易被克服。
+        </div>
+      </div>
+
+      <div class="holo-card game-card accent-green">
+        <div class="xp-tag">+12 XP</div>
+        <span class="gc-icon">🔥</span>
+        <div class="gc-title">核聚变能源</div>
+        <div class="gc-text">
+          太阳内部发生的事，正在一个冰冷的世界里被复制：
+          原子结合在一起，结果释放出巨大的能量。
+          科学家们正在学习如何在地球上做到这一点。
+          如果成功了 — 就会有无限、清洁的能源。
+          一种永远不污染、永远用不完的电！
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S15 — LV6 4/4 : SCİFİ & TÜRKİYE ================= -->
+  <div class="slide" id="s15">
+    <div class="level-banner">
+      <div class="level-badge">关卡 6</div>
+      <div class="level-title">从科幻变成现实 <svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:32px;height:22px;vertical-align:middle;margin-left:10px;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.2);"><rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.5" cy="10" r="4" fill="#E30A17"/><polygon fill="#fff" points="17.6,10 21.1,8.86 18.94,11.83 18.94,8.17 21.1,11.14"/></svg></div>
+      <div class="page-tag">第 4/4 页</div>
+    </div>
+    <div class="slide-sub">曾经只是电影里的剧情 — 现在已经在我们生活中了！</div>
+
+    <div class="scifi-flow">
+      <div class="sf-col real">
+        <h4>✅ 过去的科幻 → 今天的现实</h4>
+        <ul>
+          <li><strong>视频通话</strong>（《星际迷航》1966）→ Zoom 📹</li>
+          <li><strong>平板电脑</strong>（《2001 太空漫游》1968）→ iPad 📱</li>
+          <li><strong>语音控制</strong> → Siri/Alexa 🎤</li>
+          <li><strong>手机</strong>（《星际迷航》）→ 人人口袋里都有 📞</li>
+        </ul>
+      </div>
+      <div class="sf-col fic">
+        <h4>🔮 仍然是科幻</h4>
+        <ul>
+          <li>✨ <strong>瞬间移动</strong> — 传送原子</li>
+          <li>⏰ <strong>时间旅行</strong> — 去过去或未来</li>
+          <li>🦸 <strong>超能力</strong> — 飞行、隐身</li>
+          <li>🪐 <strong>前往其他星系旅行</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tr-tech">
+      <div class="tr-tech-card"><div class="trt-emoji">🚗</div><div class="trt-name">TOGG</div><div class="trt-sub">国产电动汽车</div></div>
+      <div class="tr-tech-card"><div class="trt-emoji">🚁</div><div class="trt-name">TB2 BAYRAKTAR</div><div class="trt-sub">举世闻名的无人机</div></div>
+      <div class="tr-tech-card"><div class="trt-emoji">🚢</div><div class="trt-name">MİLGEM</div><div class="trt-sub">国产海军舰艇</div></div>
+      <div class="tr-tech-card"><div class="trt-emoji">🚀</div><div class="trt-name">ROKETSAN</div><div class="trt-sub">国产太空与火箭技术</div></div>
+      <div class="tr-tech-card"><div class="trt-emoji">🛰️</div><div class="trt-name">TÜRKSAT</div><div class="trt-sub">土耳其卫星在太空里！</div></div>
+    </div>
+  </div>
+
+  <!-- ================= S16 — LV7 1/3 : 6 MESLEK ================= -->
+  <div class="slide" id="s16">
+    <div class="level-banner">
+      <div class="level-badge">关卡 7</div>
+      <div class="level-title">未来的职业</div>
+      <div class="page-tag">第 1/3 页</div>
+    </div>
+    <div class="slide-sub">选择你的角色！长大后你会走哪条路？</div>
+
+    <div class="career-rpg">
+      <div class="holo-card crpg accent-green">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🤖</div>
+        <div class="c-class">人工智能工程师</div>
+        <div class="c-routine">一天：训练 AI 模型，写代码，分析数据。</div>
+        <div class="c-role-model">★ Demis Hassabis（DeepMind）</div>
+      </div>
+      <div class="holo-card crpg accent-purple">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🥽</div>
+        <div class="c-class">元宇宙建筑师</div>
+        <div class="c-routine">一天：设计 3D 世界，建造虚拟城市。</div>
+        <div class="c-role-model">★ Palmer Luckey（Oculus）</div>
+      </div>
+      <div class="holo-card crpg accent-pink">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🧬</div>
+        <div class="c-class">基因工程师</div>
+        <div class="c-routine">一天：研究 DNA，开发疾病的治疗方法。</div>
+        <div class="c-role-model">★ Jennifer Doudna（CRISPR）</div>
+      </div>
+      <div class="holo-card crpg accent-warm">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🌍</div>
+        <div class="c-class">气候技术专家</div>
+        <div class="c-routine">一天：开发绿色科技，减少二氧化碳。</div>
+        <div class="c-role-model">★ Boyan Slat（Ocean Cleanup）</div>
+      </div>
+      <div class="holo-card crpg accent-cyan">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🚀</div>
+        <div class="c-class">航天工程师</div>
+        <div class="c-routine">一天：设计火箭，规划太空任务。</div>
+        <div class="c-role-model">★ Elon Musk（SpaceX）</div>
+      </div>
+      <div class="holo-card crpg accent-yellow">
+        <div class="c-level">LV.???</div>
+        <div class="c-icon">🛡️</div>
+        <div class="c-class">网络安全英雄</div>
+        <div class="c-routine">一天：阻挡网络危险，保护信息安全。</div>
+        <div class="c-role-model">★ Bruce Schneier（网络安全专家）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S17 — LV7 2/3 : TR YILDIZLARI ================= -->
+  <div class="slide" id="s17">
+    <div class="level-banner">
+      <div class="level-badge">关卡 7</div>
+      <div class="level-title"><svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:32px;height:22px;vertical-align:middle;margin-right:10px;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.2);"><rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.5" cy="10" r="4" fill="#E30A17"/><polygon fill="#fff" points="17.6,10 21.1,8.86 18.94,11.83 18.94,8.17 21.1,11.14"/></svg>土耳其科技之星</div>
+      <div class="page-tag">第 2/3 页</div>
+    </div>
+    <div class="slide-sub">你也能走上这条路！这些土耳其英雄会给你带来灵感：</div>
+
+    <div class="people-row">
+      <div class="person-card">
+        <div class="person-icon">👨‍🔬</div>
+        <div>
+          <div class="person-name">奥克塔伊·西南奥卢 (Oktay Sinanoğlu)</div>
+          <div class="person-role">理论化学天才</div>
+          <div class="person-do">
+            他 22 岁就完成了博士学位，28 岁成为耶鲁大学的
+            教授 — 是获得这个头衔最年轻的人。
+            他为化学带来了新的理论，
+            激励了许多土耳其科学家。
+          </div>
+        </div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-icon">📡</div>
+        <div>
+          <div class="person-name">埃尔达尔·阿勒坎 (Erdal Arıkan)</div>
+          <div class="person-role">5G 的发明者</div>
+          <div class="person-do">
+            他是 Bilkent 大学的教授。他发现的一种叫 "极化码" 的
+            数学方法，今天在全世界所有 5G 手机里运行着。
+            如果你的手机能快速连上网，
+            其中也有他的一份功劳！
+          </div>
+        </div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-icon">🌌</div>
+        <div>
+          <div class="person-name">费里亚尔·厄泽尔 (Feryal Özel)</div>
+          <div class="person-role">NASA 天体物理学家</div>
+          <div class="person-do">
+            她是历史上第一次拍下黑洞照片的国际团队中的
+            土耳其成员。她现在在 NASA 参与太空项目，
+            研究黑洞和中子星。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="extras-grid">
+      <div class="extras-col new-jobs" style="grid-column: 1 / -1;">
+        <div class="ext-title">🌟 不管你选哪种职业 — 科技都会陪在你身边！</div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:14px; margin-top:16px;">
+
+          <div style="background:rgba(0,200,255,0.08); border-left:3px solid #00c8ff; padding:12px 14px; border-radius:6px;">
+            <div style="font-weight:bold; margin-bottom:6px; color:#00c8ff;">🤖 给喜欢科技的人</div>
+            <div style="font-size:0.9rem; line-height:1.6;">
+              人工智能工程师 · 游戏设计师 · 网络安全专家 · 机器人工程师
+            </div>
+          </div>
+
+          <div style="background:rgba(255,100,150,0.08); border-left:3px solid #ff6496; padding:12px 14px; border-radius:6px;">
+            <div style="font-weight:bold; margin-bottom:6px; color:#ff6496;">🩺 给喜欢生命的人</div>
+            <div style="font-size:0.9rem; line-height:1.6;">
+              兽医 🐾 · 医生 · 心理学家 · 生物医学工程师 · 遗传学专家
+            </div>
+          </div>
+
+          <div style="background:rgba(200,100,255,0.08); border-left:3px solid #c864ff; padding:12px 14px; border-radius:6px;">
+            <div style="font-weight:bold; margin-bottom:6px; color:#c864ff;">🎨 给喜欢创造的人</div>
+            <div style="font-size:0.9rem; line-height:1.6;">
+              数字艺术家 · UX 设计师 · 内容创作者 · 游戏美术师 · 建筑师
+            </div>
+          </div>
+
+          <div style="background:rgba(100,230,100,0.08); border-left:3px solid #64e664; padding:12px 14px; border-radius:6px;">
+            <div style="font-weight:bold; margin-bottom:6px; color:#64e664;">🌱 给喜欢大自然的人</div>
+            <div style="font-size:0.9rem; line-height:1.6;">
+              可持续发展专家 · 绿色建筑师 · 气候分析师 · 林业工程师 · 生态学家
+            </div>
+          </div>
+
+          <div style="background:rgba(255,200,50,0.08); border-left:3px solid #ffc832; padding:12px 14px; border-radius:6px; grid-column: span 2;">
+            <div style="font-weight:bold; margin-bottom:6px; color:#ffc832;">📚 给喜欢语言和与人打交道的人</div>
+            <div style="font-size:0.9rem; line-height:1.6;">
+              老师 · 科技记者 · 网络法律师 · 数字伦理专家 · 翻译
+            </div>
+          </div>
+
+        </div>
+
+        <div style="text-align:center; margin-top:20px; font-style:italic; opacity:0.9; font-size:1.05rem;">
+          💫 不管你想成为什么 — 科技都会让那份职业更精彩、
+          更有力量。最重要的是：保持好奇，多问问题，
+          一直热爱学习！
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S18 — LV7 3/3 : SEN DE BAŞLA ================= -->
+  <div class="slide" id="s18">
+    <div class="level-banner">
+      <div class="level-badge">关卡 7</div>
+      <div class="level-title">你今天就可以开始！</div>
+      <div class="page-tag">第 3/3 页</div>
+    </div>
+    <div class="slide-sub">这不是大人才能做的事 — 你从今天起就可以开始准备！</div>
+
+    <div class="extras-grid">
+      <div class="extras-col study">
+        <div class="ext-title">📚 从今天起我该学什么？</div>
+        <ul>
+          <li>🔢 <strong>数学</strong> — 一切的基础</li>
+          <li>💻 <strong>编程</strong> — 先学 Scratch，再学 Python（免费！）</li>
+          <li>🗣️ <strong>英语</strong> — 科技的语言</li>
+          <li>🎨 <strong>创造力</strong> — 画画、音乐、写作</li>
+          <li>🤔 <strong>好奇心</strong> — 别停止问 "为什么？"</li>
+        </ul>
+      </div>
+
+      <div class="career-quiz">
+        <div class="cq-title">🎯 小测验 — 哪种职业适合你？</div>
+        <div class="cq-question" id="cqQ">选出最适合你的：</div>
+        <div class="cq-options" id="cqOpts">
+          <button class="cq-opt" onclick="cqPick('🤖 人工智能工程师')">🧩 我喜欢解谜</button>
+          <button class="cq-opt" onclick="cqPick('🥽 元宇宙建筑师')">🎨 画画和做设计很有意思</button>
+          <button class="cq-opt" onclick="cqPick('🧬 基因工程师')">🔬 我对生命很好奇</button>
+          <button class="cq-opt" onclick="cqPick('🚀 航天工程师')">🌌 我喜欢仰望天空</button>
+        </div>
+        <div class="cq-result" id="cqRes"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S19 — LV8 1/6 : DOPAMIN ================= -->
+  <div class="slide" id="s19">
+    <div class="level-banner">
+      <div class="level-badge mint-badge">关卡 8</div>
+      <div class="level-title mint-title">🧠 为什么放下手机这么难？</div>
+      <div class="page-tag">第 1/6 页</div>
+    </div>
+    <div class="slide-sub">这不是你的错 — 这和你的大脑是怎么工作的有关！</div>
+
+    <div class="smart-full">
+      <div class="sf-head">
+        <div class="sf-emo">🧠</div>
+        <h3>大脑里到底发生了什么？</h3>
+      </div>
+      <div class="sf-text">
+        你的大脑里有一种叫 <strong style="color:var(--primary)">多巴胺</strong> 的
+        快乐化学物质。当有好事发生时，大脑会分泌多巴胺，
+        你就会说 "啊，我喜欢这个！"。
+        <br><br>
+        以前要获得多巴胺，得去 <strong>采水果</strong>、
+        <strong>玩游戏</strong>、<strong>交朋友</strong>。
+        这要花时间，也需要一点努力。
+        <br><br>
+        现在呢？你刷着 TikTok，每 10 秒就有一个新视频。每看一个新视频，
+        大脑就给你一点点多巴胺。大脑说：
+        <em>"哇，这太容易了！继续！"</em>
+        <br><br>
+        这就是为什么放下手机这么难。屏幕让你的大脑习惯了
+        <strong>非常快速的快乐</strong>。
+      </div>
+
+      <div style="margin-top:24px; padding:16px; background:rgba(255,100,100,0.08); border-left:3px solid #ff6464; border-radius:6px;">
+        <div style="font-weight:bold; color:#ff6464; margin-bottom:8px;">⚠️ 问题在于：</div>
+        <div style="line-height:1.7;">
+          当大脑习惯了快速的多巴胺，那些 <strong>慢节奏的事</strong>
+          （学习、读书、运动）就开始变得无聊起来。
+          因为它们给多巴胺给得很慢。
+        </div>
+      </div>
+
+      <div style="margin-top:16px; padding:16px; background:rgba(100,230,100,0.08); border-left:3px solid #64e664; border-radius:6px;">
+        <div style="font-weight:bold; color:#64e664; margin-bottom:8px;">🎯 解决办法：12 分钟法则</div>
+        <div style="line-height:1.7;">
+          就算一件事让你觉得无聊（作业、读书、运动）— 也只要先
+          试 <strong>12 分钟</strong>。过了头 12 分钟，你的大脑就会开始
+          <em>"咦，其实还挺不错的嘛"</em>。多巴胺来得慢，
+          但来得扎实！
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S20 — LV8 2/6 : BEYİN ŞEKİLLENİYOR ================= -->
+  <div class="slide" id="s20">
+    <div class="level-banner">
+      <div class="level-badge mint-badge">关卡 8</div>
+      <div class="level-title mint-title">🧩 大脑会被什么塑造？</div>
+      <div class="page-tag">第 2/6 页</div>
+    </div>
+    <div class="slide-sub">你做什么，你的大脑就会朝那个方向变强。</div>
+
+    <div class="smart-full">
+
+      <!-- ANA PRENSIP -->
+      <div class="sf-head">
+        <div class="sf-emo">🧠</div>
+        <h3>大脑就像肌肉一样</h3>
+      </div>
+      <div class="sf-text">
+        你的大脑里有 <strong>860 亿个细胞</strong>。这些细胞通过细细的通路彼此相连。一件事你做得越多，用来做这件事的通路就变得越 <strong>粗、越强</strong>。
+        <br><br>
+        学骑自行车时你会觉得难，会摔倒。后来你的大脑加强了 "骑车通路"，你就能不假思索地骑了。乘法口诀、国际象棋、乐器、外语 — 全都是同样的道理。
+        <br><br>
+        结论是：<strong>你做什么，大脑就会被塑造成什么样。</strong> 那么你在做什么呢？这才是真正重要的问题。
+      </div>
+
+      <!-- YAPAY ZEKA ÖRNEĞİ -->
+      <div style="margin-top:24px; padding:18px; background:rgba(0,207,255,0.08); border-left:4px solid var(--info); border-radius:8px; line-height:1.7;">
+        <div style="font-weight:bold; margin-bottom:10px; font-size:1.05rem; color:var(--info);">🤖 例子：用人工智能做作业</div>
+        <div>
+          假设老师布置了一个作业：<em>"写出阿塔图尔克生平中的 3 件重要事情。"</em>
+          <br><br>
+          <strong>🟢 方法 1 — 动脑思考：</strong>你打开书。读一读。在脑海里想象这些事情。你会思考 "哪一件更重要？"。作业花了 20 分钟，但你大脑的 <strong>思考通路变强了。</strong> 一个星期后你还记得那些事情。
+          <br><br>
+          <strong>🔴 方法 2 — 去问人工智能：</strong>你把问题打给 AI 工具，5 秒钟就有了答案。你复制、粘贴，作业就做完了。可是你的大脑 <strong>完全没有动过。</strong> 第二天如果有人问你是哪 3 件事，你会想不起来。
+          <br><br>
+          两种方法都能得到正确答案。但一种让你变强，另一种让人工智能变强。
+        </div>
+      </div>
+
+      <!-- İKİ YÖNLÜ KARŞILAŞTIRMA -->
+      <div class="ai-split" style="margin-top:24px;">
+
+        <!-- SOL: ÇOK İNTERNET/EKRAN -->
+        <div class="smart-full" style="max-width:none; background:rgba(255,49,49,0.05); border-color:rgba(255,49,49,0.3);">
+          <div class="sf-head">
+            <div class="sf-emo" style="background:rgba(255,49,49,0.15); border-radius:12px; padding:4px 8px;">📱</div>
+            <h3 style="color:var(--red);">如果你用太多互联网/屏幕</h3>
+          </div>
+          <div class="sf-text">
+            科学家们用 MRI 仪器研究了孩子们的大脑。在每天屏幕时间超过 7 小时的孩子身上，他们发现了以下一些迹象：
+          </div>
+          <ul class="sf-list">
+            <li style="border-left-color: var(--red);">🧠 负责深度思考的区域（皮层）被发现变薄了。</li>
+            <li style="border-left-color: var(--red);">📖 阅读和语言区域之间的连接被发现变弱了。</li>
+            <li style="border-left-color: var(--red);">⏱️ 长时间专注变得更难了；因为大脑习惯了短视频。</li>
+            <li style="border-left-color: var(--red);">💭 想象力在减弱；因为屏幕把每一幅画面都现成地呈现出来了。</li>
+            <li style="border-left-color: var(--red);">🤖 在习惯了 AI 工具的孩子身上，独立思考的能力被发现变弱了。</li>
+            <li style="border-left-color: var(--red);">😴 蓝光会打乱睡眠规律，大脑因为睡眠不足而无法充分地自我修复。</li>
+          </ul>
+          <div style="margin-top:12px; padding:10px; background:rgba(255,49,49,0.1); border-radius:6px; font-size:0.9rem; font-style:italic;">
+            大脑会被 "按照屏幕" 塑造 — 习惯一种又快、又浅、又依赖现成答案的思考方式。
+          </div>
+        </div>
+
+        <!-- SAĞ: EL BECERİLERİ -->
+        <div class="smart-full" style="max-width:none; background:rgba(57,255,20,0.05); border-color:rgba(57,255,20,0.3);">
+          <div class="sf-head">
+            <div class="sf-emo" style="background:rgba(57,255,20,0.15); border-radius:12px; padding:4px 8px;">✋</div>
+            <h3 style="color:var(--success);">如果你多用你的双手</h3>
+          </div>
+          <div class="sf-text">
+            一个有趣的事实：<strong>你的双手会训练你的大脑。</strong> 手指上的神经连着大脑最大的一块区域。所以每一项需要动手的活动都会让大脑变强：
+          </div>
+          <ul class="sf-list">
+            <li style="border-left-color: var(--success);">🧱 <strong>乐高、拼图：</strong>空间思维、规划和耐心</li>
+            <li style="border-left-color: var(--success);">✏️ <strong>画画、上色：</strong>想象力和精细的协调能力</li>
+            <li style="border-left-color: var(--success);">🎹 <strong>乐器：</strong>两只手 + 看谱 + 节奏 — 大脑的所有区域同时工作</li>
+            <li style="border-left-color: var(--success);">🥧 <strong>做饭、揉面团：</strong>顺序、分量和触觉记忆</li>
+            <li style="border-left-color: var(--success);">📚 <strong>读书：</strong>故事在脑海里活起来 — 大脑自己搭建出场景</li>
+            <li style="border-left-color: var(--success);">⚽ <strong>运动、跳舞：</strong>身体与大脑的协调，以及冲动控制</li>
+            <li style="border-left-color: var(--success);">🪡 <strong>折纸、手工：</strong>专注、精细动作和耐心</li>
+          </ul>
+          <div style="margin-top:12px; padding:10px; background:rgba(57,255,20,0.1); border-radius:6px; font-size:0.9rem; font-style:italic;">
+            大脑会被 "按照真实生活" 塑造 — 获得一种深入、灵活又富有创造力的思考方式。
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ZEKİ OLMAK NEDİR? -->
+      <div style="margin-top:24px; padding:18px; background:rgba(168,85,247,0.08); border-left:4px solid var(--purple); border-radius:8px; line-height:1.7;">
+        <div style="font-weight:bold; margin-bottom:10px; font-size:1.05rem; color:var(--purple);">🌟 聪明到底是什么？</div>
+        <div>
+          聪明不是 "什么都知道"。因为现在人工智能也什么都知道。
+          <br><br>
+          真正的聪明是：<strong>问出对的问题、在事物之间建立联系、创造新东西、把大问题拆成小块、并且耐心地努力。</strong> 这些都是人工智能做不到的事 — 而且只有通过 <strong>使用你自己的大脑</strong> 才能进步。
+          <br><br>
+          人工智能是一个帮手。但你要先自己思考，然后再去问它。如果不思考就马上去提问，落在后面的就会是你。
+        </div>
+      </div>
+
+      <!-- KAPANIŞ -->
+      <div style="margin-top:20px; padding:18px; background:rgba(255,230,0,0.08); border:1px solid rgba(255,230,0,0.3); border-radius:10px; text-align:center; line-height:1.7;">
+        <div style="font-weight:bold; margin-bottom:10px; font-size:1.1rem; color:var(--primary);">💡 结论：科技不是敌人 — 需要的是平衡</div>
+        <div>
+          手机、人工智能、互联网 — 它们都是很棒的工具。但光靠它们并不能让你变强。甚至如果用得太多，还会削弱你的能力。
+          <br><br>
+          重要的是这一点：<strong>用屏幕，但也别忘了你的双手。</strong> 做作业，但先自己想一想。提问题，但先自己查一查。只有这样，你的大脑才会变强。
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= S21 — LV8 3/6 : EKRAN SÜRESİ ================= -->
+  <div class="slide" id="s21">
+    <div class="level-banner">
+      <div class="level-badge mint-badge">关卡 8</div>
+      <div class="level-title mint-title">⏰ 屏幕时间的平衡</div>
+      <div class="page-tag">第 3/6 页</div>
+    </div>
+    <div class="slide-sub">科技很棒 — 但你的眼睛和睡眠也很重要！</div>
+
+    <div class="smart-full">
+      <div class="sf-head"><div class="sf-emo">⏰</div><h3>多少小时才合适？</h3></div>
+      <div class="sf-text">健康专家建议 9 到 10 岁的孩子，每天用于娱乐的屏幕时间 <strong style="color:var(--primary)">最多 2 小时</strong>（不包括作业和学习）。</div>
+      <ul class="sf-list">
+        <li>🌙 <strong>睡前 1 小时关掉屏幕</strong> — 蓝光会扰乱你的睡眠！</li>
+        <li>👁 <strong>20-20-20 法则：</strong>每隔 20 分钟，朝 6 米外看 20 秒 — 让眼睛休息一下！</li>
+        <li>🏃 每隔 30 分钟站起来，活动 2 到 3 分钟</li>
+      </ul>
+      <div class="screen-slider-wrap">
+        <div class="sslider-label">📱 你每天的屏幕时间是几个小时？</div>
+        <div class="sslider-row">
+          <input type="range" class="sslider" id="screenSlider" min="0" max="8" step="0.5" value="2">
+          <div class="sslider-val" id="screenVal">2 小时</div>
+        </div>
+        <div class="sslider-msg" id="screenMsg" style="color:var(--success)">✅ 太棒了！你正好在理想范围里。</div>
+      </div>
+
+      <div style="margin-top:28px; padding:18px; background:rgba(0,200,255,0.05); border:1px solid rgba(0,200,255,0.25); border-radius:10px;">
+        <div style="font-weight:bold; color:#00c8ff; margin-bottom:14px; font-size:1.05rem; text-align:center;">
+          📅 健康的一天是怎么度过的？
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
+
+          <div style="padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:6px;">
+            <div style="font-weight:bold; color:var(--primary); margin-bottom:4px;">🌙 睡眠</div>
+            <div style="font-size:0.9rem; line-height:1.5;">
+              9 到 10 岁需要 <strong>9 到 11 小时</strong> 睡眠。
+              睡前 <strong>1 小时</strong> 关掉屏幕！
+            </div>
+          </div>
+
+          <div style="padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:6px;">
+            <div style="font-weight:bold; color:#ffc832; margin-bottom:4px;">📚 上学 + 作业</div>
+            <div style="font-size:0.9rem; line-height:1.5;">
+              上学约 6 小时。做作业要 <strong>1 到 2 小时</strong>
+              专注的时间。这段时间里手机放远一点！
+            </div>
+          </div>
+
+          <div style="padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:6px;">
+            <div style="font-weight:bold; color:#64e664; margin-bottom:4px;">🏃 运动</div>
+            <div style="font-size:0.9rem; line-height:1.5;">
+              每天至少 <strong>1 小时</strong> 体育活动。
+              公园、骑车、打球、跳舞 — 什么都行！
+            </div>
+          </div>
+
+          <div style="padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:6px;">
+            <div style="font-weight:bold; color:#ff6496; margin-bottom:4px;">👨‍👩‍👧 家人 + 朋友</div>
+            <div style="font-size:0.9rem; line-height:1.5;">
+              吃饭、聊天、玩耍 — 每天 <strong>1 到 2 小时</strong>
+              不看屏幕、一起度过的时间。
+            </div>
+          </div>
+
+          <div style="padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:6px;">
+            <div style="font-weight:bold; color:#c864ff; margin-bottom:4px;">📱 娱乐屏幕</div>
+            <div style="font-size:0.9rem; line-height:1.5;">
+              用于娱乐最多 <strong>2 小时</strong>
+              （TikTok、YouTube、游戏）。中间多休息一下！
+            </div>
+          </div>
+
+          <div style="padding:10px 12px; background:rgba(255,255,255,0.03); border-radius:6px;">
+            <div style="font-weight:bold; color:#00ffc8; margin-bottom:4px;">🎨 兴趣爱好 + 阅读</div>
+            <div style="font-size:0.9rem; line-height:1.5;">
+              画画、音乐、读书、乐器 — 每天
+              <strong>30 分钟到 1 小时</strong> 创造性的时间。
+            </div>
+          </div>
+
+        </div>
+
+        <div style="margin-top:14px; text-align:center; font-size:0.9rem; opacity:0.85; font-style:italic;">
+          这只是一个建议。每个人的一天都不一样 — 但平衡很重要。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S22 — LV8 4/6 : GÜVENLİ İNTERNET ================= -->
+  <div class="slide" id="s22">
+    <div class="level-banner">
+      <div class="level-badge mint-badge">关卡 8</div>
+      <div class="level-title mint-title">🛡 安全上网</div>
+      <div class="page-tag">第 4/6 页</div>
+    </div>
+    <div class="slide-sub">你的信息很宝贵 — 学会保护它们。</div>
+
+    <div class="smart-full">
+      <div class="sf-head"><div class="sf-emo">🛡</div><h3>个人信息是你的秘密宝藏</h3></div>
+      <div class="sf-text"><strong style="color:var(--red)">绝对不要分享：</strong>你的全名 · 你的学校 · 家庭住址 · 电话号码 · 家庭照片 · 父母的工作信息</div>
+      <ul class="sf-list">
+        <li>💬 不要在网络游戏或聊天里和不认识的人说话</li>
+        <li>🚨 如果遇到让你不舒服的事 → <strong>立刻告诉家人/老师，不要藏着！</strong></li>
+        <li>☎️ 土耳其求助热线：<strong>155</strong>（警察）· <strong>183</strong>（社会援助）</li>
+        <li>🔗 收到可疑链接？点击之前先给家人看一看</li>
+      </ul>
+      <div class="pw-creator">
+        <div class="pw-lbl">🔐 试试设一个强密码（例如：KediM2024!seviyor）</div>
+        <input type="text" class="pw-input" id="pwInput" placeholder="试着输入密码……" maxlength="30">
+        <div class="pw-checks">
+          <div class="pw-check" id="pw-len">❔ 至少 8 个字符</div>
+          <div class="pw-check" id="pw-up">❔ 大写字母</div>
+          <div class="pw-check" id="pw-num">❔ 数字</div>
+          <div class="pw-check" id="pw-sym">❔ 符号 (! ? @)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S23 — LV8 5/6 : ÜRET-TÜKET + DİJİTAL ZEKA ================= -->
+  <div class="slide" id="s23">
+    <div class="level-banner">
+      <div class="level-badge mint-badge">关卡 8</div>
+      <div class="level-title mint-title">🎯 创造-消费 + 数字智慧</div>
+      <div class="page-tag">第 5/6 页</div>
+    </div>
+    <div class="slide-sub">不要只做观看的人，要做动手的人！而且别相信你看到的每一样东西。</div>
+
+    <div class="ai-split">
+      <div class="smart-full" style="max-width:none;">
+        <div class="sf-head"><div class="sf-emo">🎯</div><h3>创造与消费的平衡</h3></div>
+        <div class="sf-text"><strong style="color:var(--warm)">被动消费：</strong>看 TikTok、刷视频。<strong style="color:var(--success)">主动创造：</strong>编程、拍视频、做游戏！</div>
+        <div class="sf-text" style="color: var(--primary); font-weight: 600;">只要你创造 20%，就值得消费 80%！</div>
+        <ul class="sf-list">
+          <li>💻 <strong>编程：</strong>Scratch、Code.org — 免费！</li>
+          <li>🎨 <strong>艺术：</strong>Canva、Procreate</li>
+          <li>🎬 <strong>视频：</strong>iMovie、CapCut</li>
+          <li>🎮 <strong>做游戏：</strong>Unity</li>
+        </ul>
+      </div>
+
+      <div class="smart-full" style="max-width:none;">
+        <div class="sf-head"><div class="sf-emo">🧠</div><h3>数字智慧 — 别相信你看到的！</h3></div>
+
+        <div class="sf-text">
+          你在网上看到一个视频：一位有名的演员在说一些奇怪的话。
+          是真的吗？<strong style="color:var(--red)">也许并不是。</strong>
+        </div>
+
+        <div style="margin-top:16px; padding:14px; background:rgba(255,100,100,0.1); border-left:3px solid #ff6464; border-radius:6px;">
+          <div style="font-weight:bold; color:#ff6464; margin-bottom:8px;">🎭 什么是深度伪造（Deepfake）？</div>
+          <div style="line-height:1.7; font-size:0.95rem;">
+            人工智能能模仿一个人的脸和声音。
+            这样就能做出视频，让那个人看起来像在说一些
+            他从没说过的话。这种东西叫 <strong>deepfake</strong> —
+            意思是 "深度伪造"。
+            <br><br>
+            例子：一段名人说 "把这笔钱寄过来，我让你赚回 10 倍" 的视频。
+            其实那位名人从没说过这话 —
+            是 AI 模仿了他的脸和声音。很多人因此上当受骗。
+          </div>
+        </div>
+
+        <div style="margin-top:12px; padding:14px; background:rgba(255,200,50,0.08); border-left:3px solid #ffc832; border-radius:6px;">
+          <div style="font-weight:bold; color:#ffc832; margin-bottom:8px;">🤖 AI 生成的图片也非常逼真</div>
+          <div style="line-height:1.7; font-size:0.95rem;">
+            你看到一张照片：一只巨大的章鱼缠住了一艘船。是真的吗？
+            不是 — 像 ChatGPT 或 Midjourney 这样的 AI，能在 5 秒内
+            生成这类图片。"照片 = 真实" 这条规则已经不成立了。
+          </div>
+        </div>
+
+        <ul class="sf-list" style="margin-top:16px;">
+          <li>🔍 <strong>3 个来源法则：</strong>看到一条信息，再到另外 2 到 3 个可信的地方核实一下（比如 BBC、NTV、TRT）</li>
+          <li>🎥 <strong>视频可疑吗？</strong>查一查那位名人的官方账号 — 如果那里没有发过，可能就是假的</li>
+          <li>👀 <strong>线索：</strong>脸上的光线奇怪吗？嘴型和说的话完全对得上吗？眼睛自然吗？</li>
+          <li>🚨 <strong>任何要钱、要密码、要信息</strong> 的消息都很可疑 — 问问家人！</li>
+          <li>🎭 社交媒体是每个人最美好的瞬间 — 不是真实的生活</li>
+          <li>❤️ 粉丝数量 ≠ 快乐</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= S24 — LV8 6/6 : 5 ALTIN KURAL ================= -->
+  <div class="slide" id="s24">
+    <div class="level-banner">
+      <div class="level-badge mint-badge">关卡 8</div>
+      <div class="level-title mint-title">💎 5 条黄金法则</div>
+      <div class="page-tag">第 6/6 页</div>
+    </div>
+    <div class="slide-sub">科技英雄的准则 — 一辈子都要记住！</div>
+
+    <div class="golden-rules">
+      <div class="gr-card">
+        <div class="gr-num">01</div>
+        <div class="gr-icon">⏰</div>
+        <div class="gr-title">编程一小时，<br>游戏一小时</div>
+        <div class="gr-desc">创造的时间别比消费的少！</div>
+      </div>
+      <div class="gr-card">
+        <div class="gr-num">02</div>
+        <div class="gr-icon">👁</div>
+        <div class="gr-title">2-2-2 法则</div>
+        <div class="gr-desc">每天最多 2 小时，每 20 分钟休息 20 秒，睡前 2 小时关掉。</div>
+      </div>
+      <div class="gr-card">
+        <div class="gr-num">03</div>
+        <div class="gr-icon">🔍</div>
+        <div class="gr-title">可以相信，<br>但要核实</div>
+        <div class="gr-desc">每条信息都查一查，不要相信不认识的人。</div>
+      </div>
+      <div class="gr-card">
+        <div class="gr-num">04</div>
+        <div class="gr-icon">🎨</div>
+        <div class="gr-title">创造、创作、<br>探索</div>
+        <div class="gr-desc">科技不是玩具，而是工作坊！</div>
+      </div>
+      <div class="gr-card">
+        <div class="gr-num">05</div>
+        <div class="gr-icon">🌳</div>
+        <div class="gr-title">走向<br>真实生活</div>
+        <div class="gr-desc">朋友、书本、大自然 — 屏幕只占生活的 10%！</div>
+      </div>
+    </div>
+
+    <button class="oath-btn" onclick="swearOath()">✋ 我郑重承诺 — 我是一名科技英雄！</button>
+  </div>
+
+  <!-- ================= S25 — VICTORY ================= -->
+  <div class="slide" id="s25">
+    <div id="confettiContainer"></div>
+    <div class="victory-screen">
+      <div class="victory-trophy">🏆</div>
+      <div class="victory-title">恭喜你！<br>通关啦！</div>
+      <div class="final-xp">🌟 总 XP：1000 / 1000 — 最高等级！</div>
+
+      <div class="achievement-row">
+        <div class="achievement"><div class="ach-icon">🌐</div><div class="ach-label">互联网<br>大师</div></div>
+        <div class="achievement"><div class="ach-icon">⚡</div><div class="ach-label">速度<br>冠军</div></div>
+        <div class="achievement"><div class="ach-icon">🤖</div><div class="ach-label">人工智能<br>探险家</div></div>
+        <div class="achievement"><div class="ach-icon">🚀</div><div class="ach-label">未来<br>建筑师</div></div>
+        <div class="achievement"><div class="ach-icon">🧭</div><div class="ach-label">聪明<br>使用者</div></div>
+      </div>
+
+      <div class="quote-row">
+        <div class="quote-card">"想象力比知识更重要。"<span class="quote-author">— 爱因斯坦</span></div>
+        <div class="quote-card">"追随你的内心和直觉。"<span class="quote-author">— 史蒂夫·乔布斯</span></div>
+        <div class="quote-card">"所谓的不可能，其实并非真的不可能。"<span class="quote-author">— 埃隆·马斯克</span></div>
+      </div>
+
+      <div class="final-cta" onclick="goToQuiz()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goToQuiz();}">🎯 接下来是测验 — 展示你的知识！</div>
+      <div style="font-size:clamp(13px, 1.5vw, 16px); color:rgba(255,255,255,0.65); max-width:800px; text-align:center; line-height:1.55; font-style:italic;">
+        "改变世界没有年龄限制。你从今天起就可以开始！"
+      </div>
+      <div class="press-start">按右方向键 (→) 进入测验</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- === KONTROLLER === -->
+<button class="arrow-btn arrow-left"  onclick="changeSlide(-1)">◀</button>
+<button class="arrow-btn arrow-right" onclick="changeSlide(1)">▶</button>
+<div class="bottom-nav" id="bottomNav"></div>
+
+<script>
+  // === Level yapısı: her levelın kaç sub-sayfası var ===
+  const levels = [
+    { label: 'START', pages: 1 },   // s1
+    { label: 'LV1',   pages: 2 },   // s2-s3
+    { label: 'LV2',   pages: 3 },   // s4-s6
+    { label: 'LV3',   pages: 2 },   // s7-s8 (6G eklendi)
+    { label: 'LV4',   pages: 1 },   // s9
+    { label: 'LV5',   pages: 2 },   // s10-s11
+    { label: 'LV6',   pages: 4 },   // s12-s15
+    { label: 'LV7',   pages: 3 },   // s16-s18
+    { label: 'LV8',   pages: 6 },   // s19-s24
+    { label: 'MAX',   pages: 1 }    // s25
+  ];
+  const TOTAL = levels.reduce((a, l) => a + l.pages, 0);  // 33
+  let current = 0;
+
+  // === Her slayt için kümülatif XP ===
+  // Her level toplam 100 XP, sub-sayfa sayısına bölünür
+  const slideXP = (() => {
+    const arr = [];
+    let totalXP = 0;
+    levels.forEach((lvl, li) => {
+      const perPage = (li === 0 || li === levels.length - 1) ? 0 : 100 / lvl.pages;
+      for (let p = 0; p < lvl.pages; p++) {
+        if (li === levels.length - 1) {
+          arr.push(1000);   // MAX
+        } else {
+          totalXP += perPage;
+          arr.push(Math.round(totalXP));
+        }
+      }
+    });
+    return arr;
+  })();
+
+  // === Slide → level/page bilgi ===
+  function getLevelInfo(slideIdx) {
+    let idx = slideIdx, startIdx = 0;
+    for (let i = 0; i < levels.length; i++) {
+      if (idx < levels[i].pages) {
+        return {
+          levelIdx: i,
+          pageIdx: idx,
+          pages: levels[i].pages,
+          label: levels[i].label,
+          firstSlide: startIdx,
+          lastSlide: startIdx + levels[i].pages - 1
+        };
+      }
+      idx -= levels[i].pages;
+      startIdx += levels[i].pages;
+    }
+  }
+
+  // === Pip tıklayınca o levelın ilk sub-sayfasına atla ===
+  function goToLevel(levelIdx) {
+    let slideIdx = 0;
+    for (let i = 0; i < levelIdx; i++) slideIdx += levels[i].pages;
+    goTo(slideIdx);
+  }
+
+  // === Alt nav (11 pip) ===
+  const bn = document.getElementById('bottomNav');
+  levels.forEach((lvl, i) => {
+    const pip = document.createElement('div');
+    pip.className = 'level-pip' + (i === 0 ? ' active' : '');
+    pip.textContent = lvl.label;
+
+    // Alt noktalar (sub-sayfa göstergesi)
+    if (lvl.pages > 1) {
+      const dots = document.createElement('div');
+      dots.className = 'pip-dots';
+      for (let p = 0; p < lvl.pages; p++) {
+        const d = document.createElement('div');
+        d.className = 'pip-dot' + (i === 0 && p === 0 ? ' cur' : '');
+        dots.appendChild(d);
+      }
+      pip.appendChild(dots);
+    }
+
+    pip.onclick = () => goToLevel(i);
+    bn.appendChild(pip);
+  });
+
+  function updateHUD(n) {
+    const info = getLevelInfo(n);
+    const xp  = slideXP[n];
+    const pct = (xp / 1000) * 100;
+    document.getElementById('xpFill').style.width = pct + '%';
+    document.getElementById('xpCount').textContent = xp + ' / 1000';
+    document.getElementById('hudLevel').textContent =
+      info.levelIdx === 0 ? 'START' :
+      info.levelIdx === levels.length - 1 ? 'MAX' :
+      'LV.' + info.levelIdx;
+    document.getElementById('hudPage').textContent = (info.pageIdx + 1) + '/' + info.pages;
+
+    // Rozet: b[levelIdx-1] o levelın SON sub-sayfasına ulaşıldığında açılır
+    for (let i = 0; i < 8; i++) {
+      const badge = document.getElementById('b' + i);
+      // b[i] = LV(i+1). LV(i+1)'in son slayt indeksi?
+      let lastSlideOfLevel = 0;
+      for (let lv = 0; lv <= i + 1; lv++) lastSlideOfLevel += levels[lv].pages;
+      lastSlideOfLevel -= 1;
+      if (n > lastSlideOfLevel) badge.classList.add('earned');
+      else badge.classList.remove('earned');
+    }
+  }
+
+  function goTo(n) {
+    document.getElementById('s' + (current + 1)).classList.remove('active');
+    current = Math.max(0, Math.min(TOTAL - 1, n));
+    document.getElementById('s' + (current + 1)).classList.add('active');
+
+    const currentInfo = getLevelInfo(current);
+
+    // Pip state
+    document.querySelectorAll('.level-pip').forEach((p, i) => {
+      p.classList.remove('active', 'done');
+      const pipDots = p.querySelectorAll('.pip-dot');
+      pipDots.forEach(d => d.classList.remove('cur'));
+
+      if (i < currentInfo.levelIdx) {
+        p.classList.add('done');
+        pipDots.forEach(d => d.classList.add('cur'));
+      } else if (i === currentInfo.levelIdx) {
+        p.classList.add('active');
+        if (pipDots[currentInfo.pageIdx]) pipDots[currentInfo.pageIdx].classList.add('cur');
+      }
+    });
+
+    updateHUD(current);
+    if (current === TOTAL - 1) spawnConfetti();
+
+    // İnfografikler: sayfaya her girildiğinde SIFIRDAN başlasın
+    if (current === 7) restartDlRace();   // LV3 2/2 - indirme yarisi (s8)
+  }
+
+  // İndirme yarışını (LV3 SAYFA 2/3) sıfırlayıp yeniden oynat
+  function restartDlRace() {
+    const race = document.querySelector('#s8 .dl-race');
+    if (!race) return;
+    // 1) running class'ı kaldır → animation-name: none → barlar 0'a döner
+    race.classList.remove('running');
+    // 2) Her bar için SADECE animation-name'i reset et (duration'ı SİLME!)
+    //    `f.style.animation` shorthand tüm longhand'leri silerdi — duration dahil.
+    //    `animationName` longhand ise yalnızca adı override eder, duration inline kalır.
+    const fills = race.querySelectorAll('.dl-fill');
+    fills.forEach(f => {
+      f.style.animationName = 'none';   // inline override: animasyon durgun
+      void f.offsetWidth;                // reflow
+      f.style.animationName = '';        // override kaldır, CSS devreye girer
+    });
+    // 3) running class'ı ekle → CSS'te animation-name: dlMove aktif → 0'dan başlar
+    requestAnimationFrame(() => requestAnimationFrame(() => race.classList.add('running')));
+  }
+
+  function changeSlide(d) { goTo(current + d); }
+
+  // iframe içinden parent'ı /quiz sayfasına yönlendir
+  function goToQuiz() {
+    try {
+      if (window.top && window.top !== window.self) {
+        window.top.location.href = '/quiz';
+      } else {
+        window.location.href = '/quiz';
+      }
+    } catch (e) {
+      // cross-origin koruması olursa yeni sekmede aç
+      window.open('/quiz', '_top');
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') changeSlide(1);
+    if (e.key === 'ArrowLeft') changeSlide(-1);
+  });
+
+  // === Yıldızlar ===
+  const starsContainer = document.getElementById('starsContainer');
+  for (let i = 0; i < 70; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 2.5 + 0.8;
+    star.style.cssText =
+      `width:${size}px;height:${size}px;left:${Math.random() * 100}%;top:${Math.random() * 100}%;` +
+      `animation-delay:${Math.random() * 3}s;animation-duration:${Math.random() * 2 + 1.5}s`;
+    starsContainer.appendChild(star);
+  }
+
+  // === Parçacıklar ===
+  const pc = document.getElementById('particles');
+  const particleColors = ['#00cfff', '#A855F7', '#39ff14', '#FF6B35', '#ffe600'];
+  for (let i = 0; i < 36; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 3 + 1;
+    const drift = (Math.random() - 0.5) * 220;
+    const color = particleColors[Math.floor(Math.random() * particleColors.length)];
+    p.style.cssText =
+      `width:${size}px;height:${size}px;left:${Math.random() * 100}%;background:${color};` +
+      `animation-duration:${Math.random() * 8 + 7}s;animation-delay:${Math.random() * 10}s;` +
+      `--drift:${drift}px;opacity:0.55;box-shadow:0 0 6px currentColor`;
+    pc.appendChild(p);
+  }
+
+  // === Canlı sayaçlar (kapak) ===
+  // Global ve Türkiye verileri (DataReportal & TÜİK 2025 referans, tahmini)
+  // rate = saniyede artış miktarı
+  const counters = [
+    // GLOBAL
+    { el: 'lc1', base: 5_200_000_000,    rate: 60_000     }, // Google araması
+    { el: 'lc2', base: 100_000_000_000,  rate: 1_157_000  }, // WhatsApp mesajı
+    { el: 'lc3', base: 1_000_000_000,    rate: 11_574     }, // YouTube saati
+    // TÜRKİYE — günlük değerler (75M, 2B, 45M)
+    { el: 'lc4', base: 75_000_000,       rate: 868        }, // 75M / 86400
+    { el: 'lc5', base: 2_000_000_000,    rate: 23_148     }, // 2B / 86400
+    { el: 'lc6', base: 45_000_000,       rate: 521        }  // 45M / 86400
+  ];
+  function fmt(n) {
+    if (n >= 1e8) return (n/1e8).toFixed(2) + ' 亿';
+    if (n >= 1e4) return (n/1e4).toFixed(1) + ' 万';
+    return Math.floor(n).toLocaleString('zh-CN');
+  }
+  counters.forEach(c => {
+    c.val = c.base + Math.random() * c.rate * 30;
+    const el = document.getElementById(c.el);
+    if (el) el.textContent = fmt(c.val);
+  });
+  setInterval(() => {
+    counters.forEach(c => {
+      c.val += c.rate / 2 + Math.random() * c.rate;
+      const el = document.getElementById(c.el);
+      if (el) el.textContent = fmt(c.val);
+    });
+  }, 500);
+
+  // === Ekran süresi slider (LV9 s1) ===
+  const ss = document.getElementById('screenSlider');
+  const sv = document.getElementById('screenVal');
+  const sm = document.getElementById('screenMsg');
+  if (ss) {
+    ss.addEventListener('input', () => {
+      const v = parseFloat(ss.value);
+      sv.textContent = v + ' 小时';
+      let msg, color;
+      if (v <= 1)      { msg = '🌿 太棒了！非常均衡。';                   color = 'var(--success)'; }
+      else if (v <= 2) { msg = '✅ 理想范围 — 对 9 到 10 岁最合适！';      color = 'var(--success)'; }
+      else if (v <= 4) { msg = '⚠️ 有点多了 — 该出去走走啦！';            color = 'var(--primary)'; }
+      else if (v <= 6) { msg = '🚨 注意！你的眼睛和睡眠会受影响。';        color = 'var(--warm)'; }
+      else             { msg = '🛑 太多了！赶快让屏幕休息一下！';          color = 'var(--red)'; }
+      sm.textContent = msg; sm.style.color = color;
+    });
+  }
+
+  // === Şifre kontrol (LV9 s2) ===
+  const pw = document.getElementById('pwInput');
+  if (pw) {
+    pw.addEventListener('input', () => {
+      const v = pw.value;
+      toggleCheck('pw-len', v.length >= 8, '至少 8 个字符');
+      toggleCheck('pw-up',  /[A-ZÇĞİÖŞÜ]/.test(v), '大写字母');
+      toggleCheck('pw-num', /[0-9]/.test(v), '数字');
+      toggleCheck('pw-sym', /[!?@#$%&*()_+\-=]/.test(v), '符号 (! ? @)');
+    });
+  }
+  function toggleCheck(id, ok, lbl) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (ok) { el.classList.add('ok'); el.textContent = '✅ ' + lbl; }
+    else    { el.classList.remove('ok'); el.textContent = '❔ ' + lbl; }
+  }
+
+  // === Meslek mini quiz (LV8 s3) ===
+  function cqPick(meslek) {
+    const r = document.getElementById('cqRes');
+    r.innerHTML = '🎯 <strong>推荐给你的方向：</strong> ' + meslek + ' — 你从今天起就可以开始！';
+    r.classList.add('show');
+  }
+
+  // === Söz verme (LV9 s4) ===
+  function swearOath() {
+    const container = document.createElement('div');
+    container.className = 'oath-stars';
+    document.body.appendChild(container);
+    const emojis = ['⭐','✨','🌟','💫','🎆'];
+    for (let i = 0; i < 30; i++) {
+      const s = document.createElement('div');
+      s.className = 'oath-star';
+      s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 200 + Math.random() * 300;
+      s.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+      s.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+      s.style.animationDelay = (Math.random() * 0.3) + 's';
+      container.appendChild(s);
+    }
+    setTimeout(() => container.remove(), 2000);
+  }
+
+  // === Konfetti (victory) ===
+  function spawnConfetti() {
+    const c = document.getElementById('confettiContainer');
+    if (!c) return;
+    c.innerHTML = '';
+    const colors = ['#ffe600','#FF6B35','#00cfff','#A855F7','#39ff14','#FF6B9D','#4ecdc4'];
+    for (let i = 0; i < 80; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      const isCircle = Math.random() > 0.5;
+      piece.style.cssText =
+        `left:${Math.random() * 100}%;top:-20px;background:${colors[Math.floor(Math.random() * colors.length)]};` +
+        `width:${Math.random() * 10 + 6}px;height:${Math.random() * 10 + 6}px;` +
+        `animation-duration:${Math.random() * 3 + 2.5}s;animation-delay:${Math.random() * 2}s;` +
+        `border-radius:${isCircle ? '50%' : '2px'}`;
+      c.appendChild(piece);
+    }
+  }
+
+  updateHUD(0);
+</script>
+</body>
+</html>
