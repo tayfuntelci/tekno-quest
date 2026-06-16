@@ -1,35 +1,39 @@
 'use client';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { questions, MatchPair, TOTAL_XP, Question } from '@/lib/questions-v2';
+import { MatchPair, Question } from '@/lib/questions-v2';
+import { Character, CharacterId, PowerUpId, BadgeEarnedInput } from '@/lib/game-data';
 import {
-  CHARACTERS, Character, CharacterId, PowerUpId,
-  getRank, getStreakInfo,
-  computeBadges,
-  getSpeedBonus,
-} from '@/lib/game-data';
+  getQuestions, getTotalXp, getCharacters,
+  getRank as getRankI18n, getStreakInfo as getStreakInfoI18n,
+  computeBadges as computeBadgesI18n, getSpeedBonus as getSpeedBonusI18n,
+  getSectionMeta as getSectionMetaI18n,
+} from '@/lib/quiz-data-i18n';
+import { Lang, UI, UIStrings, normalizeLang } from '@/lib/i18n';
 import { saveQuizResult } from '@/lib/supabase';
 
 // ============================================================
 // Quiz Oyunu — Teknoloji Quest (Arena Edition)
 // Akış: name → character → ready → playing → result
+// Çoklu dil: QuizApp en üstte ?lang'a göre ACTIVE_LANG'i ve veri
+// binding'lerini set eder; tüm alt bileşenler bunları okur
+// (lang oturum boyunca sabit olduğu için güvenli).
 // ============================================================
 
 type Stage = 'name' | 'character' | 'ready' | 'playing' | 'result';
 
-// ───── Bölüm Meta (soru.section string'ine göre renk/emoji) ─────
-const SECTION_META: Record<string, {
-  color: string; glow: string; emoji: string; name: string;
-}> = {
-  '🌐 İnternet Temelleri': { color: '#00cfff', glow: 'rgba(0,207,255,0.35)', emoji: '🌐', name: 'İNTERNET TEMELLERİ' },
-  '🇹🇷 Türkiye Turu':     { color: '#ff9f1c', glow: 'rgba(255,159,28,0.35)', emoji: '🇹🇷', name: 'TÜRKİYE TURU' },
-  '⚡ Hız Macerası':        { color: '#39ff14', glow: 'rgba(57,255,20,0.35)',  emoji: '⚡', name: 'HIZ MACERASI' },
-  '🤖 Yapay Zeka':         { color: '#c084fc', glow: 'rgba(192,132,252,0.35)', emoji: '🤖', name: 'YAPAY ZEKA' },
-  '🧭 Akıllı Kullanım':    { color: '#4ecdc4', glow: 'rgba(78,205,196,0.35)', emoji: '🧭', name: 'AKILLI KULLANIM' },
-};
-
-const getSectionMeta = (section: string) =>
-  SECTION_META[section] ?? SECTION_META['🌐 İnternet Temelleri'];
+// ── Render-kapsamlı dil durumu ──
+let ACTIVE_LANG: Lang = 'tr';
+let questions: Question[] = getQuestions('tr');
+let CHARACTERS: Character[] = getCharacters('tr');
+let TOTAL_XP: number = getTotalXp('tr');
+const tr = (): UIStrings => UI[ACTIVE_LANG];
+const getSectionMeta = (section: string) => getSectionMetaI18n(ACTIVE_LANG, section);
+const getRank = (xp: number) => getRankI18n(ACTIVE_LANG, xp);
+const getStreakInfo = (count: number) => getStreakInfoI18n(ACTIVE_LANG, count);
+const computeBadges = (s: BadgeEarnedInput) => computeBadgesI18n(ACTIVE_LANG, s);
+const getSpeedBonus = (ms: number) => getSpeedBonusI18n(ACTIVE_LANG, ms);
 
 // ════════════════════════ YARDIMCI BİLEŞENLER ════════════════════════
 
@@ -123,7 +127,7 @@ function BoardNode({
         }
       </div>
       {status === 'future' && <span className="node-lock">🔒</span>}
-      {status === 'current' && <div className="node-tap-hint">▼ TIKLA</div>}
+      {status === 'current' && <div className="node-tap-hint">{tr().tapHint}</div>}
       {status === 'done' && <div className="node-review-hint">👁️</div>}
     </div>
   );
@@ -137,7 +141,7 @@ function BoardTrophy({ reached }: { reached: boolean }) {
       style={{ left: `${TROPHY_POSITION.x}%`, top: `${TROPHY_POSITION.y}%` }}
     >
       <div className="trophy-inner">🏆</div>
-      <div className="trophy-label">ZAFER</div>
+      <div className="trophy-label">{tr().victoryShort}</div>
     </div>
   );
 }
@@ -232,9 +236,9 @@ function SectionChangeOverlay({
           <div className="so-emoji">{meta.emoji}</div>
         </div>
 
-        <div className="so-label">🔓 YENİ BÖLÜM AÇILDI</div>
+        <div className="so-label">{tr().newSectionUnlocked}</div>
         <div className="so-name">{meta.name}</div>
-        <div className="so-sub">Hazır mısın?</div>
+        <div className="so-sub">{tr().readyQuestion}</div>
       </div>
     </div>
   );
@@ -289,7 +293,7 @@ function StreakBanner({
 function RankUpBanner({ emoji, name }: { emoji: string; name: string }) {
   return (
     <div className="rank-up-banner">
-      <div className="ru-label">YENİ SEVİYE!</div>
+      <div className="ru-label">{tr().newLevel}</div>
       <div className="ru-emoji">{emoji}</div>
       <div className="ru-name">{name.toUpperCase()}</div>
     </div>
@@ -317,10 +321,10 @@ function ReviewModal({
   const meta = getSectionMeta(q.section);
 
   const statusBadge = record.wasSkipped
-    ? { bg: 'rgba(192,132,252,0.12)', border: 'rgba(192,132,252,0.5)', color: '#c084fc', text: '⏭️ Bu soruyu atladın' }
+    ? { bg: 'rgba(192,132,252,0.12)', border: 'rgba(192,132,252,0.5)', color: '#c084fc', text: tr().reviewSkipped }
     : record.wasCorrect
-    ? { bg: 'rgba(57,255,20,0.14)', border: 'rgba(57,255,20,0.5)', color: 'var(--success)', text: record.usedRetry ? '💪 İkinci denemede doğru!' : '✅ Doğru cevapladın' }
-    : { bg: 'rgba(255,68,68,0.14)', border: 'rgba(255,68,68,0.5)', color: 'var(--danger)', text: '❌ Yanlış cevapladın' };
+    ? { bg: 'rgba(57,255,20,0.14)', border: 'rgba(57,255,20,0.5)', color: 'var(--success)', text: record.usedRetry ? tr().reviewRetrySuccess : tr().reviewCorrect }
+    : { bg: 'rgba(255,68,68,0.14)', border: 'rgba(255,68,68,0.5)', color: 'var(--danger)', text: tr().reviewWrong };
 
   return (
     <div className="q-modal review-wrap" role="dialog" aria-modal="true" onClick={onClose}>
@@ -337,10 +341,10 @@ function ReviewModal({
         <div className="review-header">
           <div className="rh-icon">📜</div>
           <div className="rh-texts">
-            <div className="rh-small">GEÇMİŞ AŞAMA {questionIdx + 1} / {questions.length}</div>
-            <div className="rh-big">Bu soruda ne cevap verdim?</div>
+            <div className="rh-small">{tr().reviewPastStage} {questionIdx + 1} / {questions.length}</div>
+            <div className="rh-big">{tr().reviewQuestionTitle}</div>
           </div>
-          <button className="rh-close" onClick={onClose} aria-label="Kapat">✕</button>
+          <button className="rh-close" onClick={onClose} aria-label={tr().reviewClose}>✕</button>
         </div>
 
         {/* Section pill */}
@@ -371,7 +375,7 @@ function ReviewModal({
               borderColor: 'rgba(255,159,28,0.4)',
               color: 'var(--orange)',
             }}>
-              💪 İkinci Şans Kullandın
+              {tr().secondChanceUsed}
             </span>
           )}
         </div>
@@ -391,7 +395,7 @@ function ReviewModal({
             border: '1px solid rgba(0,207,255,0.3)',
           }}>
           <p className="text-sm font-bold mb-1" style={{ color: 'var(--info)' }}>
-            💡 Doğru Cevap & Açıklama
+            {tr().correctAnswerExplanation}
           </p>
           <p className="text-sm" style={{ color: 'var(--text)', lineHeight: 1.5 }}>
             {(q as any).explanation}
@@ -400,7 +404,7 @@ function ReviewModal({
 
         {/* Close */}
         <button className="btn-outline w-full mt-4" onClick={onClose} style={{ padding: '12px' }}>
-          ← HARİTAYA DÖN
+          {tr().backToMap}
         </button>
       </div>
     </div>
@@ -421,15 +425,15 @@ function ReviewAnswerView({ q, record }: { q: Question; record: AnswerRecordLite
           return (
             <div key={opt} className={cls}>
               <span className="ro-text">{opt}</span>
-              {isUser && <span className="ro-tag ro-tag-user">senin cevabın</span>}
-              {isCorrect && !isUser && <span className="ro-tag ro-tag-ok">doğru cevap</span>}
-              {isCorrect && isUser && <span className="ro-tag ro-tag-ok">✓ doğru</span>}
+              {isUser && <span className="ro-tag ro-tag-user">{tr().yourAnswer}</span>}
+              {isCorrect && !isUser && <span className="ro-tag ro-tag-ok">{tr().correctAnswer}</span>}
+              {isCorrect && isUser && <span className="ro-tag ro-tag-ok">{tr().correctTick}</span>}
             </div>
           );
         })}
         {record.wasSkipped && (
           <p className="text-xs text-center mt-2" style={{ color: 'var(--muted)', fontStyle: 'italic' }}>
-            ⏭️ Bu soruyu süper gücünle atladın — üstteki doğru cevaba dikkat!
+            {tr().skippedWithPower}
           </p>
         )}
       </div>
@@ -447,10 +451,10 @@ function ReviewAnswerView({ q, record }: { q: Question; record: AnswerRecordLite
           return (
             <div key={v} className={cls}>
               <span className="ro-big">{v === 'true' ? '✅' : '❌'}</span>
-              <span className="ro-label">{v === 'true' ? 'DOĞRU' : 'YANLIŞ'}</span>
-              {isUser && <span className="ro-tag ro-tag-user">senin cevabın</span>}
-              {isCorrect && !isUser && <span className="ro-tag ro-tag-ok">doğru cevap</span>}
-              {isCorrect && isUser && <span className="ro-tag ro-tag-ok">✓ doğru</span>}
+              <span className="ro-label">{v === 'true' ? tr().correctLabel : tr().wrongLabel}</span>
+              {isUser && <span className="ro-tag ro-tag-user">{tr().yourAnswer}</span>}
+              {isCorrect && !isUser && <span className="ro-tag ro-tag-ok">{tr().correctAnswer}</span>}
+              {isCorrect && isUser && <span className="ro-tag ro-tag-ok">{tr().correctTick}</span>}
             </div>
           );
         })}
@@ -461,7 +465,7 @@ function ReviewAnswerView({ q, record }: { q: Question; record: AnswerRecordLite
     return (
       <div className="space-y-2">
         <p className="text-xs mb-2 text-center font-game" style={{ color: 'var(--muted)', letterSpacing: '1.5px' }}>
-          DOĞRU EŞLEŞMELER
+          {tr().correctMatches}
         </p>
         {q.pairs.map(p => (
           <div key={p.left} className="review-match-row">
@@ -474,9 +478,7 @@ function ReviewAnswerView({ q, record }: { q: Question; record: AnswerRecordLite
           <p className="text-sm text-center mt-3 font-bold" style={{
             color: record.matchResult ? 'var(--success)' : 'var(--orange)',
           }}>
-            {record.matchResult
-              ? '🎉 Hepsini doğru eşleştirmiştin!'
-              : '😊 Hepsini doğru eşleştiremedin — şimdi öğrendin!'}
+            {record.matchResult ? tr().matchAllCorrect : tr().matchNotAll}
           </p>
         )}
       </div>
@@ -508,7 +510,7 @@ function NameStage({ onNext }: { onNext: (name: string) => void }) {
           TEKNOLOJİ QUEST
         </h2>
         <p className="text-sm mb-6" style={{ color: 'var(--muted)' }}>
-          İsmini yaz ve maceraya başla!
+          {tr().nameWriteStart}
         </p>
         <input
           className="w-full text-center text-xl font-bold rounded-lg px-4 py-4 mb-4 outline-none"
@@ -518,7 +520,7 @@ function NameStage({ onNext }: { onNext: (name: string) => void }) {
             color: 'var(--text)',
             fontFamily: 'Exo 2, sans-serif',
           }}
-          placeholder="Adın ne?"
+          placeholder={tr().quizNamePlaceholder}
           value={name}
           onChange={e => setName(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && name.trim() && onNext(name.trim())}
@@ -531,12 +533,12 @@ function NameStage({ onNext }: { onNext: (name: string) => void }) {
           disabled={!name.trim()}
           style={{ opacity: name.trim() ? 1 : 0.4, fontSize: '16px', padding: '14px' }}
         >
-          DEVAM →
+          {tr().continueArrow}
         </button>
         <div className="mt-6 flex justify-center gap-4 text-xs" style={{ color: 'var(--muted)' }}>
-          <span>📝 15 soru</span>
+          <span>📝 {tr().quizQuestionsCount}</span>
           <span>⭐ {TOTAL_XP}+ XP</span>
-          <span>🎯 4 kahraman</span>
+          <span>🎯 {tr().quizHeroes}</span>
         </div>
       </div>
     </div>
@@ -552,12 +554,12 @@ function CharacterStage({
     <div className="flex flex-col items-center justify-center min-h-screen px-4 py-8">
       <div className="w-full max-w-4xl animate-slide-up">
         <div className="text-center mb-6">
-          <p className="text-sm mb-1" style={{ color: 'var(--muted)' }}>Merhaba {name.toUpperCase()}! 👋</p>
+          <p className="text-sm mb-1" style={{ color: 'var(--muted)' }}>{tr().helloPrefix} {name.toUpperCase()}! 👋</p>
           <h2 className="font-game font-bold text-2xl neon-yellow" style={{ letterSpacing: '1.5px' }}>
-            SINIFINI SEÇ
+            {tr().chooseClass}
           </h2>
           <p className="text-xs mt-2" style={{ color: 'var(--muted)' }}>
-            Her sınıfın özel bir süper gücü var — sana uyanı seç!
+            {tr().chooseClassDesc}
           </p>
         </div>
 
@@ -590,7 +592,7 @@ function CharacterStage({
               boxShadow: `0 0 32px ${ch.glow}`,
             }}>
               <div className="text-center">
-                <p className="text-xs mb-1" style={{ color: 'var(--muted)', letterSpacing: '1px' }}>SÜPER GÜCÜN:</p>
+                <p className="text-xs mb-1" style={{ color: 'var(--muted)', letterSpacing: '1px' }}>{tr().quizYourPower}</p>
                 <p className="font-bold text-lg mb-1" style={{ color: ch.color }}>
                   {ch.powerEmoji} {ch.powerLabel}
                 </p>
@@ -603,14 +605,14 @@ function CharacterStage({
         })()}
 
         <div className="flex gap-3 justify-center">
-          <button className="btn-outline" onClick={onBack}>← Geri</button>
+          <button className="btn-outline" onClick={onBack}>{tr().backShort}</button>
           <button
             className="btn-primary"
             onClick={() => selected && onSelect(selected)}
             disabled={!selected}
             style={{ opacity: selected ? 1 : 0.4, fontSize: '16px', padding: '14px 32px' }}
           >
-            MACERA BAŞLASIN! 🚀
+            {tr().adventureBegins}
           </button>
         </div>
       </div>
@@ -637,8 +639,8 @@ function ReadyStage({
         </p>
         <div className="grid grid-cols-3 gap-2 mb-5">
           {[
-            { icon: '📝', label: '15 Soru' },
-            { icon: '🎯', label: '5 Bölüm' },
+            { icon: '📝', label: tr().quizQuestionsCountShort },
+            { icon: '🎯', label: tr().quizSections },
             { icon: '⭐', label: `${TOTAL_XP}+ XP` },
           ].map(c => (
             <div key={c.label} className="rounded-lg p-3"
@@ -651,20 +653,20 @@ function ReadyStage({
         <div className="text-left text-sm mb-5 p-4 rounded-lg"
           style={{ background: `${character.glow}`, border: `1px solid ${character.color}55` }}>
           <p className="font-bold mb-2" style={{ color: character.color }}>
-            {character.powerEmoji} Süper Gücün: {character.powerLabel}
+            {character.powerEmoji} {tr().yourPowerInline} {character.powerLabel}
           </p>
           <p className="text-xs" style={{ color: 'var(--text)' }}>
             {character.powerDesc}
           </p>
         </div>
         <div className="text-left text-xs mb-5 space-y-1" style={{ color: 'var(--muted)' }}>
-          <p>✨ Üst üste doğru cevap = <strong style={{ color: 'var(--info)' }}>Kombo bonusu</strong></p>
-          <p>⚡ Hızlı cevap = <strong style={{ color: 'var(--primary)' }}>Hız bonusu</strong></p>
-          <p>💪 Yanlışta panik yok — <strong style={{ color: 'var(--success)' }}>2. şans</strong> verilir</p>
+          <p>✨ {tr().comboHintPre}<strong style={{ color: 'var(--info)' }}>{tr().comboBonus}</strong></p>
+          <p>⚡ {tr().quizSpeedHint}<strong style={{ color: 'var(--primary)' }}>{tr().quizSpeedBonus}</strong></p>
+          <p>💪 {tr().quizRetryHint}<strong style={{ color: 'var(--success)' }}>{tr().quizSecondChance}</strong></p>
         </div>
         <button className="btn-primary w-full" onClick={onGo}
           style={{ fontSize: '16px', padding: '14px', background: character.color }}>
-          🚀 BAŞLA!
+          {tr().startExclaim}
         </button>
       </div>
     </div>
@@ -730,7 +732,7 @@ function TFCard({
             disabled={!!answered}
           >
             <span className="tf-big">{val === 'true' ? '✅' : '❌'}</span>
-            {val === 'true' ? 'DOĞRU' : 'YANLIŞ'}
+            {val === 'true' ? tr().correctLabel : tr().wrongLabel}
           </button>
         );
       })}
@@ -827,7 +829,7 @@ function MatchCard({
     <div className="match-grid" style={{ position: 'relative' }}>
       {/* Sol sütun — drop hedefleri (sabit) */}
       <div className="match-col">
-        <p className="match-col-label">EŞLEŞTİR</p>
+        <p className="match-col-label">{tr().matchTarget}</p>
         {pairs.map(p => {
           const isMatched = !!matched[p.left];
           const isHover = hoverLeft === p.left;
@@ -842,7 +844,7 @@ function MatchCard({
               {isMatched ? (
                 <div className="match-paired">{matched[p.left]} ✓</div>
               ) : (
-                <div className="match-slot">{isHover ? 'BURAYA BIRAK' : '↘ buraya sürükle'}</div>
+                <div className="match-slot">{isHover ? tr().matchDropHere : tr().matchDropHint}</div>
               )}
             </div>
           );
@@ -851,7 +853,7 @@ function MatchCard({
 
       {/* Sağ sütun — sürüklenebilir kartlar */}
       <div className="match-col">
-        <p className="match-col-label">SÜRÜKLE</p>
+        <p className="match-col-label">{tr().matchDrag}</p>
         {shuffledRight.map(p => {
           const isMatched = Object.values(matched).includes(p.right);
           const isDragging = dragging?.right === p.right;
@@ -1177,9 +1179,9 @@ function PlayingStage({ character, onFinish }: PlayingProps) {
   };
   const powerLabel = (p: PowerUpId) => {
     if (p === 'fifty') return '50/50';
-    if (p === 'skip') return 'ATLA';
+    if (p === 'skip') return tr().powerSkip;
     if (p === 'double') return '2X XP';
-    return 'ŞANSLI';
+    return tr().powerLucky;
   };
 
   return (
@@ -1220,7 +1222,7 @@ function PlayingStage({ character, onFinish }: PlayingProps) {
               {character.emoji} {character.className.toUpperCase()}
             </div>
             <div className="hud-sub">
-              AŞAMA {idx + 1} / {questions.length} · {currentSection.emoji} {currentSection.name}
+              {tr().stage} {idx + 1} / {questions.length} · {currentSection.emoji} {currentSection.name}
             </div>
             <div className="progress-bar mt-2" style={{ maxWidth: 220 }}>
               <div className="progress-fill" style={{ width: `${progress}%` }} />
@@ -1276,7 +1278,7 @@ function PlayingStage({ character, onFinish }: PlayingProps) {
           <div className="powerbar-reminder" onClick={() => handleNodeAction(idx)}>
             <span className="pr-icon">⚡</span>
             <span className="pr-text">
-              {availablePowers.length} süper güç hazır · soruya gir!
+              {availablePowers.length} {tr().powersReadyMsg}
             </span>
           </div>
         )}
@@ -1298,10 +1300,10 @@ function PlayingStage({ character, onFinish }: PlayingProps) {
               <div className="q-gate-icon">🔒</div>
               <div className="q-gate-texts">
                 <div className="q-gate-small">
-                  AŞAMA {idx + 1} / {questions.length}
+                  {tr().stage} {idx + 1} / {questions.length}
                 </div>
                 <div className="q-gate-big" style={{ color: currentSection.color }}>
-                  Bu aşamayı geçmek için soruyu çöz!
+                  {tr().stagePassPrompt}
                 </div>
               </div>
             </div>
@@ -1325,7 +1327,7 @@ function PlayingStage({ character, onFinish }: PlayingProps) {
                 borderColor: 'rgba(0,207,255,0.3)',
                 color: 'var(--info)',
               }}>
-                {q.type === 'mcq' ? '📝 Çoktan Seçmeli' : q.type === 'tf' ? '⚡ Doğru / Yanlış' : '🔗 Eşleştirme'}
+                {q.type === 'mcq' ? tr().typeMcq : q.type === 'tf' ? tr().typeTf : tr().typeMatch}
               </span>
               <span className="xp-badge">+{q.xp} XP</span>
               {retryUsed && !answered && (
@@ -1334,7 +1336,7 @@ function PlayingStage({ character, onFinish }: PlayingProps) {
                   borderColor: 'rgba(255,159,28,0.4)',
                   color: 'var(--orange)',
                 }}>
-                  💪 İkinci Şans
+                  {tr().secondChanceBadge}
                 </span>
               )}
               {doubleXpActive && (
@@ -1343,7 +1345,7 @@ function PlayingStage({ character, onFinish }: PlayingProps) {
                   borderColor: 'rgba(255,230,0,0.5)',
                   color: 'var(--primary)',
                 }}>
-                  💎 2X XP Aktif
+                  {tr().doubleXpActive}
                 </span>
               )}
             </div>
@@ -1351,7 +1353,7 @@ function PlayingStage({ character, onFinish }: PlayingProps) {
             {/* Süper güç barı — SORU CEVAPLANMADAN önce kullanılabilir */}
             {availablePowers.length > 0 && !isAnswered && !showRetry && (
               <div className="modal-powerbar">
-                <div className="mp-label">⚡ SÜPER GÜÇ KULLAN</div>
+                <div className="mp-label">{tr().usePower}</div>
                 <div className="mp-slots">
                   {availablePowers.map(p => {
                     const disabled = p === 'fifty' && q.type !== 'mcq';
@@ -1361,7 +1363,7 @@ function PlayingStage({ character, onFinish }: PlayingProps) {
                         className="powerup-slot"
                         onClick={() => usePower(p)}
                         disabled={disabled}
-                        title={disabled ? 'Sadece çoktan seçmeli sorularda' : ''}
+                        title={disabled ? tr().powerOnlyMcq : ''}
                       >
                         <span className="pu-emoji">{powerEmoji(p)}</span>
                         <span>{powerLabel(p)}</span>
@@ -1396,10 +1398,10 @@ function PlayingStage({ character, onFinish }: PlayingProps) {
                   border: '1px solid rgba(255,159,28,0.4)',
                 }}>
                 <p className="text-sm font-bold mb-1" style={{ color: 'var(--orange)' }}>
-                  😊 Oops! Yakındı — İkinci bir şansın var!
+                  {tr().retryTitle}
                 </p>
                 <p className="text-xs" style={{ color: 'var(--muted)' }}>
-                  Düşün ve tekrar dene 💪
+                  {tr().retryDesc}
                 </p>
               </div>
             )}
@@ -1427,11 +1429,11 @@ function PlayingStage({ character, onFinish }: PlayingProps) {
                   }}>
                     {wasCorrect
                       ? (retrySuccessFlag && retryUsed
-                          ? `💪 Süpersin! İkinci denemede doğru — cesurluk işte bu!`
-                          : `🎉 Harika! +${q.xp} XP kazandın — roket ateşleniyor!`)
+                          ? tr().feedbackRetryWin
+                          : tr().feedbackCorrect.replace('{xp}', String(q.xp)))
                       : wasSkipped
-                      ? `⏭️ Bu soruyu atladın — bir sonrakinde gücünü göster!`
-                      : `😊 Doğrusu işte bu — şimdi öğrendin, bir sonraki senin olsun!`
+                      ? tr().feedbackSkipped
+                      : tr().feedbackWrong
                     }
                   </p>
                   <p className="text-sm" style={{ color: 'var(--muted)', lineHeight: 1.5 }}>
@@ -1439,9 +1441,7 @@ function PlayingStage({ character, onFinish }: PlayingProps) {
                   </p>
                 </div>
                 <button className="btn-primary w-full" onClick={goNext} style={{ fontSize: '16px', padding: '14px' }}>
-                  {idx + 1 >= questions.length
-                    ? '🏁 ZAFERE UÇ →'
-                    : `🚀 SONRAKİ GEZEGENE UÇ →`}
+                  {idx + 1 >= questions.length ? tr().flyToVictory : tr().nextPlanet}
                 </button>
               </div>
             )}
@@ -1485,10 +1485,10 @@ function ResultStage({
   });
 
   const encouragement =
-    pct === 100 ? 'İnanılmaz! Sen bir teknoloji efsanesisin! 🌟' :
-    pct >= 80 ? 'Harika iş çıkardın! Büyük bir kaşifsin!' :
-    pct >= 50 ? 'İyi gidiyorsun! Pes etme, her deneme seni güçlendirir!' :
-    'Maceran yeni başlıyor! Sunumu tekrar izle ve tekrar dene — başaracaksın!';
+    pct === 100 ? tr().resultPerfect :
+    pct >= 80 ? tr().resultGreat :
+    pct >= 50 ? tr().resultGood :
+    tr().resultStart;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
@@ -1520,28 +1520,28 @@ function ResultStage({
             </div>
             <div className="stat-card" style={{ ['--s-color' as any]: 'var(--primary)' }}>
               <div className="sc-num">{stats.correct}/{questions.length}</div>
-              <div className="sc-label">DOĞRU</div>
+              <div className="sc-label">{tr().statCorrect}</div>
             </div>
             <div className="stat-card" style={{ ['--s-color' as any]: 'var(--info)' }}>
               <div className="sc-num">%{pct}</div>
-              <div className="sc-label">BAŞARI</div>
+              <div className="sc-label">{tr().statSuccess}</div>
             </div>
             <div className="stat-card" style={{ ['--s-color' as any]: '#ff9f1c' }}>
               <div className="sc-num">{stats.bestStreak}</div>
-              <div className="sc-label">EN UZUN SERİ</div>
+              <div className="sc-label">{tr().statStreak}</div>
             </div>
             <div className="stat-card" style={{ ['--s-color' as any]: '#ff6b9d' }}>
               <div className="sc-num">
                 {stats.fastestMs !== null ? `${(stats.fastestMs / 1000).toFixed(1)}s` : '—'}
               </div>
-              <div className="sc-label">EN HIZLI</div>
+              <div className="sc-label">{tr().statFastest}</div>
             </div>
           </div>
 
           {badges.length > 0 && (
             <div className="mb-5">
               <p className="font-game text-xs mb-3" style={{ color: 'var(--muted)', letterSpacing: '1.5px' }}>
-                🏅 KAZANILAN ROZETLER ({badges.length})
+                {tr().badgesEarned} ({badges.length})
               </p>
               <div className="badge-grid">
                 {badges.map((b, i) => (
@@ -1560,17 +1560,17 @@ function ResultStage({
           )}
 
           <p className="text-xs mb-4" style={{ color: saved ? 'var(--success)' : 'var(--muted)' }}>
-            {saved ? '✅ Skor liderboard\'a kaydedildi!' : '⏳ Skor kaydediliyor...'}
+            {saved ? tr().scoreSaved : tr().scoreSaving}
           </p>
 
           <div className="space-y-3">
             <Link href="/liderboard" className="block">
               <button className="btn-primary w-full" style={{ fontSize: '16px', padding: '14px' }}>
-                🏆 LİDERBOARD'U GÖR
+                {tr().seeLeaderboard}
               </button>
             </Link>
             <Link href="/" className="block">
-              <button className="btn-outline w-full">← ANA SAYFAYA DÖN</button>
+              <button className="btn-outline w-full">{tr().backToHome}</button>
             </Link>
           </div>
         </div>
@@ -1581,7 +1581,14 @@ function ResultStage({
 
 // ════════════════════════ ANA QUIZ SAYFASI ════════════════════════
 
-export default function QuizPage() {
+function QuizApp() {
+  // ?lang'a göre dili ve veri binding'lerini set et (render başında, çocuklardan önce)
+  const params = useSearchParams();
+  ACTIVE_LANG = normalizeLang(params.get('lang'));
+  questions = getQuestions(ACTIVE_LANG);
+  CHARACTERS = getCharacters(ACTIVE_LANG);
+  TOTAL_XP = getTotalXp(ACTIVE_LANG);
+
   const [stage, setStage] = useState<Stage>('name');
   const [playerName, setPlayerName] = useState('');
   const [characterId, setCharacterId] = useState<CharacterId | null>(null);
@@ -1640,4 +1647,12 @@ export default function QuizPage() {
     return <ResultStage name={playerName} character={character} stats={finalStats} saved={saved} />;
   }
   return null;
+}
+
+export default function QuizPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <QuizApp />
+    </Suspense>
+  );
 }
